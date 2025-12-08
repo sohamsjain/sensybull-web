@@ -29,7 +29,7 @@ export default function DownloadCTA() {
 
           <p className="text-xl text-slate-300 mb-12 max-w-2xl mx-auto">
             Join thousands of investors who are staying ahead of the market 
-            with Sensybull's personalized financial insights.
+            with Sensybull&apos;s personalized financial insights.
           </p>
 
           {/* App Store Buttons */}

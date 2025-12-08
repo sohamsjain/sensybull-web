@@ -34,7 +34,7 @@ export default function Disclaimer() {
             <p className="text-slate-300 leading-relaxed mb-4">
               <strong>Sensybull provides financial news and information for educational purposes only.</strong> 
               This is not investment advice, financial advice, trading advice, or any other sort of advice. 
-              You should not treat any of the website's content as such.
+              You should not treat any of the website&apos;s content as such.
             </p>
             <p className="text-slate-300 leading-relaxed mb-4">
               Sensybull does not recommend that any securities should be bought, sold, or held by you. 

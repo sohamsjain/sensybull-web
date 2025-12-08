@@ -34,22 +34,22 @@ export default function PrivacyPolicy() {
           {/* Introduction */}
           <div className="mb-8 p-6 bg-slate-900/50 border border-slate-800 rounded-lg">
             <p className="text-slate-300 leading-relaxed mb-4">
-              Sensybull, LLC ("Company", "we", "us", or "our") is committed to maintaining robust 
+              Sensybull, LLC (&quot;Company&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;) is committed to maintaining robust 
               privacy protections for its users. Our Privacy Policy is designed to help you understand 
               how we collect, use and safeguard the information you provide to us and to assist you in 
               making informed decisions when using our Service.
             </p>
             <p className="text-slate-300 leading-relaxed mb-4">
-              For purposes of this Agreement, "Site" refers to the Company's website, which can be 
+              For purposes of this Agreement, &quot;Site&quot; refers to the Company&apos;s website, which can be 
               accessed at <strong>www.sensybull.com</strong> and through our mobile application.
             </p>
             <p className="text-slate-300 leading-relaxed mb-4">
-              "Service" refers to the Company's services accessed via the Site, in which users can 
+              &quot;Service&quot; refers to the Company&apos;s services accessed via the Site, in which users can 
               access personalized financial news, market insights, stock information, and investment 
               research tools.
             </p>
             <p className="text-slate-300 leading-relaxed mb-4">
-              The terms "we," "us," and "our" refer to the Company. "You" refers to you, as a user 
+              The terms &quot;we,&quot; &quot;us,&quot; and &quot;our&quot; refer to the Company. &quot;You&quot; refers to you, as a user 
               of our Site or our Service.
             </p>
             <p className="text-slate-300 leading-relaxed">
@@ -65,7 +65,7 @@ export default function PrivacyPolicy() {
             <h2 className="text-2xl font-bold mb-6 text-white">I. Information We Collect</h2>
             
             <p className="text-slate-300 leading-relaxed mb-4">
-              We collect "Non-Personal Information" and "Personal Information."
+              We collect &quot;Non-Personal Information&quot; and &quot;Personal Information.&quot;
             </p>
             
             <p className="text-slate-300 leading-relaxed mb-4">
@@ -91,15 +91,15 @@ export default function PrivacyPolicy() {
                 you may need to submit further Personal Information including your name and investment preferences. 
                 However, in an effort to improve the quality of the Service, we track information provided to us 
                 by your browser or by our software application when you view or use the Service, such as the 
-                website you came from (known as the "referring URL"), the type of browser you use, the device 
+                website you came from (known as the &quot;referring URL&quot;), the type of browser you use, the device 
                 from which you connected to the Service, the time and date of access, and other information that 
                 does not personally identify you.
               </p>
               <p className="text-slate-300 leading-relaxed mb-3">
                 We track this information using cookies, or small text files which include an anonymous unique 
-                identifier. Cookies are sent to a user's browser from our servers and are stored on the user's 
-                computer hard drive. Sending a cookie to a user's browser enables us to collect Non-Personal 
-                information about that user and keep a record of the user's preferences when utilizing our 
+                identifier. Cookies are sent to a user&apos;s browser from our servers and are stored on the user&apos;s 
+                computer hard drive. Sending a cookie to a user&apos;s browser enables us to collect Non-Personal 
+                information about that user and keep a record of the user&apos;s preferences when utilizing our 
                 services, both on an individual and aggregate basis.
               </p>
               <p className="text-slate-300 leading-relaxed mb-3">
@@ -136,7 +136,7 @@ export default function PrivacyPolicy() {
             {/* Subsection 3: Children's Privacy */}
             <div className="pl-6 border-l-2 border-slate-700">
               <h3 className="text-xl font-semibold mb-3 text-slate-200">
-                3. Children's Privacy
+                3. Children&apos;s Privacy
               </h3>
               <p className="text-slate-300 leading-relaxed">
                 The Site and the Service are not directed to anyone under the age of 18. The Site does not 
@@ -162,7 +162,7 @@ export default function PrivacyPolicy() {
                 Except as otherwise stated in this Privacy Policy, we do not sell, trade, rent or otherwise 
                 share for marketing purposes your Personal Information with third parties without your consent. 
                 We do share Personal Information with vendors who are performing services for the Company, such 
-                as the servers for our email communications who are provided access to user's email address for 
+                as the servers for our email communications who are provided access to user&apos;s email address for 
                 purposes of sending emails from us. Those vendors use your Personal Information only at our 
                 direction and in accordance with our Privacy Policy.
               </p>

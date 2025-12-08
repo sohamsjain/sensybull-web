@@ -37,14 +37,14 @@ export default function TermsOfService() {
           {/* Introduction */}
           <div className="mb-8 p-6 bg-slate-900/50 border border-slate-800 rounded-lg">
             <p className="text-slate-300 leading-relaxed">
-              The website located at <strong>www.sensybull.com</strong> (the "Site") is a copyrighted work 
-              belonging to Sensybull, LLC ("Company", "us", "our", and "we"). Certain features of the Site 
+              The website located at <strong>www.sensybull.com</strong> (the &quot;Site&quot;) is a copyrighted work 
+              belonging to Sensybull, LLC (&quot;Company&quot;, &quot;us&quot;, &quot;our&quot;, and &quot;we&quot;). Certain features of the Site 
               may be subject to additional guidelines, terms, or rules, which will be posted on the Site in 
               connection with such features. All such additional terms, guidelines, and rules are incorporated 
               by reference into these Terms.
             </p>
             <p className="text-slate-300 leading-relaxed mt-4">
-              These Terms of Use (these "Terms") set forth the legally binding terms and conditions that govern 
+              These Terms of Use (these &quot;Terms&quot;) set forth the legally binding terms and conditions that govern 
               your use of the Site. By accessing or using the Site, you are accepting these Terms (on behalf of 
               yourself or the entity that you represent), and you represent and warrant that you have the right, 
               authority, and capacity to enter into these Terms (on behalf of yourself or the entity that you 
@@ -81,7 +81,7 @@ export default function TermsOfService() {
             <div className="mb-6">
               <h3 className="text-xl font-semibold mb-3 text-slate-200">1.1 Account Creation</h3>
               <p className="text-slate-300 leading-relaxed">
-                In order to use certain features of the Site, you must register for an account ("Account") and 
+                In order to use certain features of the Site, you must register for an account (&quot;Account&quot;) and 
                 provide certain information about yourself as prompted by the account registration form. You 
                 represent and warrant that: (a) all required registration information you submit is truthful and 
                 accurate; (b) you will maintain the accuracy of such information. You may delete your Account at 
@@ -148,7 +148,7 @@ export default function TermsOfService() {
               <h3 className="text-xl font-semibold mb-3 text-slate-200">2.5 Ownership</h3>
               <p className="text-slate-300 leading-relaxed">
                 You acknowledge that all the intellectual property rights, including copyrights, patents, trade marks, and 
-                trade secrets, in the Site and its content are owned by Company or Company's suppliers. Neither these Terms 
+                trade secrets, in the Site and its content are owned by Company or Company&apos;s suppliers. Neither these Terms 
                 (nor your access to the Site) transfers to you or any third party any rights, title or interest in or to such 
                 intellectual property rights, except for the limited access rights expressly set forth in Section 2.1.
               </p>
@@ -157,7 +157,7 @@ export default function TermsOfService() {
             <div className="mb-6">
               <h3 className="text-xl font-semibold mb-3 text-slate-200">2.6 Feedback</h3>
               <p className="text-slate-300 leading-relaxed">
-                If you provide Company with any feedback or suggestions regarding the Site ("Feedback"), you hereby assign 
+                If you provide Company with any feedback or suggestions regarding the Site (&quot;Feedback&quot;), you hereby assign 
                 to Company all rights in such Feedback and agree that Company shall have the right to use and fully exploit 
                 such Feedback and related information in any manner it deems appropriate. Company will treat any Feedback you 
                 provide to Company as non-confidential and non-proprietary.
@@ -170,7 +170,7 @@ export default function TermsOfService() {
             <h2 className="text-2xl font-bold mb-6 text-white">3. Indemnification</h2>
             <p className="text-slate-300 leading-relaxed">
               You agree to indemnify and hold Company (and its officers, employees, and agents) harmless, including costs 
-              and attorneys' fees, from any claim or demand made by any third party due to or arising out of (a) your use 
+              and attorneys&apos; fees, from any claim or demand made by any third party due to or arising out of (a) your use 
               of the Site, (b) your violation of these Terms or (c) your violation of applicable laws or regulations. Company 
               reserves the right, at your expense, to assume the exclusive defense and control of any matter for which you are 
               required to indemnify us, and you agree to cooperate with our defense of these claims.
