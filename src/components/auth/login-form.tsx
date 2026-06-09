@@ -1,0 +1,78 @@
+"use client";
+
+import { useState } from "react";
+import { useAuth } from "@/hooks/use-auth";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import Link from "next/link";
+
+export function LoginForm() {
+  const { login } = useAuth();
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      await login(email, password);
+      router.push("/feed");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Login failed");
+    }
+    setLoading(false);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <Input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          className="bg-slate-900 border-slate-600 text-white placeholder:text-slate-500 focus-visible:border-slate-400 focus-visible:ring-0"
+        />
+      </div>
+      <div>
+        <Input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          minLength={6}
+          className="bg-slate-900 border-slate-600 text-white placeholder:text-slate-500 focus-visible:border-slate-400 focus-visible:ring-0"
+        />
+      </div>
+      {error && <p className="text-red-400 text-xs">{error}</p>}
+      <Button
+        type="submit"
+        disabled={loading}
+        className="w-full bg-blue-600 hover:bg-blue-500"
+      >
+        {loading ? "..." : "Sign In"}
+      </Button>
+      <div className="flex justify-between text-xs">
+        <Link
+          href="/register"
+          className="text-slate-400 hover:text-slate-200"
+        >
+          Create account
+        </Link>
+        <Link
+          href="/forgot-password"
+          className="text-slate-400 hover:text-slate-200"
+        >
+          Forgot password?
+        </Link>
+      </div>
+    </form>
+  );
+}
