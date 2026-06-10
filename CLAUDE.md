@@ -12,20 +12,24 @@
 - Watchlists: CRUD at `/watchlists/`, company management at `/watchlists/:id/companies`
 - Companies: `GET /companies/?q=...` (search by ticker or name), `GET /companies/search?q=` (typeahead)
 - Alerts: `GET/PUT /alerts/preferences`, `GET /alerts/notifications`, `GET /alerts/channels`
+- Chats: `GET /chats/` (inbox: watchlist companies + unread counts), `POST /chats/:companyId/read`, `PUT /chats/:companyId/mute`
 - WebSocket: Socket.IO namespace `/feed`, auth via `{token}` dict, events: `filing_event`, `connected`
 
 ## Project Structure
 - `src/types/` — API and event type definitions
 - `src/lib/` — API client (auto-refresh on 401), Socket.IO wrapper, utilities
-- `src/hooks/` — useAuth, useSocket, useEvents (REST+Socket merge), useWatchlists
+- `src/hooks/` — useAuth, useSocket, useEvents (REST+Socket merge), useWatchlists, useChats (inbox + live unread), useCompanyEvents (per-company history)
 - `src/context/` — AuthProvider (login/register/google/logout)
 - `src/components/ui/` — shadcn/ui primitives
 - `src/components/feed/` — FilingCard, FilingList, badges
+- `src/components/chat/` — WhatsApp-style chats: ChatList, ChatConversation, ChatMessage, ChatAvatar
 - `src/components/layout/` — TopBar, Sidebar, MobileNav
 - `src/components/watchlist/` — Watchlist CRUD components
 - `src/components/auth/` — Login/register/forgot-password forms
 - `src/app/(auth)/` — Auth pages (centered layout, no sidebar)
 - `src/app/(dashboard)/` — Dashboard pages (topbar + sidebar + main)
+  - `/chats` — default landing for signed-in users; two-pane chat UI (list + conversation), self-contained layout (no watchlist sidebar/feed filters)
+  - `/feed` — chronological all-events feed (public for guests)
 
 ## Related Projects
 - Backend API: ~/Projects/sensybull-api (Flask)

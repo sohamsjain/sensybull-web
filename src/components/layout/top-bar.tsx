@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
 import { api } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,7 @@ interface TopBarProps {
   search: string;
   onSearchChange: (value: string) => void;
   onMobileMenuToggle?: () => void;
+  showFilters?: boolean;
 }
 
 export function TopBar({
@@ -29,8 +31,10 @@ export function TopBar({
   search,
   onSearchChange,
   onMobileMenuToggle,
+  showFilters = true,
 }: TopBarProps) {
   const { user, logout } = useAuth();
+  const pathname = usePathname();
   const [eventTypes, setEventTypes] = useState<string[]>([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -91,10 +95,32 @@ export function TopBar({
         </button>
       )}
 
-      <h1 className="text-white font-bold text-lg mr-4">Sensybull</h1>
+      <h1 className="text-white font-bold text-lg mr-2">Sensybull</h1>
+
+      {/* Primary nav */}
+      {user && (
+        <nav className="flex items-center gap-1 mr-2">
+          {[
+            { href: "/chats", label: "Chats" },
+            { href: "/feed", label: "Feed" },
+          ].map(({ href, label }) => (
+            <Link
+              key={href}
+              href={href}
+              className={`px-2.5 py-1 rounded text-sm transition-colors ${
+                pathname?.startsWith(href)
+                  ? "bg-slate-700 text-white"
+                  : "text-slate-400 hover:text-white hover:bg-slate-800"
+              }`}
+            >
+              {label}
+            </Link>
+          ))}
+        </nav>
+      )}
 
       {/* Significance filter toggles */}
-      <div className="hidden sm:flex gap-1">
+      <div className={showFilters ? "hidden sm:flex gap-1" : "hidden"}>
         {SIGNIFICANCE_LEVELS.map((level) => (
           <button
             key={level}
@@ -111,7 +137,10 @@ export function TopBar({
       </div>
 
       {/* Event type filter dropdown */}
-      <div className="relative hidden sm:block" ref={dropdownRef}>
+      <div
+        className={showFilters ? "relative hidden sm:block" : "hidden"}
+        ref={dropdownRef}
+      >
         <button
           onClick={() => setDropdownOpen((prev) => !prev)}
           className={`flex px-3 py-1.5 rounded text-xs font-medium transition-colors items-center gap-1.5 ${
@@ -161,13 +190,15 @@ export function TopBar({
       </div>
 
       {/* Search */}
-      <Input
-        type="text"
-        placeholder="Search ticker or company..."
-        value={search}
-        onChange={(e) => onSearchChange(e.target.value)}
-        className="hidden sm:block flex-1 max-w-xs bg-slate-800 border-slate-700 text-sm text-slate-200 placeholder:text-slate-500 focus-visible:border-slate-500 focus-visible:ring-0"
-      />
+      {showFilters && (
+        <Input
+          type="text"
+          placeholder="Search ticker or company..."
+          value={search}
+          onChange={(e) => onSearchChange(e.target.value)}
+          className="hidden sm:block flex-1 max-w-xs bg-slate-800 border-slate-700 text-sm text-slate-200 placeholder:text-slate-500 focus-visible:border-slate-500 focus-visible:ring-0"
+        />
+      )}
 
       {/* Auth */}
       <div className="ml-auto flex items-center gap-3">

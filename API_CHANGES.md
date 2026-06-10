@@ -5,6 +5,34 @@ For full endpoint details, read the route files directly at `~/Projects/sensybul
 
 ---
 
+## 2026-06-10: Chat-style Watchlist Endpoints
+
+### New: GET /api/v1/chats/
+- Every company across the user's watchlists, presented as a chat inbox
+- Returns: `{ chats: [...], total_unread }` where each chat is
+  `{ company: {id, ticker, name, cik}, last_event, last_activity_at, unread_count, muted, last_read_at }`
+- `last_event` is a compact preview: `{ id, headline, significance, sentiment, primary_event_type, max_tier, signal_type, filing_date, received_at }`
+- Sorted server-side: unread chats first, then most recent activity
+- Unread = filing events received after `last_read_at` (no read state = full history)
+- Auth: JWT required
+
+### New: POST /api/v1/chats/:company_id/read
+- Marks the company's history as read (sets `last_read_at` to now)
+- Returns: `{ read_state: { company_id, last_read_at, muted } }`
+- 403 if company not on the user's watchlists
+
+### New: PUT /api/v1/chats/:company_id/mute
+- Body: `{ muted: boolean }` — mutes/unmutes alert delivery for one company
+- Muted companies are skipped by the alert dispatcher (all channels)
+- 403 if company not on the user's watchlists
+
+### Changed: POST /api/v1/watchlists/:id/companies
+- Adding a company now initializes its read state (`last_read_at = now`),
+  so pre-existing filing history doesn't show as unread for a fresh add.
+  Re-adding never resets existing read/mute state.
+
+---
+
 ## 2026-06-10: Company Search Improvements
 
 ### Changed: GET /api/v1/companies/
