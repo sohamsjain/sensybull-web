@@ -10,7 +10,8 @@
 - Auth: `POST /auth/login`, `/auth/register`, `/auth/google`, `/auth/refresh`, `GET /auth/me`
 - Events: `GET /events/` (auth, watchlist-filtered), `/events/all` (public), `/events/types`, `/events/catalysts`
 - Watchlists: CRUD at `/watchlists/`, company management at `/watchlists/:id/companies`
-- Companies: `GET /companies/?ticker=...`
+- Companies: `GET /companies/?q=...` (search by ticker or name), `GET /companies/search?q=` (typeahead)
+- Alerts: `GET/PUT /alerts/preferences`, `GET /alerts/notifications`, `GET /alerts/channels`
 - WebSocket: Socket.IO namespace `/feed`, auth via `{token}` dict, events: `filing_event`, `connected`
 
 ## Project Structure
@@ -25,6 +26,11 @@
 - `src/components/auth/` — Login/register/forgot-password forms
 - `src/app/(auth)/` — Auth pages (centered layout, no sidebar)
 - `src/app/(dashboard)/` — Dashboard pages (topbar + sidebar + main)
+
+## Related Projects
+- Backend API: ~/Projects/sensybull-api (Flask)
+- API changes log: see API_CHANGES.md in this repo
+- When unsure about an endpoint's shape, read the backend route file directly
 
 ## Conventions
 - Files: kebab-case. Exports: PascalCase for components, camelCase for hooks/utils
