@@ -181,6 +181,13 @@ export function TopBar({
             </button>
             {userMenuOpen && (
               <div className="absolute top-full right-0 mt-1 bg-slate-800 border border-slate-700 rounded-lg shadow-xl z-50 py-1 min-w-[120px]">
+                <Link
+                  href="/alerts"
+                  onClick={() => setUserMenuOpen(false)}
+                  className="block w-full text-left px-3 py-1.5 text-sm text-slate-300 hover:bg-slate-700 hover:text-white"
+                >
+                  Alerts
+                </Link>
                 <button
                   onClick={() => {
                     logout();

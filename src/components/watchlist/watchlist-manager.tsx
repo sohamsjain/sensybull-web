@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import type { Watchlist, Company, PaginatedCompanies } from "@/types/api";
+import type { Watchlist, CompanySearchResult, CompanySearchResponse } from "@/types/api";
 import { api } from "@/lib/api-client";
 
 interface WatchlistManagerProps {
@@ -22,7 +22,7 @@ export function WatchlistManager({
   onRefresh,
 }: WatchlistManagerProps) {
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<Company[]>([]);
+  const [results, setResults] = useState<CompanySearchResult[]>([]);
   const [searching, setSearching] = useState(false);
 
   useEffect(() => {
@@ -33,10 +33,10 @@ export function WatchlistManager({
     const timer = setTimeout(async () => {
       setSearching(true);
       try {
-        const data = await api<PaginatedCompanies>(
-          `/companies/?ticker=${encodeURIComponent(query.trim())}`
+        const data = await api<CompanySearchResponse>(
+          `/companies/search?q=${encodeURIComponent(query.trim())}&limit=10`
         );
-        setResults(data.companies || []);
+        setResults(data.results || []);
       } catch {}
       setSearching(false);
     }, 300);
@@ -91,7 +91,7 @@ export function WatchlistManager({
       {/* Search companies */}
       <input
         type="text"
-        placeholder="Search ticker..."
+        placeholder="Search ticker or company..."
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         className="w-full bg-slate-900 border border-slate-600 rounded px-2 py-1 text-xs text-white placeholder-slate-500 outline-none focus:border-slate-400"

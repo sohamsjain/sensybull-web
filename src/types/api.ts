@@ -75,6 +75,55 @@ export interface CatalystsResponse {
   >;
 }
 
+export interface CompanySearchResult {
+  id: string;
+  name: string;
+  ticker: string;
+}
+
+export interface CompanySearchResponse {
+  results: CompanySearchResult[];
+}
+
+export interface AlertPreferences {
+  id: string;
+  enabled: boolean;
+  max_tier: 1 | 2 | 3;
+  channels: Record<string, boolean>;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AlertPreferencesResponse {
+  preferences: AlertPreferences;
+}
+
+export interface AlertNotification {
+  id: string;
+  filing_event_id: string;
+  channel: string;
+  status: "pending" | "sent" | "failed";
+  error_message: string | null;
+  sent_at: string | null;
+  created_at: string;
+  filing_event: {
+    id: string;
+    ticker: string;
+    company_name: string;
+    max_tier: 1 | 2 | 3;
+    event_types: string[];
+    received_at: string;
+  };
+}
+
+export interface PaginatedNotifications extends PaginatedResponse<AlertNotification> {
+  notifications: AlertNotification[];
+}
+
+export interface AlertChannelsResponse {
+  channels: string[];
+}
+
 export interface ApiError {
   error: string;
   details?: Record<string, string>;
