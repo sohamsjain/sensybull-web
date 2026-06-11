@@ -4,6 +4,7 @@ import { useState, useCallback, createContext, useContext } from "react";
 import { usePathname } from "next/navigation";
 import type { Watchlist } from "@/types/api";
 import { TopBar } from "@/components/layout/top-bar";
+import { NavRail } from "@/components/layout/nav-rail";
 import { Sidebar } from "@/components/layout/sidebar";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { useAuth } from "@/hooks/use-auth";
@@ -70,28 +71,31 @@ export default function DashboardLayout({
     <DashboardContext.Provider
       value={{ significanceFilter, eventTypeFilter, search, selectedWatchlist }}
     >
-      <div className="h-screen flex flex-col bg-slate-900 text-slate-100">
-        <TopBar
-          significanceFilter={significanceFilter}
-          onSignificanceToggle={handleSignificanceToggle}
-          eventTypeFilter={eventTypeFilter}
-          onEventTypeToggle={handleEventTypeToggle}
-          onEventTypeClear={handleEventTypeClear}
-          search={search}
-          onSearchChange={setSearch}
-          onMobileMenuToggle={isChats ? undefined : () => setMobileNavOpen(true)}
-          showFilters={!isChats}
-        />
-        <div className="flex flex-1 overflow-hidden">
-          {user && !isChats && (
-            <div className="hidden md:block">
-              <Sidebar
-                selectedWatchlist={selectedWatchlist}
-                onSelectWatchlist={setSelectedWatchlist}
-              />
-            </div>
-          )}
-          <main className="flex-1 overflow-hidden">{children}</main>
+      <div className="h-screen flex bg-slate-900 text-slate-100">
+        <NavRail />
+        <div className="flex-1 flex flex-col min-w-0">
+          <TopBar
+            significanceFilter={significanceFilter}
+            onSignificanceToggle={handleSignificanceToggle}
+            eventTypeFilter={eventTypeFilter}
+            onEventTypeToggle={handleEventTypeToggle}
+            onEventTypeClear={handleEventTypeClear}
+            search={search}
+            onSearchChange={setSearch}
+            onMobileMenuToggle={isChats ? undefined : () => setMobileNavOpen(true)}
+            showFilters={!isChats}
+          />
+          <div className="flex flex-1 overflow-hidden">
+            {user && !isChats && (
+              <div className="hidden md:block">
+                <Sidebar
+                  selectedWatchlist={selectedWatchlist}
+                  onSelectWatchlist={setSelectedWatchlist}
+                />
+              </div>
+            )}
+            <main className="flex-1 overflow-hidden">{children}</main>
+          </div>
         </div>
         {user && !isChats && (
           <MobileNav

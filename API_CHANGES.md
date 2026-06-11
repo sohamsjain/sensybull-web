@@ -5,6 +5,30 @@ For full endpoint details, read the route files directly at `~/Projects/sensybul
 
 ---
 
+## 2026-06-11: Browser Web Push Channel
+
+### New channel: "push"
+- `GET /alerts/channels` now returns `["email", "push"]`; enable per user via
+  the existing `PUT /alerts/preferences` channels dict
+- Delivery payload: `{title, body, url, tag}` JSON; expired browser
+  subscriptions are pruned automatically
+
+### New: GET /api/v1/alerts/push/public-key
+- Returns `{ public_key }` (VAPID); null when push isn't configured server-side
+
+### New: POST /api/v1/alerts/push/subscriptions
+- Body: `{ endpoint, keys: { p256dh, auth } }` (PushSubscription.toJSON() shape)
+- Re-posting an existing endpoint re-claims it for the current user
+
+### New: DELETE /api/v1/alerts/push/subscriptions
+- Body: `{ endpoint }` — removes this browser's subscription
+
+### Server env required
+- `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, optional `VAPID_SUBJECT`
+  (generate with `npx web-push generate-vapid-keys`)
+
+---
+
 ## 2026-06-10: Chat-style Watchlist Endpoints
 
 ### New: GET /api/v1/chats/

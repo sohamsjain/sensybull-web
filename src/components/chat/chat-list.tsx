@@ -23,13 +23,14 @@ export function ChatList({
   onAddCompany,
 }: ChatListProps) {
   const [filter, setFilter] = useState("");
-  const [adding, setAdding] = useState(false);
   const [results, setResults] = useState<CompanySearchResult[]>([]);
   const [searching, setSearching] = useState(false);
+  const [addingId, setAddingId] = useState<string | null>(null);
 
-  // In add mode the same input searches all SEC companies (typeahead)
+  // One search box, two scopes: filters your chats locally and runs a
+  // typeahead over the whole SEC company universe in parallel.
   useEffect(() => {
-    const query = adding ? filter.trim() : "";
+    const query = filter.trim();
     const timer = setTimeout(
       async () => {
         if (!query) {
@@ -40,7 +41,7 @@ export function ChatList({
         setSearching(true);
         try {
           const data = await api<CompanySearchResponse>(
-            `/companies/search?q=${encodeURIComponent(query)}&limit=10`
+            `/companies/search?q=${encodeURIComponent(query)}&limit=8`
           );
           setResults(data.results || []);
         } catch {}
@@ -49,7 +50,7 @@ export function ChatList({
       query ? 300 : 0
     );
     return () => clearTimeout(timer);
-  }, [adding, filter]);
+  }, [filter]);
 
   // Keep the keyboard-selected chat visible in the list
   useEffect(() => {
@@ -60,22 +61,28 @@ export function ChatList({
   }, [activeCompanyId]);
 
   const existingIds = new Set(chats.map((c) => c.company.id));
-  const visible = filter.trim()
+  const query = filter.trim();
+  const matchingChats = query
     ? chats.filter((c) => {
-        const q = filter.trim().toLowerCase();
+        const q = query.toLowerCase();
         return (
           c.company.name.toLowerCase().includes(q) ||
           c.company.ticker?.toLowerCase().includes(q)
         );
       })
     : chats;
+  const newCompanies = results.filter((r) => !existingIds.has(r.id));
 
   const handleAdd = async (companyId: string) => {
-    setAdding(false);
-    setFilter("");
-    setResults([]);
-    await onAddCompany(companyId);
-    onSelect(companyId);
+    setAddingId(companyId);
+    try {
+      await onAddCompany(companyId);
+      setFilter("");
+      setResults([]);
+      onSelect(companyId);
+    } finally {
+      setAddingId(null);
+    }
   };
 
   return (
@@ -90,59 +97,18 @@ export function ChatList({
               title={connected ? "Live — connected to the filing feed" : "Connecting..."}
             />
           </h2>
-          <button
-            onClick={() => {
-              setAdding((a) => !a);
-              setFilter("");
-              setResults([]);
-            }}
-            className={`text-xs px-2 py-1 rounded transition-colors ${
-              adding
-                ? "bg-slate-700 text-slate-300"
-                : "bg-blue-600 hover:bg-blue-500 text-white"
-            }`}
-          >
-            {adding ? "Cancel" : "+ Add"}
-          </button>
         </div>
         <input
           id="chat-search"
           type="text"
-          placeholder={adding ? "Search any ticker or company..." : "Search your chats..."}
+          placeholder="Search or add a company..."
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          autoFocus={adding}
           className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-slate-200 placeholder:text-slate-500 outline-none focus:border-slate-500"
         />
       </div>
 
-      {/* Add-company results */}
-      {adding && (
-        <div className="px-3 pb-2 shrink-0">
-          {searching && <p className="text-slate-500 text-xs py-1">Searching...</p>}
-          {results
-            .filter((r) => !existingIds.has(r.id))
-            .map((r) => (
-              <button
-                key={r.id}
-                onClick={() => handleAdd(r.id)}
-                className="w-full text-left px-2 py-1.5 text-sm text-slate-300 hover:bg-slate-800 rounded flex items-baseline gap-2"
-              >
-                <span className="font-mono font-semibold text-slate-200">
-                  {r.ticker}
-                </span>
-                <span className="text-xs text-slate-500 truncate">{r.name}</span>
-              </button>
-            ))}
-          {!searching && filter.trim() && results.length === 0 && (
-            <p className="text-slate-500 text-xs py-1">
-              No SEC-registered companies match &ldquo;{filter.trim()}&rdquo;
-            </p>
-          )}
-        </div>
-      )}
-
-      {/* Chat list */}
+      {/* List */}
       <div className="flex-1 overflow-y-auto">
         {loading ? (
           <div className="space-y-0 animate-pulse">
@@ -156,7 +122,7 @@ export function ChatList({
               </div>
             ))}
           </div>
-        ) : chats.length === 0 ? (
+        ) : chats.length === 0 && !query ? (
           <div className="px-6 py-10 text-center">
             <p className="text-slate-300 text-sm font-medium mb-1">
               Track your first company
@@ -164,28 +130,63 @@ export function ChatList({
             <p className="text-slate-500 text-xs leading-relaxed">
               Each company gets its own chat. New SEC filings arrive as
               messages — decoded into plain English, seconds after they hit
-              EDGAR.
+              EDGAR. Search above to get started.
             </p>
-            <button
-              onClick={() => setAdding(true)}
-              className="mt-4 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs rounded"
-            >
-              + Add a company
-            </button>
           </div>
-        ) : visible.length === 0 && !adding ? (
-          <p className="px-6 py-8 text-center text-slate-500 text-xs">
-            No chats match &ldquo;{filter.trim()}&rdquo;
-          </p>
         ) : (
-          visible.map((chat) => (
-            <ChatListItem
-              key={chat.company.id}
-              chat={chat}
-              active={chat.company.id === activeCompanyId}
-              onSelect={() => onSelect(chat.company.id)}
-            />
-          ))
+          <>
+            {/* Your chats */}
+            {query && matchingChats.length > 0 && (
+              <p className="px-3 pt-2 pb-1 text-[11px] uppercase tracking-wide text-slate-500 font-medium">
+                Your chats
+              </p>
+            )}
+            {matchingChats.map((chat) => (
+              <ChatListItem
+                key={chat.company.id}
+                chat={chat}
+                active={chat.company.id === activeCompanyId}
+                onSelect={() => onSelect(chat.company.id)}
+              />
+            ))}
+
+            {/* Companies you can start tracking */}
+            {query && (
+              <>
+                <p className="px-3 pt-3 pb-1 text-[11px] uppercase tracking-wide text-slate-500 font-medium">
+                  Companies
+                </p>
+                {newCompanies.map((r) => (
+                  <button
+                    key={r.id}
+                    onClick={() => handleAdd(r.id)}
+                    disabled={addingId !== null}
+                    className="w-full flex items-center justify-between gap-2 px-3 py-2.5 text-left hover:bg-slate-800/60 transition-colors disabled:opacity-50"
+                  >
+                    <span className="flex items-baseline gap-2 min-w-0">
+                      <span className="font-mono font-semibold text-slate-200 text-sm">
+                        {r.ticker}
+                      </span>
+                      <span className="text-xs text-slate-500 truncate">
+                        {r.name}
+                      </span>
+                    </span>
+                    <span className="text-[11px] text-blue-400 shrink-0">
+                      {addingId === r.id ? "Adding..." : "+ Track"}
+                    </span>
+                  </button>
+                ))}
+                {searching && (
+                  <p className="px-3 py-1.5 text-slate-500 text-xs">Searching…</p>
+                )}
+                {!searching && newCompanies.length === 0 && (
+                  <p className="px-3 py-1.5 text-slate-600 text-xs">
+                    No other SEC-registered companies match &ldquo;{query}&rdquo;
+                  </p>
+                )}
+              </>
+            )}
+          </>
         )}
       </div>
     </div>

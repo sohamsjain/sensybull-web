@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { useAlertPreferences, useAlertChannels } from "@/hooks/use-alerts";
+import { pushSupported, enablePush, disablePush } from "@/lib/push";
 
 const TIER_LABELS: Record<number, string> = {
   1: "High priority only",
@@ -8,9 +10,41 @@ const TIER_LABELS: Record<number, string> = {
   3: "All priorities",
 };
 
+const CHANNEL_LABELS: Record<string, string> = {
+  email: "Email",
+  push: "Browser push",
+};
+
 export function AlertPreferencesPanel() {
   const { preferences, loading, saving, update } = useAlertPreferences();
   const channels = useAlertChannels();
+  const [pushError, setPushError] = useState<string | null>(null);
+  const [pushBusy, setPushBusy] = useState(false);
+
+  const toggleChannel = async (channel: string) => {
+    if (!preferences) return;
+    const turningOn = !preferences.channels[channel];
+
+    if (channel === "push") {
+      setPushError(null);
+      setPushBusy(true);
+      try {
+        if (turningOn) await enablePush();
+        else await disablePush();
+      } catch (err) {
+        setPushError(
+          err instanceof Error ? err.message : "Couldn't enable push notifications."
+        );
+        setPushBusy(false);
+        return;
+      }
+      setPushBusy(false);
+    }
+
+    update({
+      channels: { ...preferences.channels, [channel]: turningOn },
+    });
+  };
 
   if (loading) {
     return (
@@ -84,31 +118,34 @@ export function AlertPreferencesPanel() {
               Notification channels
             </label>
             <div className="space-y-2">
-              {channels.map((channel) => (
-                <label
-                  key={channel}
-                  className="flex items-center justify-between px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg cursor-pointer hover:border-slate-500"
-                >
-                  <span className="text-sm text-slate-300 capitalize">
-                    {channel}
-                  </span>
-                  <input
-                    type="checkbox"
-                    checked={preferences.channels[channel] ?? false}
-                    onChange={() =>
-                      update({
-                        channels: {
-                          ...preferences.channels,
-                          [channel]: !preferences.channels[channel],
-                        },
-                      })
-                    }
-                    disabled={saving}
-                    className="rounded border-slate-600 bg-slate-800 text-blue-500 focus:ring-0 focus:ring-offset-0 w-4 h-4"
-                  />
-                </label>
-              ))}
+              {channels
+                .filter((channel) => channel !== "push" || pushSupported())
+                .map((channel) => (
+                  <label
+                    key={channel}
+                    className="flex items-center justify-between px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg cursor-pointer hover:border-slate-500"
+                  >
+                    <span className="text-sm text-slate-300">
+                      {CHANNEL_LABELS[channel] || channel}
+                      {channel === "push" && (
+                        <span className="block text-xs text-slate-500 mt-0.5">
+                          Instant alerts on this device, even with the tab closed
+                        </span>
+                      )}
+                    </span>
+                    <input
+                      type="checkbox"
+                      checked={preferences.channels[channel] ?? false}
+                      onChange={() => toggleChannel(channel)}
+                      disabled={saving || (channel === "push" && pushBusy)}
+                      className="rounded border-slate-600 bg-slate-800 text-blue-500 focus:ring-0 focus:ring-offset-0 w-4 h-4"
+                    />
+                  </label>
+                ))}
             </div>
+            {pushError && (
+              <p className="text-red-400 text-xs mt-2">{pushError}</p>
+            )}
           </div>
         </>
       )}
