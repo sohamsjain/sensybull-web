@@ -96,15 +96,18 @@ export function TopBar({
       )}
 
       <Link href="/" className="flex items-center gap-2 mr-2">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/logo.svg"
-          alt=""
-          className="h-6 w-6"
-          onError={(e) => {
-            e.currentTarget.style.display = "none";
-          }}
-        />
+        <span className="h-6 w-6 rounded-md bg-white flex items-center justify-center overflow-hidden">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo.png"
+            alt=""
+            className="h-5 w-5 object-contain"
+            onError={(e) => {
+              // No logo file yet — hide the chip, keep the wordmark
+              e.currentTarget.parentElement!.style.display = "none";
+            }}
+          />
+        </span>
         <h1 className="text-white font-bold text-lg">Sensybull</h1>
       </Link>
 

@@ -110,13 +110,16 @@ export function NavRail() {
             S
           </span>
         ) : (
-          /* eslint-disable-next-line @next/next/no-img-element */
-          <img
-            src="/logo.svg"
-            alt="Sensybull"
-            className="w-9 h-9 rounded-xl"
-            onError={() => setLogoFailed(true)}
-          />
+          /* White chip — the logo mark is black and needs a light surface */
+          <span className="w-9 h-9 rounded-xl bg-white flex items-center justify-center overflow-hidden">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo.png"
+              alt="Sensybull"
+              className="w-7 h-7 object-contain"
+              onError={() => setLogoFailed(true)}
+            />
+          </span>
         )}
       </Link>
 
