@@ -129,6 +129,7 @@ export interface ChatCompany {
   ticker: string | null;
   name: string;
   cik: string | null;
+  logo_url?: string | null;
 }
 
 export interface ChatPreviewEvent {

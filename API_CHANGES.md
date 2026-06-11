@@ -5,6 +5,17 @@ For full endpoint details, read the route files directly at `~/Projects/sensybul
 
 ---
 
+## 2026-06-11: Company Logo URLs (Benzinga)
+
+### Changed: GET /api/v1/chats/ and company payloads
+- `company` objects now include `logo_url` (nullable) — a Benzinga brand-mark
+  image URL, preferring square dark-theme marks
+- Populated server-side by `flask sync-logos` (runs on deploy; requires
+  `BENZINGA_API_KEY` env, no-ops without it); the API key never reaches
+  the client
+
+---
+
 ## 2026-06-11: Browser Web Push Channel
 
 ### New channel: "push"
