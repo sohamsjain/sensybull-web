@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 
-// Ticker-keyed logo CDN. Parqet's logo API is free for ticker symbols;
-// swap providers via env without touching code. "{ticker}" is replaced.
+// Fallback ticker-keyed logo CDN, used when the company has no synced
+// Benzinga mark. "{ticker}" is replaced; swap providers via env.
 const LOGO_URL_TEMPLATE =
   process.env.NEXT_PUBLIC_LOGO_URL_TEMPLATE ||
   "https://assets.parqet.com/logos/symbol/{ticker}?format=png&size=96";
@@ -27,36 +27,56 @@ function colorFor(key: string): string {
   return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
 }
 
+/**
+ * Company avatar as a squircle (rounded square) — square brand marks fill
+ * it naturally, unlike circles which leave white crescents.
+ *
+ * Source priority: synced Benzinga dark mark (made for dark UIs, sits on
+ * slate) → ticker CDN logo (light artwork, sits on white) → colored
+ * initials. Each failed image advances to the next source.
+ */
 export function ChatAvatar({
   ticker,
   name,
+  logoUrl,
   size = "md",
 }: {
   ticker: string | null;
   name: string;
+  logoUrl?: string | null;
   size?: "sm" | "md";
 }) {
-  // Track which ticker's logo failed so a reused component instance
-  // retries when it starts rendering a different company.
-  const [failedTicker, setFailedTicker] = useState<string | null>(null);
+  const candidates = [
+    logoUrl || null,
+    ticker ? LOGO_URL_TEMPLATE.replace("{ticker}", encodeURIComponent(ticker)) : null,
+  ].filter(Boolean) as string[];
+
+  // Keyed by identity so a reused component instance resets its failure
+  // count when it starts rendering a different company.
+  const identity = `${ticker}|${logoUrl || ""}`;
+  const [failure, setFailure] = useState({ identity: "", stage: 0 });
+  const stage = failure.identity === identity ? failure.stage : 0;
+  const src = candidates[stage];
 
   const label = ticker || name.slice(0, 2).toUpperCase();
   const sizeClass = size === "sm" ? "w-9 h-9 text-[10px]" : "w-12 h-12 text-xs";
-  const showLogo = !!ticker && failedTicker !== ticker;
+  const radius = size === "sm" ? "rounded-lg" : "rounded-xl";
 
-  if (showLogo) {
+  if (src) {
+    // Benzinga dark marks belong on the dark surface; CDN logos on white
+    const surface = src === logoUrl ? "bg-slate-800" : "bg-white";
     return (
       <div
-        className={`${sizeClass} rounded-full overflow-hidden bg-white shrink-0 select-none`}
+        className={`${sizeClass} ${radius} ${surface} overflow-hidden shrink-0 select-none`}
         aria-hidden="true"
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={LOGO_URL_TEMPLATE.replace("{ticker}", encodeURIComponent(ticker))}
+          src={src}
           alt=""
           loading="lazy"
           className="w-full h-full object-contain p-0.5"
-          onError={() => setFailedTicker(ticker)}
+          onError={() => setFailure({ identity, stage: stage + 1 })}
         />
       </div>
     );
@@ -64,7 +84,7 @@ export function ChatAvatar({
 
   return (
     <div
-      className={`${sizeClass} ${colorFor(label)} rounded-full flex items-center justify-center font-mono font-bold shrink-0 select-none`}
+      className={`${sizeClass} ${radius} ${colorFor(label)} flex items-center justify-center font-mono font-bold shrink-0 select-none`}
       aria-hidden="true"
     >
       {label.slice(0, 4)}

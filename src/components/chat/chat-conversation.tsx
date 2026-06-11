@@ -133,7 +133,12 @@ export function ChatConversation({
         >
           <BackIcon />
         </button>
-        <ChatAvatar ticker={company.ticker} name={company.name} size="sm" />
+        <ChatAvatar
+          ticker={company.ticker}
+          name={company.name}
+          logoUrl={company.logo_url}
+          size="sm"
+        />
         <div className="min-w-0 flex-1">
           <p className="text-white text-sm font-semibold truncate leading-tight">
             {company.name}

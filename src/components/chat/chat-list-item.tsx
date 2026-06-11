@@ -43,7 +43,11 @@ export function ChatListItem({
         active ? "bg-slate-800" : "hover:bg-slate-800/60"
       }`}
     >
-      <ChatAvatar ticker={company.ticker} name={company.name} />
+      <ChatAvatar
+        ticker={company.ticker}
+        name={company.name}
+        logoUrl={company.logo_url}
+      />
 
       <div className="flex-1 min-w-0 border-b border-slate-800/70 pb-3 -mb-3">
         <div className="flex items-baseline justify-between gap-2">
