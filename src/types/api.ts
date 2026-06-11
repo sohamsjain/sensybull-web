@@ -124,6 +124,50 @@ export interface AlertChannelsResponse {
   channels: string[];
 }
 
+export interface ChatCompany {
+  id: string;
+  ticker: string | null;
+  name: string;
+  cik: string | null;
+}
+
+export interface ChatPreviewEvent {
+  id: string;
+  headline: string;
+  significance: "High" | "Medium" | "Low" | null;
+  sentiment: "Positive" | "Negative" | "Neutral" | "Mixed" | null;
+  primary_event_type: string | null;
+  max_tier: 1 | 2 | 3;
+  signal_type: string;
+  filing_date: string | null;
+  received_at: string | null;
+}
+
+export interface Chat {
+  company: ChatCompany;
+  last_event: ChatPreviewEvent | null;
+  last_activity_at: string | null;
+  unread_count: number;
+  muted: boolean;
+  last_read_at: string | null;
+}
+
+export interface ChatsResponse {
+  chats: Chat[];
+  total_unread: number;
+}
+
+export interface ChatReadState {
+  company_id: string;
+  last_read_at: string | null;
+  muted: boolean;
+}
+
+export interface ReadStateResponse {
+  message: string;
+  read_state: ChatReadState;
+}
+
 export interface ApiError {
   error: string;
   details?: Record<string, string>;

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, createContext, useContext } from "react";
+import { usePathname } from "next/navigation";
 import type { Watchlist } from "@/types/api";
 import { TopBar } from "@/components/layout/top-bar";
 import { Sidebar } from "@/components/layout/sidebar";
@@ -29,6 +30,10 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const { user } = useAuth();
+  const pathname = usePathname();
+  // The chats page brings its own list pane; the watchlist sidebar and feed
+  // filters only apply to the feed.
+  const isChats = pathname?.startsWith("/chats") ?? false;
   const [significanceFilter, setSignificanceFilter] = useState(
     new Set(["High", "Medium", "Low"])
   );
@@ -74,10 +79,11 @@ export default function DashboardLayout({
           onEventTypeClear={handleEventTypeClear}
           search={search}
           onSearchChange={setSearch}
-          onMobileMenuToggle={() => setMobileNavOpen(true)}
+          onMobileMenuToggle={isChats ? undefined : () => setMobileNavOpen(true)}
+          showFilters={!isChats}
         />
         <div className="flex flex-1 overflow-hidden">
-          {user && (
+          {user && !isChats && (
             <div className="hidden md:block">
               <Sidebar
                 selectedWatchlist={selectedWatchlist}
@@ -87,7 +93,7 @@ export default function DashboardLayout({
           )}
           <main className="flex-1 overflow-hidden">{children}</main>
         </div>
-        {user && (
+        {user && !isChats && (
           <MobileNav
             open={mobileNavOpen}
             onOpenChange={setMobileNavOpen}

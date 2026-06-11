@@ -113,6 +113,12 @@ export function Sidebar({ selectedWatchlist, onSelectWatchlist }: SidebarProps) 
 
       <div className="mt-auto pt-4 border-t border-slate-700">
         <Link
+          href="/chats"
+          className="block px-3 py-2 rounded text-sm text-slate-400 hover:bg-slate-800 hover:text-white transition-colors"
+        >
+          Chats
+        </Link>
+        <Link
           href="/alerts"
           className="block px-3 py-2 rounded text-sm text-slate-400 hover:bg-slate-800 hover:text-white transition-colors"
         >
