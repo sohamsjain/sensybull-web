@@ -9,6 +9,14 @@ import { ChatList } from "@/components/chat/chat-list";
 import { ChatConversation } from "@/components/chat/chat-conversation";
 import { Button } from "@/components/ui/button";
 
+function Key({ children }: { children: React.ReactNode }) {
+  return (
+    <kbd className="px-1.5 py-0.5 bg-slate-800 border border-slate-700 rounded text-slate-400 text-[10px] font-mono leading-none">
+      {children}
+    </kbd>
+  );
+}
+
 export default function ChatsPage() {
   const { user, loading: authLoading } = useAuth();
   const [activeCompanyId, setActiveCompanyId] = useState<string | null>(null);
@@ -52,6 +60,44 @@ export default function ChatsPage() {
     setActiveCompanyId(null);
     await removeCompany(id);
   }, [activeCompanyId, removeCompany]);
+
+  // Keyboard: ↑/↓ move between chats, "/" focuses search, Esc closes
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      const typing =
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.isContentEditable;
+
+      if (typing) {
+        if (e.key === "Escape") (target as HTMLInputElement).blur();
+        return;
+      }
+      if (e.key === "/") {
+        e.preventDefault();
+        document.getElementById("chat-search")?.focus();
+        return;
+      }
+      if (e.key === "Escape") {
+        setActiveCompanyId(null);
+        return;
+      }
+      if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+      if (chats.length === 0) return;
+      e.preventDefault();
+      const idx = chats.findIndex((c) => c.company.id === activeCompanyId);
+      const next =
+        e.key === "ArrowDown"
+          ? chats[idx === -1 ? 0 : Math.min(idx + 1, chats.length - 1)]
+          : chats[idx === -1 ? chats.length - 1 : Math.max(idx - 1, 0)];
+      if (next && next.company.id !== activeCompanyId) {
+        handleSelect(next.company.id);
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [chats, activeCompanyId, handleSelect]);
 
   if (!authLoading && !user) {
     return (
@@ -113,14 +159,29 @@ export default function ChatsPage() {
             />
           </div>
         ) : (
-          <div className="flex-1 flex items-center justify-center">
-            <div className="text-center max-w-xs px-6">
-              <p className="text-slate-300 text-sm font-medium mb-1">
-                Select a company
+          <div className="chat-wallpaper flex-1 flex items-center justify-center">
+            <div className="text-center max-w-sm px-6">
+              <div className="mx-auto w-16 h-16 rounded-full bg-slate-800/80 flex items-center justify-center mb-4 text-2xl">
+                📈
+              </div>
+              <p className="text-slate-200 text-base font-medium mb-1.5">
+                Sensybull Chats
               </p>
-              <p className="text-slate-500 text-xs leading-relaxed">
-                Its full filing history opens as a conversation. Every
-                briefing links back to the original document on SEC EDGAR.
+              <p className="text-slate-500 text-[13px] leading-relaxed">
+                Pick a company and its filing history opens as a conversation.
+                Every briefing links back to the original document on SEC
+                EDGAR.
+              </p>
+              <p className="text-slate-600 text-xs mt-5 flex items-center justify-center gap-2">
+                <Key>↑</Key>
+                <Key>↓</Key>
+                <span>switch chats</span>
+                <span className="text-slate-700">·</span>
+                <Key>/</Key>
+                <span>search</span>
+                <span className="text-slate-700">·</span>
+                <Key>esc</Key>
+                <span>close</span>
               </p>
             </div>
           </div>

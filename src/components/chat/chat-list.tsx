@@ -51,6 +51,14 @@ export function ChatList({
     return () => clearTimeout(timer);
   }, [adding, filter]);
 
+  // Keep the keyboard-selected chat visible in the list
+  useEffect(() => {
+    if (!activeCompanyId) return;
+    document
+      .querySelector(`[data-company-id="${CSS.escape(activeCompanyId)}"]`)
+      ?.scrollIntoView({ block: "nearest" });
+  }, [activeCompanyId]);
+
   const existingIds = new Set(chats.map((c) => c.company.id));
   const visible = filter.trim()
     ? chats.filter((c) => {
@@ -98,6 +106,7 @@ export function ChatList({
           </button>
         </div>
         <input
+          id="chat-search"
           type="text"
           placeholder={adding ? "Search any ticker or company..." : "Search your chats..."}
           value={filter}
@@ -138,8 +147,8 @@ export function ChatList({
         {loading ? (
           <div className="space-y-0 animate-pulse">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="flex items-center gap-3 px-3 py-2.5">
-                <div className="w-11 h-11 rounded-full bg-slate-800" />
+              <div key={i} className="flex items-center gap-3 px-3 py-3">
+                <div className="w-12 h-12 rounded-full bg-slate-800" />
                 <div className="flex-1 space-y-2">
                   <div className="h-3 bg-slate-800 rounded w-2/3" />
                   <div className="h-2.5 bg-slate-800 rounded w-full" />

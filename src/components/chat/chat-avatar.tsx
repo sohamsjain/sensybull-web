@@ -30,7 +30,7 @@ export function ChatAvatar({
 }) {
   const label = ticker || name.slice(0, 2).toUpperCase();
   const sizeClass =
-    size === "sm" ? "w-8 h-8 text-[10px]" : "w-11 h-11 text-xs";
+    size === "sm" ? "w-9 h-9 text-[10px]" : "w-12 h-12 text-xs";
   return (
     <div
       className={`${sizeClass} ${colorFor(label)} rounded-full flex items-center justify-center font-mono font-bold shrink-0 select-none`}
