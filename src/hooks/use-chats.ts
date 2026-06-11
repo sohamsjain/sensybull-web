@@ -170,7 +170,12 @@ export function useChats(activeCompanyId: string | null) {
         const idx = prev.findIndex((c) => c.company.id === event.company_id);
         if (idx === -1) return prev; // not one of the user's chats
         const chat = prev[idx];
-        if (chat.last_event?.id === event.id) return prev;
+        // The server replays recent historical events on every (re)connect.
+        // Only events strictly newer than the chat's last known activity are
+        // genuinely new — REST already accounted for everything else, so
+        // counting replays would resurrect cleared unread badges.
+        const ts = event.received_at || "";
+        if (chat.last_activity_at && ts <= chat.last_activity_at) return prev;
         const updated: Chat = {
           ...chat,
           last_event: toPreview(event),

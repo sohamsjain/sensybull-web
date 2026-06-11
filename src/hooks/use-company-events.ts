@@ -75,6 +75,11 @@ export function useCompanyEvents(companyId: string | null, socket: Socket | null
       setState((prev) => {
         if (prev.companyId !== companyId) return prev;
         if (prev.events.some((e) => e.edgar_id === event.edgar_id)) return prev;
+        // Ignore server replays of historical events: anything not newer
+        // than the loaded head belongs to pages REST already serves, and
+        // prepending it would display an old filing as the latest message.
+        const newest = prev.events[0]?.received_at;
+        if (newest && (event.received_at || "") <= newest) return prev;
         return { ...prev, events: [event, ...prev.events] };
       });
     };
