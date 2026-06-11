@@ -2,7 +2,6 @@
 
 import type { Chat } from "@/types/api";
 import { chatTimestamp } from "@/lib/utils";
-import { SENTIMENT_CONFIG, type Sentiment } from "@/config/constants";
 import { ChatAvatar } from "./chat-avatar";
 
 function MutedIcon() {
@@ -35,29 +34,31 @@ export function ChatListItem({
 }) {
   const { company, last_event, last_activity_at, unread_count, muted } = chat;
   const hasUnread = unread_count > 0;
-  const sentiment = last_event?.sentiment as Sentiment | undefined;
 
   return (
     <button
       onClick={onSelect}
-      className={`w-full flex items-center gap-3 px-3 py-2.5 text-left transition-colors border-b border-slate-800 ${
+      data-company-id={company.id}
+      className={`w-full flex items-center gap-3 px-3 py-3 text-left transition-colors outline-none focus-visible:bg-slate-800/80 ${
         active ? "bg-slate-800" : "hover:bg-slate-800/60"
       }`}
     >
       <ChatAvatar ticker={company.ticker} name={company.name} />
 
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0 border-b border-slate-800/70 pb-3 -mb-3">
         <div className="flex items-baseline justify-between gap-2">
           <span
-            className={`truncate text-sm ${
-              hasUnread ? "text-white font-semibold" : "text-slate-200"
+            className={`truncate text-[15px] leading-5 ${
+              hasUnread ? "text-white font-semibold" : "text-slate-100"
             }`}
           >
             {company.name}
           </span>
           <span
             className={`text-[11px] whitespace-nowrap shrink-0 ${
-              hasUnread && !muted ? "text-blue-400 font-medium" : "text-slate-500"
+              hasUnread && !muted
+                ? "text-emerald-400 font-medium"
+                : "text-slate-500"
             }`}
           >
             {chatTimestamp(last_activity_at)}
@@ -66,25 +67,24 @@ export function ChatListItem({
 
         <div className="flex items-center justify-between gap-2 mt-0.5">
           <span
-            className={`truncate text-xs flex items-center gap-1.5 min-w-0 ${
-              hasUnread ? "text-slate-300" : "text-slate-500"
+            className={`truncate text-[13px] leading-5 ${
+              hasUnread
+                ? "text-slate-200"
+                : last_event
+                  ? "text-slate-400"
+                  : "text-slate-600 italic"
             }`}
           >
-            {sentiment && (
-              <span
-                className={`w-1.5 h-1.5 rounded-full shrink-0 ${SENTIMENT_CONFIG[sentiment].color}`}
-              />
-            )}
-            <span className="truncate">
-              {last_event ? last_event.headline : "No filings yet"}
-            </span>
+            {last_event ? last_event.headline : "No filings yet"}
           </span>
           <span className="flex items-center gap-1.5 shrink-0">
             {muted && <MutedIcon />}
             {hasUnread && (
               <span
-                className={`min-w-[18px] h-[18px] rounded-full flex items-center justify-center text-[10px] font-semibold leading-none px-1 ${
-                  muted ? "bg-slate-600 text-slate-300" : "bg-blue-500 text-white"
+                className={`min-w-[19px] h-[19px] rounded-full flex items-center justify-center text-[11px] font-semibold leading-none px-1.5 ${
+                  muted
+                    ? "bg-slate-600 text-slate-200"
+                    : "bg-emerald-500 text-emerald-950"
                 }`}
               >
                 {unread_count > 99 ? "99+" : unread_count}

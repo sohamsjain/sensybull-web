@@ -214,7 +214,10 @@ export function ChatConversation({
       )}
 
       {/* Messages */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto px-3 py-3 space-y-3">
+      <div
+        ref={scrollRef}
+        className="chat-wallpaper flex-1 overflow-y-auto px-4 py-3 space-y-2"
+      >
         {hasMore && (
           <div className="text-center">
             <button
@@ -257,7 +260,7 @@ export function ChatConversation({
               <div key={event.id}>
                 {showDay && ts && (
                   <div className="flex justify-center my-3">
-                    <span className="text-[11px] text-slate-400 bg-slate-800 px-2.5 py-0.5 rounded-full">
+                    <span className="text-[11px] text-slate-300 bg-slate-800/90 px-3 py-1 rounded-md shadow-sm shadow-black/20">
                       {dayLabel(ts)}
                     </span>
                   </div>

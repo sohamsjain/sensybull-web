@@ -20,21 +20,27 @@ export function ChatMessage({ event }: { event: FilingEvent }) {
   const catalysts =
     event.catalysts?.length > 0 ? event.catalysts : briefing?.catalysts || [];
 
+  const toggleExpanded = () => {
+    // Selecting text to copy shouldn't toggle the message open/closed
+    if (window.getSelection()?.toString()) return;
+    setExpanded((e) => !e);
+  };
+
   return (
     <div className="flex justify-start">
       <div
-        className="max-w-[88%] md:max-w-[75%] bg-slate-800 border border-slate-700 rounded-lg rounded-tl-sm px-3.5 py-3 cursor-pointer transition-colors hover:bg-slate-800/80"
-        onClick={() => setExpanded((e) => !e)}
+        className="max-w-[92%] md:max-w-[70%] bg-slate-800 rounded-lg rounded-tl-none px-3 py-2 shadow-md shadow-black/20 cursor-pointer transition-colors hover:bg-slate-800/90"
+        onClick={toggleExpanded}
       >
         {/* Meta row */}
-        <div className="flex items-center gap-2 mb-1.5">
+        <div className="flex items-center gap-1.5 mb-1.5">
           <SignificanceBadge level={significance} />
           {briefing?.primary_event_type &&
             briefing.primary_event_type !== "Other" && (
               <EventTypeTag type={briefing.primary_event_type} primary />
             )}
           <SentimentDot sentiment={sentiment} />
-          <span className="text-slate-500 text-[11px] ml-auto whitespace-nowrap">
+          <span className="text-slate-500 text-[10px] ml-auto whitespace-nowrap uppercase tracking-wide">
             {event.signal_type}
           </span>
         </div>
@@ -42,16 +48,16 @@ export function ChatMessage({ event }: { event: FilingEvent }) {
         {/* Briefing body */}
         {briefing ? (
           <>
-            <p className="text-slate-100 text-sm font-medium leading-snug">
+            <p className="text-slate-50 text-[14px] font-semibold leading-snug">
               {briefing.headline}
             </p>
             {briefing.investor_takeaway && (
-              <p className="text-slate-300 text-sm italic mt-1.5">
+              <p className="text-emerald-200/80 text-[13px] leading-snug mt-1">
                 {briefing.investor_takeaway}
               </p>
             )}
             {briefing.summary && (
-              <p className="text-slate-400 text-sm leading-relaxed mt-1.5">
+              <p className="text-slate-300/90 text-[13px] leading-[1.5] mt-1.5">
                 {briefing.summary}
               </p>
             )}
@@ -108,10 +114,10 @@ export function ChatMessage({ event }: { event: FilingEvent }) {
 
         {/* Footer: provenance + timestamp */}
         <div
-          className="flex items-center justify-between gap-3 mt-2.5"
+          className="flex items-center justify-between gap-3 mt-2"
           onClick={(e) => e.stopPropagation()}
         >
-          <span className="text-slate-500 text-[11px]">
+          <span className="text-slate-500 text-[10.5px]">
             AI briefing &middot;{" "}
             {edgar_url ? (
               <a
@@ -126,7 +132,7 @@ export function ChatMessage({ event }: { event: FilingEvent }) {
               "sourced from SEC EDGAR"
             )}
           </span>
-          <span className="text-slate-500 text-[11px] whitespace-nowrap">
+          <span className="text-slate-500/80 text-[10.5px] whitespace-nowrap tabular-nums">
             {messageTime(event.received_at || event.filing_date)}
           </span>
         </div>
