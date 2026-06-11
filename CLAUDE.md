@@ -11,7 +11,7 @@
 - Events: `GET /events/` (auth, watchlist-filtered), `/events/all` (public), `/events/types`, `/events/catalysts`, `/events/company/:id` (auth, per-company history)
 - Watchlists: CRUD at `/watchlists/`, company management at `/watchlists/:id/companies`
 - Companies: `GET /companies/?q=...` (search by ticker or name), `GET /companies/search?q=` (typeahead)
-- Alerts: `GET/PUT /alerts/preferences`, `GET /alerts/notifications`, `GET /alerts/channels`
+- Alerts: `GET/PUT /alerts/preferences`, `GET /alerts/notifications`, `GET /alerts/channels`, Web Push at `/alerts/push/*` (see `src/lib/push.ts` + `public/sw.js`)
 - Chats: `GET /chats/` (inbox: watchlist companies + unread counts), `POST /chats/:companyId/read`, `PUT /chats/:companyId/mute`
 - WebSocket: Socket.IO namespace `/feed`, auth via `{token}` dict, events: `filing_event`, `connected`
 

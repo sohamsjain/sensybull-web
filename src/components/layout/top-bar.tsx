@@ -95,11 +95,22 @@ export function TopBar({
         </button>
       )}
 
-      <h1 className="text-white font-bold text-lg mr-2">Sensybull</h1>
+      <Link href="/" className="flex items-center gap-2 mr-2">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/logo.svg"
+          alt=""
+          className="h-6 w-6"
+          onError={(e) => {
+            e.currentTarget.style.display = "none";
+          }}
+        />
+        <h1 className="text-white font-bold text-lg">Sensybull</h1>
+      </Link>
 
-      {/* Primary nav */}
+      {/* Primary nav — desktop uses the left rail; keep links on mobile */}
       {user && (
-        <nav className="flex items-center gap-1 mr-2">
+        <nav className="flex md:hidden items-center gap-1 mr-2">
           {[
             { href: "/chats", label: "Chats" },
             { href: "/feed", label: "Feed" },
