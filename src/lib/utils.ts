@@ -26,7 +26,8 @@ export function chatTimestamp(dateStr: string | null | undefined): string {
     return d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
   }
   const daysAgo = (startOfToday.getTime() - d.getTime()) / 86400000;
-  if (daysAgo < 1) return "Yesterday";
+  // <= 1 so a message at exactly yesterday 00:00 still reads "Yesterday"
+  if (daysAgo <= 1) return "Yesterday";
   if (daysAgo < 6) return d.toLocaleDateString("en-US", { weekday: "short" });
   return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }

@@ -64,6 +64,7 @@ export function ChatConversation({
   const loadingEarlierRef = useRef(false);
   const prevHeightRef = useRef(0);
   const newestIdRef = useRef<string | null>(null);
+  const companyIdRef = useRef(company.id);
 
   // Chronological for display: oldest at top, newest at bottom
   const ordered = useMemo(() => [...events].reverse(), [events]);
@@ -89,6 +90,13 @@ export function ChatConversation({
   useLayoutEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
+    // Switching companies invalidates any in-flight load-earlier scroll
+    // adjustment; always land at the bottom of the new conversation.
+    if (companyIdRef.current !== company.id) {
+      companyIdRef.current = company.id;
+      loadingEarlierRef.current = false;
+      newestIdRef.current = null;
+    }
     if (loadingEarlierRef.current) {
       el.scrollTop += el.scrollHeight - prevHeightRef.current;
       loadingEarlierRef.current = false;
@@ -99,7 +107,7 @@ export function ChatConversation({
       newestIdRef.current = newestId;
       el.scrollTop = el.scrollHeight;
     }
-  }, [events]);
+  }, [events, company.id]);
 
   const handleLoadEarlier = () => {
     const el = scrollRef.current;

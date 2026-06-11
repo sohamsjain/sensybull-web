@@ -18,6 +18,7 @@ export default function ChatsPage() {
     totalUnread,
     loading,
     connected,
+    socket,
     markRead,
     setMuted,
     addCompany,
@@ -26,7 +27,7 @@ export default function ChatsPage() {
 
   const activeChat = chats.find((c) => c.company.id === activeCompanyId) || null;
   const { events, loading: eventsLoading, hasMore, loadEarlier } =
-    useCompanyEvents(activeCompanyId);
+    useCompanyEvents(activeCompanyId, socket);
 
   // Unread count in the tab title, messenger-style
   useEffect(() => {

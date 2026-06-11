@@ -8,7 +8,7 @@
 ## API
 - Base URL: `NEXT_PUBLIC_API_URL` (default: `https://api.sensybull.com/api/v1`)
 - Auth: `POST /auth/login`, `/auth/register`, `/auth/google`, `/auth/refresh`, `GET /auth/me`
-- Events: `GET /events/` (auth, watchlist-filtered), `/events/all` (public), `/events/types`, `/events/catalysts`
+- Events: `GET /events/` (auth, watchlist-filtered), `/events/all` (public), `/events/types`, `/events/catalysts`, `/events/company/:id` (auth, per-company history)
 - Watchlists: CRUD at `/watchlists/`, company management at `/watchlists/:id/companies`
 - Companies: `GET /companies/?q=...` (search by ticker or name), `GET /companies/search?q=` (typeahead)
 - Alerts: `GET/PUT /alerts/preferences`, `GET /alerts/notifications`, `GET /alerts/channels`

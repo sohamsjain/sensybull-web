@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import type { Socket } from "socket.io-client";
 import type { FilingEvent } from "@/types/events";
 import type { PaginatedEvents } from "@/types/api";
 import { api } from "@/lib/api-client";
-import { getSocket } from "@/lib/socket";
 
 interface CompanyEventsState {
   companyId: string | null;
@@ -14,9 +14,10 @@ interface CompanyEventsState {
 
 /**
  * One company's filing history for the conversation view, newest first.
- * Live events arrive via the socket already opened by useChats.
+ * Pass the live socket from useChats so listeners follow reconnections
+ * instead of clinging to a stale instance.
  */
-export function useCompanyEvents(companyId: string | null) {
+export function useCompanyEvents(companyId: string | null, socket: Socket | null) {
   const [state, setState] = useState<CompanyEventsState>({
     companyId: null,
     events: [],
@@ -67,9 +68,7 @@ export function useCompanyEvents(companyId: string | null) {
 
   // Append live events for this company from the shared socket
   useEffect(() => {
-    if (!companyId) return;
-    const socket = getSocket();
-    if (!socket) return;
+    if (!companyId || !socket) return;
 
     const handler = (event: FilingEvent) => {
       if (event.company_id !== companyId) return;
@@ -83,7 +82,7 @@ export function useCompanyEvents(companyId: string | null) {
     return () => {
       socket.off("filing_event", handler);
     };
-  }, [companyId]);
+  }, [companyId, socket]);
 
   // While switching companies, show the loading state rather than the
   // previous chat's messages.
