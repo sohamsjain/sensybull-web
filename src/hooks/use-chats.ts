@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import type { Socket } from "socket.io-client";
 import type { Chat, ChatsResponse, ChatPreviewEvent, ReadStateResponse, PaginatedWatchlists, Watchlist } from "@/types/api";
 import type { FilingEvent } from "@/types/events";
 import { api, getTokens } from "@/lib/api-client";
@@ -43,6 +44,9 @@ export function useChats(activeCompanyId: string | null) {
   const [chats, setChats] = useState<Chat[]>([]);
   const [loading, setLoading] = useState(true);
   const [connected, setConnected] = useState(false);
+  // The live socket instance, exposed so dependent hooks (useCompanyEvents)
+  // re-attach their listeners whenever the connection is re-established.
+  const [socket, setSocket] = useState<Socket | null>(null);
   const activeRef = useRef(activeCompanyId);
 
   useEffect(() => {
@@ -153,7 +157,10 @@ export function useChats(activeCompanyId: string | null) {
     const { access } = getTokens();
     const socket = connectSocket(access);
 
-    socket.on("connect", () => setConnected(true));
+    socket.on("connect", () => {
+      setConnected(true);
+      setSocket(socket);
+    });
     socket.on("disconnect", () => setConnected(false));
 
     socket.on("filing_event", (event: FilingEvent) => {
@@ -189,8 +196,11 @@ export function useChats(activeCompanyId: string | null) {
   return {
     chats,
     totalUnread,
-    loading,
+    // Signed-out users have nothing to load; don't report a perpetual
+    // loading state for them.
+    loading: loading && !!user,
     connected,
+    socket,
     refetch,
     markRead,
     setMuted,
