@@ -124,28 +124,13 @@ export function FilingCard({ event }: { event: FilingEvent }) {
       )}
 
       {/* Expanded details */}
-      {expanded && (
+      {expanded && (exhibits?.length > 0 || edgar_url) && (
         <div
           className="mt-3 pt-3 border-t border-slate-700"
           onClick={(e) => e.stopPropagation()}
         >
-          {items?.map((item, i) => (
-            <div key={i} className="mb-3">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-slate-300 text-sm font-medium">
-                  Item {item.number}: {item.title}
-                </span>
-              </div>
-              {item.text && (
-                <p className="text-slate-400 text-xs whitespace-pre-wrap max-h-40 overflow-y-auto leading-relaxed">
-                  {item.text.slice(0, 2000)}
-                </p>
-              )}
-            </div>
-          ))}
-
           {exhibits?.length > 0 && (
-            <div className="mt-2">
+            <div>
               <p className="text-slate-500 text-xs uppercase tracking-wide mb-1">
                 Exhibits
               </p>

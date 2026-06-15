@@ -73,42 +73,26 @@ export function ChatMessage({ event }: { event: FilingEvent }) {
           </p>
         )}
 
-        {/* Expanded: raw filing items + exhibits */}
-        {expanded && (
+        {/* Expanded: exhibits */}
+        {expanded && exhibits?.length > 0 && (
           <div
             className="mt-3 pt-3 border-t border-slate-700"
             onClick={(e) => e.stopPropagation()}
           >
-            {items?.map((item, i) => (
-              <div key={i} className="mb-3">
-                <p className="text-slate-300 text-sm font-medium mb-1">
-                  Item {item.number}: {item.title}
-                </p>
-                {item.text && (
-                  <p className="text-slate-400 text-xs whitespace-pre-wrap max-h-40 overflow-y-auto leading-relaxed">
-                    {item.text.slice(0, 2000)}
-                  </p>
-                )}
-              </div>
+            <p className="text-slate-500 text-xs uppercase tracking-wide mb-1">
+              Exhibits
+            </p>
+            {exhibits.map((ex, i) => (
+              <a
+                key={i}
+                href={ex.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block text-blue-400 hover:text-blue-300 text-xs mb-0.5"
+              >
+                {ex.type} &mdash; {ex.description}
+              </a>
             ))}
-            {exhibits?.length > 0 && (
-              <div className="mt-2">
-                <p className="text-slate-500 text-xs uppercase tracking-wide mb-1">
-                  Exhibits
-                </p>
-                {exhibits.map((ex, i) => (
-                  <a
-                    key={i}
-                    href={ex.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block text-blue-400 hover:text-blue-300 text-xs mb-0.5"
-                  >
-                    {ex.type} &mdash; {ex.description}
-                  </a>
-                ))}
-              </div>
-            )}
           </div>
         )}
 
