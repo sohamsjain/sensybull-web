@@ -4,7 +4,7 @@ export function ConnectionStatus({ connected }: { connected: boolean }) {
       <div
         className={`w-2 h-2 rounded-full ${connected ? "bg-green-500" : "bg-red-500"}`}
       />
-      <span className="text-slate-500 text-xs">
+      <span className="text-slate-400 dark:text-slate-500 text-xs">
         {connected ? "Live" : "Connecting..."}
       </span>
     </div>

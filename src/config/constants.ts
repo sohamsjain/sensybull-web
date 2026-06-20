@@ -16,7 +16,7 @@ export const SIGNIFICANCE_CONFIG = {
   Low: {
     label: "LOW",
     badge: "bg-slate-500/20 text-slate-400 border-slate-500/30",
-    border: "border-slate-700",
+    border: "border-slate-200 dark:border-slate-700",
     activeToggle: "bg-slate-500/20 text-slate-400",
   },
 } as const;

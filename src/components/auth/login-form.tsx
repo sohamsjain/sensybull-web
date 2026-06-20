@@ -37,7 +37,7 @@ export function LoginForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="bg-slate-900 border-slate-600 text-white placeholder:text-slate-500 focus-visible:border-slate-400 focus-visible:ring-0"
+          className="bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus-visible:border-slate-500 dark:focus-visible:border-slate-400 focus-visible:ring-0"
         />
       </div>
       <div>
@@ -48,7 +48,7 @@ export function LoginForm() {
           onChange={(e) => setPassword(e.target.value)}
           required
           minLength={6}
-          className="bg-slate-900 border-slate-600 text-white placeholder:text-slate-500 focus-visible:border-slate-400 focus-visible:ring-0"
+          className="bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus-visible:border-slate-500 dark:focus-visible:border-slate-400 focus-visible:ring-0"
         />
       </div>
       {error && <p className="text-red-400 text-xs">{error}</p>}
@@ -62,13 +62,13 @@ export function LoginForm() {
       <div className="flex justify-between text-xs">
         <Link
           href="/register"
-          className="text-slate-400 hover:text-slate-200"
+          className="text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
         >
           Create account
         </Link>
         <Link
           href="/forgot-password"
-          className="text-slate-400 hover:text-slate-200"
+          className="text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
         >
           Forgot password?
         </Link>

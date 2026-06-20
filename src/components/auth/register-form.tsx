@@ -38,7 +38,7 @@ export function RegisterForm() {
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
-          className="bg-slate-900 border-slate-600 text-white placeholder:text-slate-500 focus-visible:border-slate-400 focus-visible:ring-0"
+          className="bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus-visible:border-slate-500 dark:focus-visible:border-slate-400 focus-visible:ring-0"
         />
       </div>
       <div>
@@ -48,7 +48,7 @@ export function RegisterForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="bg-slate-900 border-slate-600 text-white placeholder:text-slate-500 focus-visible:border-slate-400 focus-visible:ring-0"
+          className="bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus-visible:border-slate-500 dark:focus-visible:border-slate-400 focus-visible:ring-0"
         />
       </div>
       <div>
@@ -59,7 +59,7 @@ export function RegisterForm() {
           onChange={(e) => setPassword(e.target.value)}
           required
           minLength={6}
-          className="bg-slate-900 border-slate-600 text-white placeholder:text-slate-500 focus-visible:border-slate-400 focus-visible:ring-0"
+          className="bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus-visible:border-slate-500 dark:focus-visible:border-slate-400 focus-visible:ring-0"
         />
       </div>
       {error && <p className="text-red-400 text-xs">{error}</p>}
@@ -70,7 +70,7 @@ export function RegisterForm() {
       >
         {loading ? "..." : "Create Account"}
       </Button>
-      <p className="text-center text-xs text-slate-400">
+      <p className="text-center text-xs text-slate-500 dark:text-slate-400">
         Already have an account?{" "}
         <Link href="/login" className="text-blue-400 hover:text-blue-300">
           Sign in
