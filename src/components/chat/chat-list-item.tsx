@@ -46,7 +46,6 @@ export function ChatListItem({
       <ChatAvatar
         ticker={company.ticker}
         name={company.name}
-        logoUrl={company.logo_url}
       />
 
       <div className="flex-1 min-w-0 border-b border-slate-800/70 pb-3 -mb-3">

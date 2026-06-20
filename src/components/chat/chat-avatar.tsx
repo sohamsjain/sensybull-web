@@ -2,11 +2,7 @@
 
 import { useState } from "react";
 
-// Fallback ticker-keyed logo CDN, used when the company has no synced
-// Benzinga mark. "{ticker}" is replaced; swap providers via env.
-const LOGO_URL_TEMPLATE =
-  process.env.NEXT_PUBLIC_LOGO_URL_TEMPLATE ||
-  "https://assets.parqet.com/logos/symbol/{ticker}?format=png&size=96";
+const LOGO_DEV_TOKEN = process.env.NEXT_PUBLIC_LOGO_DEV_TOKEN;
 
 const AVATAR_COLORS = [
   "bg-blue-500/30 text-blue-300",
@@ -27,47 +23,31 @@ function colorFor(key: string): string {
   return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
 }
 
-/**
- * Company avatar as a squircle (rounded square) — square brand marks fill
- * it naturally, unlike circles which leave white crescents.
- *
- * Source priority: synced Benzinga dark mark (made for dark UIs, sits on
- * slate) → ticker CDN logo (light artwork, sits on white) → colored
- * initials. Each failed image advances to the next source.
- */
 export function ChatAvatar({
   ticker,
   name,
-  logoUrl,
   size = "md",
 }: {
   ticker: string | null;
   name: string;
-  logoUrl?: string | null;
   size?: "sm" | "md";
 }) {
-  const candidates = [
-    logoUrl || null,
-    ticker ? LOGO_URL_TEMPLATE.replace("{ticker}", encodeURIComponent(ticker)) : null,
-  ].filter(Boolean) as string[];
+  const src =
+    LOGO_DEV_TOKEN && ticker
+      ? `https://img.logo.dev/ticker/${encodeURIComponent(ticker)}?token=${LOGO_DEV_TOKEN}&format=webp&size=128`
+      : null;
 
-  // Keyed by identity so a reused component instance resets its failure
-  // count when it starts rendering a different company.
-  const identity = `${ticker}|${logoUrl || ""}`;
-  const [failure, setFailure] = useState({ identity: "", stage: 0 });
-  const stage = failure.identity === identity ? failure.stage : 0;
-  const src = candidates[stage];
+  const [failed, setFailed] = useState<string | null>(null);
+  const showImg = src && failed !== src;
 
   const label = ticker || name.slice(0, 2).toUpperCase();
   const sizeClass = size === "sm" ? "w-9 h-9 text-[10px]" : "w-12 h-12 text-xs";
   const radius = size === "sm" ? "rounded-lg" : "rounded-xl";
 
-  if (src) {
-    // Benzinga dark marks belong on the dark surface; CDN logos on white
-    const surface = src === logoUrl ? "bg-slate-800" : "bg-white";
+  if (showImg) {
     return (
       <div
-        className={`${sizeClass} ${radius} ${surface} overflow-hidden shrink-0 select-none`}
+        className={`${sizeClass} ${radius} bg-white overflow-hidden shrink-0 select-none`}
         aria-hidden="true"
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -76,7 +56,7 @@ export function ChatAvatar({
           alt=""
           loading="lazy"
           className="w-full h-full object-contain p-0.5"
-          onError={() => setFailure({ identity, stage: stage + 1 })}
+          onError={() => setFailed(src)}
         />
       </div>
     );
