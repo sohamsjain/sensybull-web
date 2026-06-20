@@ -136,7 +136,6 @@ export function ChatConversation({
         <ChatAvatar
           ticker={company.ticker}
           name={company.name}
-          logoUrl={company.logo_url}
           size="sm"
         />
         <div className="min-w-0 flex-1">

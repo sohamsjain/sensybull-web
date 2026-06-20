@@ -5,14 +5,15 @@ For full endpoint details, read the route files directly at `~/Projects/sensybul
 
 ---
 
-## 2026-06-11: Company Logo URLs (Benzinga)
+## 2026-06-20: Company Logos — Switched to Logo.dev
 
-### Changed: GET /api/v1/chats/ and company payloads
-- `company` objects now include `logo_url` (nullable) — a Benzinga brand-mark
-  image URL, preferring square dark-theme marks
-- Populated server-side by `flask sync-logos` (runs on deploy; requires
-  `BENZINGA_API_KEY` env, no-ops without it); the API key never reaches
-  the client
+- `company.logo_url` field still exists in API responses but is **no longer
+  populated** (Benzinga sync removed)
+- Frontend now constructs logo URLs client-side via Logo.dev:
+  `https://img.logo.dev/ticker/{TICKER}?token={TOKEN}&format=webp&size=128`
+- Requires `NEXT_PUBLIC_LOGO_DEV_TOKEN` env var (publishable key from
+  logo.dev/dashboard)
+- Falls back to colored initials when Logo.dev has no image or token is unset
 
 ---
 
