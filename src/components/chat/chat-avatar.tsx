@@ -47,7 +47,7 @@ export function ChatAvatar({
   if (showImg) {
     return (
       <div
-        className={`${sizeClass} ${radius} bg-white overflow-hidden shrink-0 select-none`}
+        className={`${sizeClass} ${radius} bg-transparent overflow-hidden shrink-0 select-none`}
         aria-hidden="true"
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -55,7 +55,7 @@ export function ChatAvatar({
           src={src}
           alt=""
           loading="lazy"
-          className="w-full h-full object-contain p-0.5"
+          className="w-full h-full object-cover"
           onError={() => setFailed(src)}
         />
       </div>
