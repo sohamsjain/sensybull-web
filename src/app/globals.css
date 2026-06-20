@@ -130,31 +130,43 @@
     @apply font-sans;
   }
 
-  /* Thin, dark scrollbars — default chunky scrollbars glare on a dark theme */
   * {
     scrollbar-width: thin;
-    scrollbar-color: rgb(51 65 85) transparent;
+    scrollbar-color: rgb(203 213 225) transparent;
   }
   *::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
   *::-webkit-scrollbar-thumb {
-    background: rgb(51 65 85);
+    background: rgb(203 213 225);
     border-radius: 3px;
   }
   *::-webkit-scrollbar-track {
     background: transparent;
   }
+
+  .dark * {
+    scrollbar-color: rgb(51 65 85) transparent;
+  }
+  .dark *::-webkit-scrollbar-thumb {
+    background: rgb(51 65 85);
+  }
 }
 
-/* Conversation backdrop: a whisper of texture so message bubbles sit on a
-   distinct surface, like a messenger wallpaper */
 .chat-wallpaper {
+  background-color: rgb(241 245 249);
+  background-image: radial-gradient(
+    rgba(71, 85, 105, 0.06) 1px,
+    transparent 1.3px
+  );
+  background-size: 22px 22px;
+}
+
+.dark .chat-wallpaper {
   background-color: rgb(7 11 21);
   background-image: radial-gradient(
     rgba(148, 163, 184, 0.05) 1px,
     transparent 1.3px
   );
-  background-size: 22px 22px;
 }

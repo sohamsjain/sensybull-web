@@ -71,7 +71,7 @@ export default function DashboardLayout({
     <DashboardContext.Provider
       value={{ significanceFilter, eventTypeFilter, search, selectedWatchlist }}
     >
-      <div className="h-screen flex bg-slate-900 text-slate-100">
+      <div className="h-screen flex bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100">
         <NavRail />
         <div className="flex-1 flex flex-col min-w-0">
           <TopBar

@@ -25,7 +25,7 @@ export function WatchlistCreate({ onCreate, onCancel }: WatchlistCreateProps) {
         value={name}
         onChange={(e) => setName(e.target.value)}
         autoFocus
-        className="w-full bg-slate-900 border border-slate-600 rounded px-2 py-1.5 text-sm text-white placeholder-slate-500 outline-none focus:border-slate-400"
+        className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded px-2 py-1.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none focus:border-slate-500 dark:focus:border-slate-400"
       />
       <div className="flex gap-1 mt-1">
         <button
@@ -37,7 +37,7 @@ export function WatchlistCreate({ onCreate, onCancel }: WatchlistCreateProps) {
         <button
           type="button"
           onClick={onCancel}
-          className="text-xs text-slate-500 px-2 py-1"
+          className="text-xs text-slate-400 dark:text-slate-500 px-2 py-1"
         >
           Cancel
         </button>

@@ -90,10 +90,10 @@ export function ChatList({
       {/* Header */}
       <div className="px-3 pt-3 pb-2 shrink-0">
         <div className="flex items-center justify-between mb-2">
-          <h2 className="text-white font-semibold text-base flex items-center gap-2">
+          <h2 className="text-slate-900 dark:text-white font-semibold text-base flex items-center gap-2">
             Chats
             <span
-              className={`w-1.5 h-1.5 rounded-full ${connected ? "bg-green-400" : "bg-slate-600"}`}
+              className={`w-1.5 h-1.5 rounded-full ${connected ? "bg-green-400" : "bg-slate-300 dark:bg-slate-600"}`}
               title={connected ? "Live — connected to the filing feed" : "Connecting..."}
             />
           </h2>
@@ -104,7 +104,7 @@ export function ChatList({
           placeholder="Search or add a company..."
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-slate-200 placeholder:text-slate-500 outline-none focus:border-slate-500"
+          className="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-sm text-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none focus:border-slate-400 dark:focus:border-slate-500"
         />
       </div>
 
@@ -114,20 +114,20 @@ export function ChatList({
           <div className="space-y-0 animate-pulse">
             {[...Array(6)].map((_, i) => (
               <div key={i} className="flex items-center gap-3 px-3 py-3">
-                <div className="w-12 h-12 rounded-full bg-slate-800" />
+                <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800" />
                 <div className="flex-1 space-y-2">
-                  <div className="h-3 bg-slate-800 rounded w-2/3" />
-                  <div className="h-2.5 bg-slate-800 rounded w-full" />
+                  <div className="h-3 bg-slate-100 dark:bg-slate-800 rounded w-2/3" />
+                  <div className="h-2.5 bg-slate-100 dark:bg-slate-800 rounded w-full" />
                 </div>
               </div>
             ))}
           </div>
         ) : chats.length === 0 && !query ? (
           <div className="px-6 py-10 text-center">
-            <p className="text-slate-300 text-sm font-medium mb-1">
+            <p className="text-slate-600 dark:text-slate-300 text-sm font-medium mb-1">
               Track your first company
             </p>
-            <p className="text-slate-500 text-xs leading-relaxed">
+            <p className="text-slate-400 dark:text-slate-500 text-xs leading-relaxed">
               Each company gets its own chat. New SEC filings arrive as
               messages — decoded into plain English, seconds after they hit
               EDGAR. Search above to get started.
@@ -137,7 +137,7 @@ export function ChatList({
           <>
             {/* Your chats */}
             {query && matchingChats.length > 0 && (
-              <p className="px-3 pt-2 pb-1 text-[11px] uppercase tracking-wide text-slate-500 font-medium">
+              <p className="px-3 pt-2 pb-1 text-[11px] uppercase tracking-wide text-slate-400 dark:text-slate-500 font-medium">
                 Your chats
               </p>
             )}
@@ -153,7 +153,7 @@ export function ChatList({
             {/* Companies you can start tracking */}
             {query && (
               <>
-                <p className="px-3 pt-3 pb-1 text-[11px] uppercase tracking-wide text-slate-500 font-medium">
+                <p className="px-3 pt-3 pb-1 text-[11px] uppercase tracking-wide text-slate-400 dark:text-slate-500 font-medium">
                   Companies
                 </p>
                 {newCompanies.map((r) => (
@@ -161,13 +161,13 @@ export function ChatList({
                     key={r.id}
                     onClick={() => handleAdd(r.id)}
                     disabled={addingId !== null}
-                    className="w-full flex items-center justify-between gap-2 px-3 py-2.5 text-left hover:bg-slate-800/60 transition-colors disabled:opacity-50"
+                    className="w-full flex items-center justify-between gap-2 px-3 py-2.5 text-left hover:bg-slate-100/60 dark:hover:bg-slate-800/60 transition-colors disabled:opacity-50"
                   >
                     <span className="flex items-baseline gap-2 min-w-0">
-                      <span className="font-mono font-semibold text-slate-200 text-sm">
+                      <span className="font-mono font-semibold text-slate-700 dark:text-slate-200 text-sm">
                         {r.ticker}
                       </span>
-                      <span className="text-xs text-slate-500 truncate">
+                      <span className="text-xs text-slate-400 dark:text-slate-500 truncate">
                         {r.name}
                       </span>
                     </span>
@@ -177,10 +177,10 @@ export function ChatList({
                   </button>
                 ))}
                 {searching && (
-                  <p className="px-3 py-1.5 text-slate-500 text-xs">Searching…</p>
+                  <p className="px-3 py-1.5 text-slate-400 dark:text-slate-500 text-xs">Searching…</p>
                 )}
                 {!searching && newCompanies.length === 0 && (
-                  <p className="px-3 py-1.5 text-slate-600 text-xs">
+                  <p className="px-3 py-1.5 text-slate-400 dark:text-slate-600 text-xs">
                     No other SEC-registered companies match &ldquo;{query}&rdquo;
                   </p>
                 )}

@@ -31,7 +31,7 @@ export function ForgotPasswordForm() {
   if (success) {
     return (
       <div className="text-center space-y-3">
-        <p className="text-slate-200 text-sm">
+        <p className="text-slate-700 dark:text-slate-200 text-sm">
           If an account with that email exists, we&apos;ve sent a password reset
           link.
         </p>
@@ -47,7 +47,7 @@ export function ForgotPasswordForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <p className="text-slate-400 text-sm">
+      <p className="text-slate-500 dark:text-slate-400 text-sm">
         Enter your email and we&apos;ll send you a reset link.
       </p>
       <div>
@@ -57,7 +57,7 @@ export function ForgotPasswordForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="bg-slate-900 border-slate-600 text-white placeholder:text-slate-500 focus-visible:border-slate-400 focus-visible:ring-0"
+          className="bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus-visible:border-slate-500 dark:focus-visible:border-slate-400 focus-visible:ring-0"
         />
       </div>
       {error && <p className="text-red-400 text-xs">{error}</p>}
@@ -71,7 +71,7 @@ export function ForgotPasswordForm() {
       <p className="text-center text-xs">
         <Link
           href="/login"
-          className="text-slate-400 hover:text-slate-200"
+          className="text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
         >
           Back to sign in
         </Link>

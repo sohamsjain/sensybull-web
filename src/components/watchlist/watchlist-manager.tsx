@@ -57,12 +57,12 @@ export function WatchlistManager({
   };
 
   return (
-    <div className="mt-2 bg-slate-800 border border-slate-700 rounded p-3">
+    <div className="mt-2 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded p-3">
       <div className="flex items-center justify-between mb-2">
-        <span className="text-sm text-white font-medium">{watchlist.name}</span>
+        <span className="text-sm text-slate-900 dark:text-white font-medium">{watchlist.name}</span>
         <button
           onClick={onClose}
-          className="text-slate-500 hover:text-slate-300 text-xs"
+          className="text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 text-xs"
         >
           x
         </button>
@@ -76,7 +76,7 @@ export function WatchlistManager({
               key={c.id}
               className="flex items-center justify-between text-xs"
             >
-              <span className="text-slate-300">{c.ticker || c.name}</span>
+              <span className="text-slate-600 dark:text-slate-300">{c.ticker || c.name}</span>
               <button
                 onClick={() => handleRemove(c.id)}
                 className="text-red-400/60 hover:text-red-400"
@@ -94,7 +94,7 @@ export function WatchlistManager({
         placeholder="Search ticker or company..."
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        className="w-full bg-slate-900 border border-slate-600 rounded px-2 py-1 text-xs text-white placeholder-slate-500 outline-none focus:border-slate-400"
+        className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded px-2 py-1 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none focus:border-slate-500 dark:focus:border-slate-400"
       />
       {results.length > 0 && (
         <div className="mt-1 max-h-32 overflow-y-auto space-y-0.5">
@@ -104,7 +104,7 @@ export function WatchlistManager({
               <button
                 key={c.id}
                 onClick={() => handleAdd(c.id)}
-                className="w-full text-left px-2 py-1 text-xs text-slate-300 hover:bg-slate-700 rounded"
+                className="w-full text-left px-2 py-1 text-xs text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 rounded"
               >
                 {c.ticker} &mdash; {c.name}
               </button>
@@ -112,7 +112,7 @@ export function WatchlistManager({
         </div>
       )}
       {searching && (
-        <p className="text-slate-600 text-xs mt-1">Searching...</p>
+        <p className="text-slate-400 dark:text-slate-600 text-xs mt-1">Searching...</p>
       )}
 
       <button

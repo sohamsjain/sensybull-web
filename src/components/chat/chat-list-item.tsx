@@ -7,7 +7,7 @@ import { ChatAvatar } from "./chat-avatar";
 function MutedIcon() {
   return (
     <svg
-      className="w-3.5 h-3.5 text-slate-500 shrink-0"
+      className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 shrink-0"
       fill="none"
       stroke="currentColor"
       viewBox="0 0 24 24"
@@ -39,8 +39,8 @@ export function ChatListItem({
     <button
       onClick={onSelect}
       data-company-id={company.id}
-      className={`w-full flex items-center gap-3 px-3 py-3 text-left transition-colors outline-none focus-visible:bg-slate-800/80 ${
-        active ? "bg-slate-800" : "hover:bg-slate-800/60"
+      className={`w-full flex items-center gap-3 px-3 py-3 text-left transition-colors outline-none focus-visible:bg-slate-100/80 dark:focus-visible:bg-slate-800/80 ${
+        active ? "bg-slate-100 dark:bg-slate-800" : "hover:bg-slate-100/60 dark:hover:bg-slate-800/60"
       }`}
     >
       <ChatAvatar
@@ -48,11 +48,11 @@ export function ChatListItem({
         name={company.name}
       />
 
-      <div className="flex-1 min-w-0 border-b border-slate-800/70 pb-3 -mb-3">
+      <div className="flex-1 min-w-0 border-b border-slate-200/70 dark:border-slate-800/70 pb-3 -mb-3">
         <div className="flex items-baseline justify-between gap-2">
           <span
             className={`truncate text-[15px] leading-5 ${
-              hasUnread ? "text-white font-semibold" : "text-slate-100"
+              hasUnread ? "text-slate-900 dark:text-white font-semibold" : "text-slate-800 dark:text-slate-100"
             }`}
           >
             {company.name}
@@ -61,7 +61,7 @@ export function ChatListItem({
             className={`text-[11px] whitespace-nowrap shrink-0 ${
               hasUnread && !muted
                 ? "text-emerald-400 font-medium"
-                : "text-slate-500"
+                : "text-slate-400 dark:text-slate-500"
             }`}
           >
             {chatTimestamp(last_activity_at)}
