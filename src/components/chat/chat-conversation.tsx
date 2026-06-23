@@ -125,10 +125,10 @@ export function ChatConversation({
   return (
     <div className="flex flex-col h-full min-w-0">
       {/* Header */}
-      <div className="flex items-center gap-3 px-3 py-2 border-b border-slate-700 bg-slate-900 shrink-0">
+      <div className="flex items-center gap-3 px-3 py-2 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shrink-0">
         <button
           onClick={onBack}
-          className="md:hidden text-slate-400 hover:text-white shrink-0"
+          className="md:hidden text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white shrink-0"
           aria-label="Back to chats"
         >
           <BackIcon />
@@ -139,10 +139,10 @@ export function ChatConversation({
           size="sm"
         />
         <div className="min-w-0 flex-1">
-          <p className="text-white text-sm font-semibold truncate leading-tight">
+          <p className="text-slate-900 dark:text-white text-sm font-semibold truncate leading-tight">
             {company.name}
           </p>
-          <p className="text-slate-500 text-xs truncate">
+          <p className="text-slate-400 dark:text-slate-500 text-xs truncate">
             {company.ticker && (
               <span className="font-mono">{company.ticker}</span>
             )}
@@ -153,7 +153,7 @@ export function ChatConversation({
                   href={edgarCompanyUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-slate-300 underline underline-offset-2"
+                  className="hover:text-slate-700 dark:hover:text-slate-300 underline underline-offset-2"
                 >
                   SEC filing history
                 </a>
@@ -166,7 +166,7 @@ export function ChatConversation({
           className={`p-1.5 rounded transition-colors ${
             muted
               ? "text-amber-400/80 hover:text-amber-300"
-              : "text-slate-400 hover:text-white"
+              : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
           }`}
           title={muted ? "Unmute alerts for this company" : "Mute alerts for this company"}
         >
@@ -185,7 +185,7 @@ export function ChatConversation({
             </button>
             <button
               onClick={() => setConfirmRemove(false)}
-              className="text-slate-500 hover:text-slate-300"
+              className="text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
             >
               Cancel
             </button>
@@ -193,7 +193,7 @@ export function ChatConversation({
         ) : (
           <button
             onClick={() => setConfirmRemove(true)}
-            className="text-slate-500 hover:text-red-400 text-xs shrink-0"
+            className="text-slate-400 dark:text-slate-500 hover:text-red-400 text-xs shrink-0"
             title="Remove from watchlist"
           >
             Remove
@@ -203,9 +203,9 @@ export function ChatConversation({
 
       {/* Pinned upcoming catalysts */}
       {pinnedCatalysts.length > 0 && (
-        <div className="px-3 py-1.5 bg-slate-800/80 border-b border-slate-700 shrink-0">
+        <div className="px-3 py-1.5 bg-slate-100/80 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700 shrink-0">
           {pinnedCatalysts.map((c, i) => (
-            <p key={i} className="text-xs text-slate-300 truncate">
+            <p key={i} className="text-xs text-slate-600 dark:text-slate-300 truncate">
               <span className="mr-1.5" aria-hidden="true">📌</span>
               <span className="text-blue-300 font-medium">
                 {formatCatalystDate(c.date)}
@@ -227,7 +227,7 @@ export function ChatConversation({
             <button
               onClick={handleLoadEarlier}
               disabled={loading}
-              className="text-xs text-slate-400 hover:text-slate-200 bg-slate-800 px-3 py-1 rounded-full disabled:opacity-50"
+              className="text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full disabled:opacity-50"
             >
               {loading ? "Loading..." : "Load earlier filings"}
             </button>
@@ -237,16 +237,16 @@ export function ChatConversation({
         {loading && events.length === 0 ? (
           <div className="space-y-3 animate-pulse pt-2">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="max-w-[75%] h-24 bg-slate-800 rounded-lg" />
+              <div key={i} className="max-w-[75%] h-24 bg-slate-100 dark:bg-slate-800 rounded-lg" />
             ))}
           </div>
         ) : ordered.length === 0 ? (
           <div className="h-full flex items-center justify-center">
             <div className="text-center max-w-xs">
-              <p className="text-slate-300 text-sm font-medium mb-1">
+              <p className="text-slate-600 dark:text-slate-300 text-sm font-medium mb-1">
                 No filings yet
               </p>
-              <p className="text-slate-500 text-xs leading-relaxed">
+              <p className="text-slate-400 dark:text-slate-500 text-xs leading-relaxed">
                 The moment {company.name} files with the SEC, the decoded
                 briefing lands here — usually within minutes of hitting EDGAR.
               </p>
@@ -264,7 +264,7 @@ export function ChatConversation({
               <div key={event.id}>
                 {showDay && ts && (
                   <div className="flex justify-center my-3">
-                    <span className="text-[11px] text-slate-300 bg-slate-800/90 px-3 py-1 rounded-md shadow-sm shadow-black/20">
+                    <span className="text-[11px] text-slate-600 dark:text-slate-300 bg-slate-100/90 dark:bg-slate-800/90 px-3 py-1 rounded-md shadow-sm shadow-slate-300/30 dark:shadow-black/20">
                       {dayLabel(ts)}
                     </span>
                   </div>

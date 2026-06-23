@@ -28,7 +28,7 @@ export function FilingList({
         <div
           className={`w-2 h-2 rounded-full ${connected ? "bg-green-500" : "bg-red-500"}`}
         />
-        <span className="text-slate-500 text-xs">
+        <span className="text-slate-400 dark:text-slate-500 text-xs">
           {connected ? "Live" : "Connecting..."} &middot; {events.length}{" "}
           event{events.length !== 1 ? "s" : ""}
         </span>
@@ -48,7 +48,7 @@ export function FilingList({
             variant="ghost"
             onClick={onLoadMore}
             disabled={loading}
-            className="text-slate-400 hover:text-slate-200"
+            className="text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
           >
             {loading ? "Loading..." : "Load more"}
           </Button>
@@ -57,20 +57,20 @@ export function FilingList({
 
       {/* Empty states */}
       {events.length === 0 && allCount > 0 && (
-        <p className="text-slate-500 text-sm text-center mt-12">
+        <p className="text-slate-400 dark:text-slate-500 text-sm text-center mt-12">
           No events match your filters.
         </p>
       )}
       {allCount === 0 && !loading && (
         <div className="text-center mt-16">
-          <p className="text-slate-500 text-sm">No filing events yet.</p>
-          <p className="text-slate-600 text-xs mt-1">
+          <p className="text-slate-400 dark:text-slate-500 text-sm">No filing events yet.</p>
+          <p className="text-slate-400 dark:text-slate-600 text-xs mt-1">
             New 8-K filings will appear here in real time.
           </p>
         </div>
       )}
       {loading && allCount === 0 && (
-        <p className="text-slate-500 text-sm text-center mt-12">
+        <p className="text-slate-400 dark:text-slate-500 text-sm text-center mt-12">
           Loading events...
         </p>
       )}

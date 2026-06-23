@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTheme } from "next-themes";
 
 const LOGO_DEV_TOKEN = process.env.NEXT_PUBLIC_LOGO_DEV_TOKEN;
 
@@ -32,9 +33,10 @@ export function ChatAvatar({
   name: string;
   size?: "sm" | "md";
 }) {
+  const { resolvedTheme } = useTheme();
   const src =
     LOGO_DEV_TOKEN && ticker
-      ? `https://img.logo.dev/ticker/${encodeURIComponent(ticker)}?token=${LOGO_DEV_TOKEN}&format=webp&size=128`
+      ? `https://img.logo.dev/ticker/${encodeURIComponent(ticker)}?token=${LOGO_DEV_TOKEN}&format=webp&size=128&theme=${resolvedTheme === "dark" ? "dark" : "light"}`
       : null;
 
   const [failed, setFailed] = useState<string | null>(null);

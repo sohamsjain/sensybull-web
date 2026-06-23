@@ -38,10 +38,10 @@ function VerifyEmailContent() {
 
   return (
     <div className="text-center space-y-4">
-      <h2 className="text-white font-semibold text-lg">Email Verification</h2>
+      <h2 className="text-slate-900 dark:text-white font-semibold text-lg">Email Verification</h2>
 
       {status === "loading" && (
-        <p className="text-slate-400 text-sm">Verifying...</p>
+        <p className="text-slate-500 dark:text-slate-400 text-sm">Verifying...</p>
       )}
 
       {status === "success" && (
@@ -74,7 +74,7 @@ function VerifyEmailContent() {
 export default function VerifyEmailPage() {
   return (
     <Suspense
-      fallback={<p className="text-slate-400 text-sm text-center">Verifying...</p>}
+      fallback={<p className="text-slate-500 dark:text-slate-400 text-sm text-center">Verifying...</p>}
     >
       <VerifyEmailContent />
     </Suspense>

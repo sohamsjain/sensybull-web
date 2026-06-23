@@ -3,12 +3,12 @@ import { ArrowLeft } from "lucide-react";
 
 export default function PrivacyPolicy() {
   return (
-    <div className="min-h-screen bg-slate-900">
-      <header className="border-b border-slate-700 bg-slate-900/80 backdrop-blur-sm sticky top-0 z-50">
+    <div className="min-h-screen bg-white dark:bg-slate-900">
+      <header className="border-b border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <Link
             href="/feed"
-            className="inline-flex items-center space-x-2 text-slate-300 hover:text-white transition-colors"
+            className="inline-flex items-center space-x-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
             <span>Back to Home</span>
@@ -18,35 +18,35 @@ export default function PrivacyPolicy() {
 
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 max-w-4xl">
         <div className="mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4">
             Privacy Policy
           </h1>
-          <p className="text-slate-400">Last updated: December 8, 2025</p>
+          <p className="text-slate-500 dark:text-slate-400">Last updated: December 8, 2025</p>
         </div>
 
-        <div className="prose prose-invert prose-slate max-w-none">
+        <div className="prose dark:prose-invert prose-slate max-w-none">
           {/* Introduction */}
-          <div className="mb-8 p-6 bg-slate-800/50 border border-slate-700 rounded-lg">
-            <p className="text-slate-300 leading-relaxed mb-4">
+          <div className="mb-8 p-6 bg-slate-100/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg">
+            <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
               Sensybull, LLC (&quot;Company&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;) is committed to maintaining robust
               privacy protections for its users. Our Privacy Policy is designed to help you understand
               how we collect, use and safeguard the information you provide to us and to assist you in
               making informed decisions when using our Service.
             </p>
-            <p className="text-slate-300 leading-relaxed mb-4">
+            <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
               For purposes of this Agreement, &quot;Site&quot; refers to the Company&apos;s website, which can be
               accessed at <strong>www.sensybull.com</strong> and through our mobile application.
             </p>
-            <p className="text-slate-300 leading-relaxed mb-4">
+            <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
               &quot;Service&quot; refers to the Company&apos;s services accessed via the Site, in which users can
               access personalized financial news, market insights, stock information, and investment
               research tools.
             </p>
-            <p className="text-slate-300 leading-relaxed mb-4">
+            <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
               The terms &quot;we,&quot; &quot;us,&quot; and &quot;our&quot; refer to the Company. &quot;You&quot; refers to you, as a user
               of our Site or our Service.
             </p>
-            <p className="text-slate-300 leading-relaxed">
+            <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
               By accessing our Site or our Service, you accept our Privacy Policy and{" "}
               <Link href="/terms" className="text-blue-400 hover:text-blue-300">
                 Terms of Use
@@ -58,31 +58,31 @@ export default function PrivacyPolicy() {
 
           {/* Section I */}
           <section className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 text-white">I. Information We Collect</h2>
+            <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">I. Information We Collect</h2>
 
-            <p className="text-slate-300 leading-relaxed mb-4">
+            <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
               We collect &quot;Non-Personal Information&quot; and &quot;Personal Information.&quot;
             </p>
 
-            <p className="text-slate-300 leading-relaxed mb-4">
-              <strong className="text-white">Non-Personal Information</strong> includes information
+            <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
+              <strong className="text-slate-900 dark:text-white">Non-Personal Information</strong> includes information
               that cannot be used to personally identify you, such as anonymous usage data, general
               demographic information we may collect, referring/exit pages and URLs, platform types,
               preferences you submit and preferences that are generated based on the data you submit
               and number of clicks.
             </p>
 
-            <p className="text-slate-300 leading-relaxed mb-6">
-              <strong className="text-white">Personal Information</strong> includes your email address,
+            <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-6">
+              <strong className="text-slate-900 dark:text-white">Personal Information</strong> includes your email address,
               name, and account preferences, which you submit to us through the registration process at
               the Site.
             </p>
 
-            <div className="mb-6 pl-6 border-l-2 border-slate-600">
-              <h3 className="text-xl font-semibold mb-3 text-slate-200">
+            <div className="mb-6 pl-6 border-l-2 border-slate-300 dark:border-slate-600">
+              <h3 className="text-xl font-semibold mb-3 text-slate-700 dark:text-slate-200">
                 1. Information Collected via Technology
               </h3>
-              <p className="text-slate-300 leading-relaxed mb-3">
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-3">
                 To activate the Service you need to submit your email address. To use the Service
                 thereafter, you may need to submit further Personal Information including your name and
                 investment preferences. However, in an effort to improve the quality of the Service, we
@@ -91,35 +91,35 @@ export default function PrivacyPolicy() {
                 URL&quot;), the type of browser you use, the device from which you connected to the Service,
                 the time and date of access, and other information that does not personally identify you.
               </p>
-              <p className="text-slate-300 leading-relaxed mb-3">
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-3">
                 We track this information using cookies, or small text files which include an anonymous
                 unique identifier. Cookies are sent to a user&apos;s browser from our servers and are stored
                 on the user&apos;s computer hard drive. Sending a cookie to a user&apos;s browser enables us to
                 collect Non-Personal information about that user and keep a record of the user&apos;s
                 preferences when utilizing our services, both on an individual and aggregate basis.
               </p>
-              <p className="text-slate-300 leading-relaxed mb-3">
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-3">
                 For example, the Company may use cookies to collect the following information:
               </p>
-              <ul className="list-disc list-inside text-slate-300 space-y-2 ml-4 mb-3">
+              <ul className="list-disc list-inside text-slate-600 dark:text-slate-600 dark:text-slate-300 space-y-2 ml-4 mb-3">
                 <li>User preferences and settings</li>
                 <li>Stocks and sectors you track</li>
                 <li>Articles you view and interact with</li>
                 <li>App usage patterns and session duration</li>
                 <li>Device and browser information</li>
               </ul>
-              <p className="text-slate-300 leading-relaxed">
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
                 The Company may use both persistent and session cookies; persistent cookies remain on
                 your computer after you close your session and until you delete them, while session
                 cookies expire when you close your browser.
               </p>
             </div>
 
-            <div className="mb-6 pl-6 border-l-2 border-slate-600">
-              <h3 className="text-xl font-semibold mb-3 text-slate-200">
+            <div className="mb-6 pl-6 border-l-2 border-slate-300 dark:border-slate-600">
+              <h3 className="text-xl font-semibold mb-3 text-slate-700 dark:text-slate-200">
                 2. Information You Provide by Registering for an Account
               </h3>
-              <p className="text-slate-300 leading-relaxed">
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
                 In addition to the information provided automatically by your browser when you visit the
                 Site, to become a subscriber to the Service you will need to create a personal profile.
                 You can create a profile by registering with the Service and entering your email address,
@@ -129,11 +129,11 @@ export default function PrivacyPolicy() {
               </p>
             </div>
 
-            <div className="pl-6 border-l-2 border-slate-600">
-              <h3 className="text-xl font-semibold mb-3 text-slate-200">
+            <div className="pl-6 border-l-2 border-slate-300 dark:border-slate-600">
+              <h3 className="text-xl font-semibold mb-3 text-slate-700 dark:text-slate-200">
                 3. Children&apos;s Privacy
               </h3>
-              <p className="text-slate-300 leading-relaxed">
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
                 The Site and the Service are not directed to anyone under the age of 18. The Site does
                 not knowingly collect or solicit information from anyone under the age of 18, or allow
                 anyone under the age of 18 to sign up for the Service. In the event that we learn that
@@ -153,13 +153,13 @@ export default function PrivacyPolicy() {
 
           {/* Section II */}
           <section className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 text-white">
+            <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">
               II. How We Use and Share Information
             </h2>
 
             <div className="mb-6">
-              <h3 className="text-xl font-semibold mb-3 text-slate-200">Personal Information</h3>
-              <p className="text-slate-300 leading-relaxed mb-3">
+              <h3 className="text-xl font-semibold mb-3 text-slate-700 dark:text-slate-200">Personal Information</h3>
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-3">
                 Except as otherwise stated in this Privacy Policy, we do not sell, trade, rent or
                 otherwise share for marketing purposes your Personal Information with third parties
                 without your consent. We do share Personal Information with vendors who are performing
@@ -168,13 +168,13 @@ export default function PrivacyPolicy() {
                 vendors use your Personal Information only at our direction and in accordance with our
                 Privacy Policy.
               </p>
-              <p className="text-slate-300 leading-relaxed mb-3">
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-3">
                 In general, the Personal Information you provide to us is used to help us communicate
                 with you. For example, we use Personal Information to contact users in response to
                 questions, solicit feedback from users, provide technical support, and inform users about
                 promotional offers.
               </p>
-              <p className="text-slate-300 leading-relaxed">
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
                 We may share Personal Information with outside parties if we have a good-faith belief
                 that access, use, preservation or disclosure of the information is reasonably necessary
                 to meet any applicable legal process or enforceable governmental request; to enforce
@@ -185,8 +185,8 @@ export default function PrivacyPolicy() {
             </div>
 
             <div>
-              <h3 className="text-xl font-semibold mb-3 text-slate-200">Non-Personal Information</h3>
-              <p className="text-slate-300 leading-relaxed mb-3">
+              <h3 className="text-xl font-semibold mb-3 text-slate-700 dark:text-slate-200">Non-Personal Information</h3>
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-3">
                 In general, we use Non-Personal Information to help us improve the Service and customize
                 the user experience. We also aggregate Non-Personal Information in order to track trends
                 and analyze use patterns on the Site. This Privacy Policy does not limit in any way our
@@ -194,7 +194,7 @@ export default function PrivacyPolicy() {
                 disclose such Non-Personal Information to our partners, advertisers and other third
                 parties at our discretion.
               </p>
-              <p className="text-slate-300 leading-relaxed">
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
                 In the event we undergo a business transaction such as a merger, acquisition by another
                 company, or sale of all or a portion of our assets, your Personal Information may be
                 among the assets transferred. You acknowledge and consent that such transfers may occur
@@ -206,14 +206,14 @@ export default function PrivacyPolicy() {
 
           {/* Section III */}
           <section className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 text-white">III. How We Protect Information</h2>
-            <p className="text-slate-300 leading-relaxed mb-3">
+            <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">III. How We Protect Information</h2>
+            <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-3">
               We implement security measures designed to protect your information from unauthorized
               access. Your account is protected by your account password and we urge you to take steps
               to keep your personal information safe by not disclosing your password and by logging out
               of your account after each use.
             </p>
-            <p className="text-slate-300 leading-relaxed">
+            <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
               We further protect your information from potential security breaches by implementing
               certain technological security measures including encryption, firewalls and secure socket
               layer technology. However, these measures do not guarantee that your information will not
@@ -225,16 +225,16 @@ export default function PrivacyPolicy() {
 
           {/* Section IV */}
           <section className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 text-white">
+            <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">
               IV. Your Rights Regarding the Use of Your Personal Information
             </h2>
-            <p className="text-slate-300 leading-relaxed mb-3">
+            <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-3">
               You have the right at any time to prevent us from contacting you for marketing purposes.
               When we send a promotional communication to a user, the user can opt out of further
               promotional communications by following the unsubscribe instructions provided in each
               promotional e-mail.
             </p>
-            <p className="text-slate-300 leading-relaxed">
+            <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
               You can also indicate that you do not wish to receive marketing communications from us in
               the Settings section of the Site or mobile app. Please note that notwithstanding the
               promotional preferences you indicate by either unsubscribing or opting out in the
@@ -245,14 +245,14 @@ export default function PrivacyPolicy() {
 
           {/* Section V */}
           <section className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 text-white">V. Links to Other Websites</h2>
-            <p className="text-slate-300 leading-relaxed mb-3">
+            <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">V. Links to Other Websites</h2>
+            <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-3">
               As part of the Service, we may provide links to or compatibility with other websites or
               applications. However, we are not responsible for the privacy practices employed by those
               websites or the information or content they contain. This Privacy Policy applies solely to
               information collected by us through the Site and the Service.
             </p>
-            <p className="text-slate-300 leading-relaxed">
+            <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
               Therefore, this Privacy Policy does not apply to your use of a third party website
               accessed by selecting a link on our Site or via our Service. To the extent that you access
               or use the Service through or on another website or application, then the privacy policy
@@ -264,14 +264,14 @@ export default function PrivacyPolicy() {
 
           {/* Section VI */}
           <section className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 text-white">VI. Changes to Our Privacy Policy</h2>
-            <p className="text-slate-300 leading-relaxed mb-3">
+            <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">VI. Changes to Our Privacy Policy</h2>
+            <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-3">
               The Company reserves the right to change this policy and our Terms of Service at any time.
               We will notify you of significant changes to our Privacy Policy by sending a notice to the
               primary email address specified in your account or by placing a prominent notice on our
               site.
             </p>
-            <p className="text-slate-300 leading-relaxed">
+            <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
               Significant changes will go into effect 30 days following such notification. Non-material
               changes or clarifications will take effect immediately. You should periodically check the
               Site and this privacy page for updates.
@@ -279,9 +279,9 @@ export default function PrivacyPolicy() {
           </section>
 
           {/* Section VII */}
-          <section className="mb-12 p-6 bg-slate-800/50 border border-slate-700 rounded-lg">
-            <h2 className="text-2xl font-bold mb-6 text-white">VII. Contact Us</h2>
-            <p className="text-slate-300 leading-relaxed mb-4">
+          <section className="mb-12 p-6 bg-slate-100/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg">
+            <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">VII. Contact Us</h2>
+            <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
               If you have any questions regarding this Privacy Policy or the practices of this Site,
               please contact us by sending an email to{" "}
               <a
@@ -292,7 +292,7 @@ export default function PrivacyPolicy() {
               </a>
               .
             </p>
-            <div className="text-slate-300 space-y-2">
+            <div className="text-slate-600 dark:text-slate-300 space-y-2">
               <p>
                 <strong>Soham Siddhesh Jain</strong>
               </p>
@@ -311,7 +311,7 @@ export default function PrivacyPolicy() {
             </div>
           </section>
 
-          <div className="mt-12 pt-8 border-t border-slate-700 text-center text-slate-400">
+          <div className="mt-12 pt-8 border-t border-slate-200 dark:border-slate-700 text-center text-slate-500 dark:text-slate-400">
             <p>Copyright &copy; 2025 Sensybull, LLC. All rights reserved.</p>
           </div>
         </div>

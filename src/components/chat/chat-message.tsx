@@ -29,7 +29,7 @@ export function ChatMessage({ event }: { event: FilingEvent }) {
   return (
     <div className="flex justify-start">
       <div
-        className="max-w-[92%] md:max-w-[70%] bg-slate-800 rounded-lg rounded-tl-none px-3 py-2 shadow-md shadow-black/20 cursor-pointer transition-colors hover:bg-slate-800/90"
+        className="max-w-[92%] md:max-w-[70%] bg-slate-100 dark:bg-slate-800 rounded-lg rounded-tl-none px-3 py-2 shadow-md shadow-slate-300/30 dark:shadow-black/20 cursor-pointer transition-colors hover:bg-slate-100/90 dark:hover:bg-slate-800/90"
         onClick={toggleExpanded}
       >
         {/* Meta row */}
@@ -40,7 +40,7 @@ export function ChatMessage({ event }: { event: FilingEvent }) {
               <EventTypeTag type={briefing.primary_event_type} primary />
             )}
           <SentimentDot sentiment={sentiment} />
-          <span className="text-slate-500 text-[10px] ml-auto whitespace-nowrap uppercase tracking-wide">
+          <span className="text-slate-400 dark:text-slate-500 text-[10px] ml-auto whitespace-nowrap uppercase tracking-wide">
             {event.signal_type}
           </span>
         </div>
@@ -48,7 +48,7 @@ export function ChatMessage({ event }: { event: FilingEvent }) {
         {/* Briefing body */}
         {briefing ? (
           <>
-            <p className="text-slate-50 text-[14px] font-semibold leading-snug">
+            <p className="text-slate-900 dark:text-slate-50 text-[14px] font-semibold leading-snug">
               {briefing.headline}
             </p>
             {briefing.investor_takeaway && (
@@ -57,7 +57,7 @@ export function ChatMessage({ event }: { event: FilingEvent }) {
               </p>
             )}
             {briefing.summary && (
-              <p className="text-slate-300/90 text-[13px] leading-[1.5] mt-1.5">
+              <p className="text-slate-600/90 dark:text-slate-300/90 text-[13px] leading-[1.5] mt-1.5">
                 {briefing.summary}
               </p>
             )}
@@ -68,7 +68,7 @@ export function ChatMessage({ event }: { event: FilingEvent }) {
             {catalysts.length > 0 && <CatalystsTable catalysts={catalysts} />}
           </>
         ) : (
-          <p className="text-slate-300 text-sm">
+          <p className="text-slate-600 dark:text-slate-300 text-sm">
             {event.company_name} filed an {event.signal_type}.
           </p>
         )}
@@ -76,10 +76,10 @@ export function ChatMessage({ event }: { event: FilingEvent }) {
         {/* Expanded: exhibits */}
         {expanded && exhibits?.length > 0 && (
           <div
-            className="mt-3 pt-3 border-t border-slate-700"
+            className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700"
             onClick={(e) => e.stopPropagation()}
           >
-            <p className="text-slate-500 text-xs uppercase tracking-wide mb-1">
+            <p className="text-slate-400 dark:text-slate-500 text-xs uppercase tracking-wide mb-1">
               Exhibits
             </p>
             {exhibits.map((ex, i) => (
@@ -101,7 +101,7 @@ export function ChatMessage({ event }: { event: FilingEvent }) {
           className="flex items-center justify-between gap-3 mt-2"
           onClick={(e) => e.stopPropagation()}
         >
-          <span className="text-slate-500 text-[10.5px]">
+          <span className="text-slate-400 dark:text-slate-500 text-[10.5px]">
             AI briefing &middot;{" "}
             {edgar_url ? (
               <a
@@ -116,7 +116,7 @@ export function ChatMessage({ event }: { event: FilingEvent }) {
               "sourced from SEC EDGAR"
             )}
           </span>
-          <span className="text-slate-500/80 text-[10.5px] whitespace-nowrap tabular-nums">
+          <span className="text-slate-400/80 dark:text-slate-500/80 text-[10.5px] whitespace-nowrap tabular-nums">
             {messageTime(event.received_at || event.filing_date)}
           </span>
         </div>

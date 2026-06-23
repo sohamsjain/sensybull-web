@@ -41,7 +41,7 @@ export function FilingCard({ event }: { event: FilingEvent }) {
 
   return (
     <div
-      className={`bg-slate-800 rounded-lg border ${sigConfig.border} p-4 cursor-pointer transition-colors hover:bg-slate-800/80 ${isLow ? "opacity-60" : ""}`}
+      className={`bg-slate-100 dark:bg-slate-800 rounded-lg border ${sigConfig.border} p-4 cursor-pointer transition-colors hover:bg-slate-100/80 dark:hover:bg-slate-800/80 ${isLow ? "opacity-60" : ""}`}
       onClick={() => setExpanded((e) => !e)}
     >
       {/* Header row */}
@@ -49,15 +49,15 @@ export function FilingCard({ event }: { event: FilingEvent }) {
         <div className="flex items-center gap-2 min-w-0">
           <SignificanceBadge level={significance} />
           {ticker && (
-            <span className="font-mono font-bold text-white">{ticker}</span>
+            <span className="font-mono font-bold text-slate-900 dark:text-white">{ticker}</span>
           )}
-          <span className="text-slate-400 text-sm truncate">
+          <span className="text-slate-500 dark:text-slate-400 text-sm truncate">
             {company_name}
           </span>
         </div>
         <div className="flex items-center gap-2 shrink-0 ml-2">
           <SentimentDot sentiment={sentiment} />
-          <span className="text-slate-500 text-xs whitespace-nowrap">
+          <span className="text-slate-400 dark:text-slate-500 text-xs whitespace-nowrap">
             {timeAgo(received_at || filing_date)}
           </span>
         </div>
@@ -67,7 +67,7 @@ export function FilingCard({ event }: { event: FilingEvent }) {
       {briefing && (
         <div className="mb-2">
           <div className="flex items-center gap-2 mb-1">
-            <p className="text-slate-200 text-sm font-medium flex-1 min-w-0">
+            <p className="text-slate-700 dark:text-slate-200 text-sm font-medium flex-1 min-w-0">
               {briefing.headline}
             </p>
             {briefing.primary_event_type &&
@@ -77,13 +77,13 @@ export function FilingCard({ event }: { event: FilingEvent }) {
           </div>
 
           {briefing.investor_takeaway && (
-            <p className="text-slate-200 text-sm italic mt-1">
+            <p className="text-slate-700 dark:text-slate-200 text-sm italic mt-1">
               {briefing.investor_takeaway}
             </p>
           )}
 
           {briefing.summary && (!isLow || expanded) && (
-            <p className="text-slate-400 text-sm leading-relaxed mt-1">
+            <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mt-1">
               {briefing.summary}
             </p>
           )}
@@ -115,7 +115,7 @@ export function FilingCard({ event }: { event: FilingEvent }) {
           {items.map((item, i) => (
             <span
               key={i}
-              className="px-1.5 py-0.5 bg-slate-700 text-slate-400 rounded text-xs"
+              className="px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400 rounded text-xs"
             >
               {item.category}
             </span>
@@ -126,12 +126,12 @@ export function FilingCard({ event }: { event: FilingEvent }) {
       {/* Expanded details */}
       {expanded && (exhibits?.length > 0 || edgar_url) && (
         <div
-          className="mt-3 pt-3 border-t border-slate-700"
+          className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700"
           onClick={(e) => e.stopPropagation()}
         >
           {exhibits?.length > 0 && (
             <div>
-              <p className="text-slate-500 text-xs uppercase tracking-wide mb-1">
+              <p className="text-slate-400 dark:text-slate-500 text-xs uppercase tracking-wide mb-1">
                 Exhibits
               </p>
               {exhibits.map((ex, i) => (
@@ -153,7 +153,7 @@ export function FilingCard({ event }: { event: FilingEvent }) {
               href={edgar_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block mt-3 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded text-xs font-semibold uppercase tracking-wide transition-colors"
+              className="inline-block mt-3 px-3 py-1.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 rounded text-xs font-semibold uppercase tracking-wide transition-colors"
             >
               Read SEC Filing &rarr;
             </a>

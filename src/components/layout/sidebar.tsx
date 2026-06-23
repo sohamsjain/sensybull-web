@@ -37,8 +37,8 @@ export function Sidebar({ selectedWatchlist, onSelectWatchlist }: SidebarProps) 
   };
 
   return (
-    <aside className="w-56 border-r border-slate-700 p-4 shrink-0 overflow-y-auto flex flex-col">
-      <h2 className="text-slate-500 text-xs uppercase tracking-wide mb-3 font-medium">
+    <aside className="w-56 border-r border-slate-200 dark:border-slate-700 p-4 shrink-0 overflow-y-auto flex flex-col">
+      <h2 className="text-slate-400 dark:text-slate-500 text-xs uppercase tracking-wide mb-3 font-medium">
         Watchlists
       </h2>
 
@@ -46,8 +46,8 @@ export function Sidebar({ selectedWatchlist, onSelectWatchlist }: SidebarProps) 
         onClick={() => onSelectWatchlist(null)}
         className={`w-full text-left px-3 py-2 rounded text-sm mb-1 transition-colors ${
           !selectedWatchlist
-            ? "bg-slate-700 text-white"
-            : "text-slate-400 hover:bg-slate-800"
+            ? "bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white"
+            : "text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
         }`}
       >
         All Events
@@ -59,13 +59,13 @@ export function Sidebar({ selectedWatchlist, onSelectWatchlist }: SidebarProps) 
             onClick={() => onSelectWatchlist(wl)}
             className={`flex-1 text-left px-3 py-2 rounded text-sm transition-colors ${
               selectedWatchlist?.id === wl.id
-                ? "bg-slate-700 text-white"
-                : "text-slate-400 hover:bg-slate-800"
+                ? "bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white"
+                : "text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
             }`}
           >
             {wl.name}
             {wl.companies?.length > 0 && (
-              <span className="text-slate-600 text-xs ml-1">
+              <span className="text-slate-400 dark:text-slate-600 text-xs ml-1">
                 ({wl.companies.length})
               </span>
             )}
@@ -74,7 +74,7 @@ export function Sidebar({ selectedWatchlist, onSelectWatchlist }: SidebarProps) 
             onClick={() =>
               setManagingWlId(managingWlId === wl.id ? null : wl.id)
             }
-            className="text-slate-600 hover:text-slate-300 px-1 text-xs opacity-0 group-hover:opacity-100"
+            className="text-slate-400 dark:text-slate-600 hover:text-slate-600 dark:hover:text-slate-300 px-1 text-xs opacity-0 group-hover:opacity-100"
             title="Manage"
           >
             ...
@@ -105,22 +105,22 @@ export function Sidebar({ selectedWatchlist, onSelectWatchlist }: SidebarProps) 
       ) : (
         <button
           onClick={() => setShowCreate(true)}
-          className="mt-2 text-slate-500 hover:text-slate-300 text-xs px-3 py-1"
+          className="mt-2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 text-xs px-3 py-1"
         >
           + New Watchlist
         </button>
       )}
 
-      <div className="mt-auto pt-4 border-t border-slate-700">
+      <div className="mt-auto pt-4 border-t border-slate-200 dark:border-slate-700">
         <Link
           href="/chats"
-          className="block px-3 py-2 rounded text-sm text-slate-400 hover:bg-slate-800 hover:text-white transition-colors"
+          className="block px-3 py-2 rounded text-sm text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors"
         >
           Chats
         </Link>
         <Link
           href="/alerts"
-          className="block px-3 py-2 rounded text-sm text-slate-400 hover:bg-slate-800 hover:text-white transition-colors"
+          className="block px-3 py-2 rounded text-sm text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors"
         >
           Alerts
         </Link>

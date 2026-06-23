@@ -24,10 +24,10 @@ export function NotificationList() {
 
   if (loading && notifications.length === 0) {
     return (
-      <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
+      <div className="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-6">
         <div className="animate-pulse space-y-3">
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="h-16 bg-slate-700 rounded" />
+            <div key={i} className="h-16 bg-slate-200 dark:bg-slate-700 rounded" />
           ))}
         </div>
       </div>
@@ -36,9 +36,9 @@ export function NotificationList() {
 
   if (notifications.length === 0) {
     return (
-      <div className="bg-slate-800 border border-slate-700 rounded-lg p-8 text-center">
-        <p className="text-slate-400 text-sm">No notifications yet.</p>
-        <p className="text-slate-500 text-xs mt-1">
+      <div className="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-8 text-center">
+        <p className="text-slate-500 dark:text-slate-400 text-sm">No notifications yet.</p>
+        <p className="text-slate-400 dark:text-slate-500 text-xs mt-1">
           Notifications will appear here when filing events trigger your alerts.
         </p>
       </div>
@@ -46,8 +46,8 @@ export function NotificationList() {
   }
 
   return (
-    <div className="bg-slate-800 border border-slate-700 rounded-lg overflow-hidden">
-      <div className="divide-y divide-slate-700">
+    <div className="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden">
+      <div className="divide-y divide-slate-200 dark:divide-slate-700">
         {notifications.map((n) => {
           const sigKey = TIER_TO_SIGNIFICANCE[n.filing_event.max_tier] || "Low";
           const sigConfig = SIGNIFICANCE_CONFIG[sigKey];
@@ -60,7 +60,7 @@ export function NotificationList() {
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-white text-sm font-medium">
+                    <span className="text-slate-900 dark:text-white text-sm font-medium">
                       {n.filing_event.ticker}
                     </span>
                     <span
@@ -76,7 +76,7 @@ export function NotificationList() {
                       {n.status}
                     </span>
                   </div>
-                  <p className="text-slate-400 text-xs truncate">
+                  <p className="text-slate-500 dark:text-slate-400 text-xs truncate">
                     {n.filing_event.company_name}
                     {n.filing_event.event_types?.length > 0 &&
                       ` — ${n.filing_event.event_types.join(", ")}`}
@@ -88,10 +88,10 @@ export function NotificationList() {
                   )}
                 </div>
                 <div className="text-right shrink-0">
-                  <span className="text-slate-500 text-xs capitalize">
+                  <span className="text-slate-400 dark:text-slate-500 text-xs capitalize">
                     {n.channel}
                   </span>
-                  <p className="text-slate-600 text-xs mt-0.5">
+                  <p className="text-slate-400 dark:text-slate-600 text-xs mt-0.5">
                     {timeAgo(n.sent_at || n.created_at)}
                   </p>
                 </div>
@@ -103,25 +103,25 @@ export function NotificationList() {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="px-4 py-3 border-t border-slate-700 flex items-center justify-between">
-          <span className="text-slate-500 text-xs">
+        <div className="px-4 py-3 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between">
+          <span className="text-slate-400 dark:text-slate-500 text-xs">
             {total} notification{total !== 1 ? "s" : ""}
           </span>
           <div className="flex gap-1">
             <button
               onClick={() => goToPage(page - 1)}
               disabled={page <= 1 || loading}
-              className="px-2.5 py-1 rounded text-xs text-slate-400 hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="px-2.5 py-1 rounded text-xs text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               Prev
             </button>
-            <span className="px-2 py-1 text-xs text-slate-500">
+            <span className="px-2 py-1 text-xs text-slate-400 dark:text-slate-500">
               {page} / {totalPages}
             </span>
             <button
               onClick={() => goToPage(page + 1)}
               disabled={page >= totalPages || loading}
-              className="px-2.5 py-1 rounded text-xs text-slate-400 hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="px-2.5 py-1 rounded text-xs text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               Next
             </button>

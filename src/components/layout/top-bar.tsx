@@ -211,26 +211,27 @@ export function TopBar({
           placeholder="Search ticker or company..."
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="hidden sm:block flex-1 max-w-xs bg-slate-800 border-slate-700 text-sm text-slate-200 placeholder:text-slate-500 focus-visible:border-slate-500 focus-visible:ring-0"
+          className="hidden sm:block flex-1 max-w-xs bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-sm text-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus-visible:border-slate-400 dark:focus-visible:border-slate-500 focus-visible:ring-0"
         />
       )}
 
       {/* Auth */}
       <div className="ml-auto flex items-center gap-3">
+        <ThemeToggle className="w-8 h-8 md:hidden" />
         {user ? (
           <div className="relative" ref={userMenuRef}>
             <button
               onClick={() => setUserMenuOpen((prev) => !prev)}
-              className="text-slate-400 text-sm hover:text-white"
+              className="text-slate-500 dark:text-slate-400 text-sm hover:text-slate-900 dark:hover:text-white"
             >
               {user.name}
             </button>
             {userMenuOpen && (
-              <div className="absolute top-full right-0 mt-1 bg-slate-800 border border-slate-700 rounded-lg shadow-xl z-50 py-1 min-w-[120px]">
+              <div className="absolute top-full right-0 mt-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl z-50 py-1 min-w-[120px]">
                 <Link
                   href="/alerts"
                   onClick={() => setUserMenuOpen(false)}
-                  className="block w-full text-left px-3 py-1.5 text-sm text-slate-300 hover:bg-slate-700 hover:text-white"
+                  className="block w-full text-left px-3 py-1.5 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white"
                 >
                   Alerts
                 </Link>
@@ -239,7 +240,7 @@ export function TopBar({
                     logout();
                     setUserMenuOpen(false);
                   }}
-                  className="w-full text-left px-3 py-1.5 text-sm text-slate-300 hover:bg-slate-700 hover:text-white"
+                  className="w-full text-left px-3 py-1.5 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white"
                 >
                   Logout
                 </button>

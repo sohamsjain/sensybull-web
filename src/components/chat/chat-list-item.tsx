@@ -72,10 +72,10 @@ export function ChatListItem({
           <span
             className={`truncate text-[13px] leading-5 ${
               hasUnread
-                ? "text-slate-200"
+                ? "text-slate-700 dark:text-slate-200"
                 : last_event
-                  ? "text-slate-400"
-                  : "text-slate-600 italic"
+                  ? "text-slate-500 dark:text-slate-400"
+                  : "text-slate-400 dark:text-slate-600 italic"
             }`}
           >
             {last_event ? last_event.headline : "No filings yet"}
@@ -86,7 +86,7 @@ export function ChatListItem({
               <span
                 className={`min-w-[19px] h-[19px] rounded-full flex items-center justify-center text-[11px] font-semibold leading-none px-1.5 ${
                   muted
-                    ? "bg-slate-600 text-slate-200"
+                    ? "bg-slate-300 dark:bg-slate-600 text-slate-700 dark:text-slate-200"
                     : "bg-emerald-500 text-emerald-950"
                 }`}
               >

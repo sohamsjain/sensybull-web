@@ -48,11 +48,11 @@ export function AlertPreferencesPanel() {
 
   if (loading) {
     return (
-      <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
+      <div className="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-6">
         <div className="animate-pulse space-y-4">
-          <div className="h-4 bg-slate-700 rounded w-1/3" />
-          <div className="h-8 bg-slate-700 rounded w-full" />
-          <div className="h-8 bg-slate-700 rounded w-full" />
+          <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-1/3" />
+          <div className="h-8 bg-slate-200 dark:bg-slate-700 rounded w-full" />
+          <div className="h-8 bg-slate-200 dark:bg-slate-700 rounded w-full" />
         </div>
       </div>
     );
@@ -61,11 +61,11 @@ export function AlertPreferencesPanel() {
   if (!preferences) return null;
 
   return (
-    <div className="bg-slate-800 border border-slate-700 rounded-lg p-6 space-y-6">
+    <div className="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-white font-medium">Alert Notifications</h3>
-          <p className="text-slate-400 text-sm mt-1">
+          <h3 className="text-slate-900 dark:text-white font-medium">Alert Notifications</h3>
+          <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
             Get notified when new filing events match your criteria.
           </p>
         </div>
@@ -73,7 +73,7 @@ export function AlertPreferencesPanel() {
           onClick={() => update({ enabled: !preferences.enabled })}
           disabled={saving}
           className={`relative w-11 h-6 rounded-full transition-colors ${
-            preferences.enabled ? "bg-blue-600" : "bg-slate-600"
+            preferences.enabled ? "bg-blue-600" : "bg-slate-300 dark:bg-slate-600"
           }`}
         >
           <span
@@ -88,7 +88,7 @@ export function AlertPreferencesPanel() {
         <>
           {/* Tier selection */}
           <div>
-            <label className="text-slate-300 text-sm font-medium block mb-2">
+            <label className="text-slate-600 dark:text-slate-300 text-sm font-medium block mb-2">
               Alert sensitivity
             </label>
             <div className="space-y-2">
@@ -100,11 +100,11 @@ export function AlertPreferencesPanel() {
                   className={`w-full text-left px-4 py-2.5 rounded-lg text-sm transition-colors border ${
                     preferences.max_tier === tier
                       ? "bg-blue-500/15 border-blue-500/40 text-blue-400"
-                      : "bg-slate-900 border-slate-700 text-slate-400 hover:border-slate-500"
+                      : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-slate-400 dark:hover:border-slate-500"
                   }`}
                 >
                   <span className="font-medium">Tier {tier}</span>
-                  <span className="text-slate-500 ml-2">
+                  <span className="text-slate-400 dark:text-slate-500 ml-2">
                     &mdash; {TIER_LABELS[tier]}
                   </span>
                 </button>
@@ -114,7 +114,7 @@ export function AlertPreferencesPanel() {
 
           {/* Channel toggles */}
           <div>
-            <label className="text-slate-300 text-sm font-medium block mb-2">
+            <label className="text-slate-600 dark:text-slate-300 text-sm font-medium block mb-2">
               Notification channels
             </label>
             <div className="space-y-2">
@@ -123,12 +123,12 @@ export function AlertPreferencesPanel() {
                 .map((channel) => (
                   <label
                     key={channel}
-                    className="flex items-center justify-between px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg cursor-pointer hover:border-slate-500"
+                    className="flex items-center justify-between px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg cursor-pointer hover:border-slate-400 dark:hover:border-slate-500"
                   >
-                    <span className="text-sm text-slate-300">
+                    <span className="text-sm text-slate-600 dark:text-slate-300">
                       {CHANNEL_LABELS[channel] || channel}
                       {channel === "push" && (
-                        <span className="block text-xs text-slate-500 mt-0.5">
+                        <span className="block text-xs text-slate-400 dark:text-slate-500 mt-0.5">
                           Instant alerts on this device, even with the tab closed
                         </span>
                       )}
@@ -138,7 +138,7 @@ export function AlertPreferencesPanel() {
                       checked={preferences.channels[channel] ?? false}
                       onChange={() => toggleChannel(channel)}
                       disabled={saving || (channel === "push" && pushBusy)}
-                      className="rounded border-slate-600 bg-slate-800 text-blue-500 focus:ring-0 focus:ring-offset-0 w-4 h-4"
+                      className="rounded border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 text-blue-500 focus:ring-0 focus:ring-offset-0 w-4 h-4"
                     />
                   </label>
                 ))}

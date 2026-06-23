@@ -48,7 +48,7 @@ function ResetPasswordContent() {
   if (success) {
     return (
       <div className="text-center space-y-3">
-        <p className="text-slate-200 text-sm">Password reset successfully.</p>
+        <p className="text-slate-700 dark:text-slate-200 text-sm">Password reset successfully.</p>
         <Link
           href="/login"
           className="text-blue-400 hover:text-blue-300 text-sm"
@@ -61,7 +61,7 @@ function ResetPasswordContent() {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-white font-semibold text-lg">New Password</h2>
+      <h2 className="text-slate-900 dark:text-white font-semibold text-lg">New Password</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <Input
           type="password"
@@ -70,7 +70,7 @@ function ResetPasswordContent() {
           onChange={(e) => setPassword(e.target.value)}
           required
           minLength={6}
-          className="bg-slate-900 border-slate-600 text-white placeholder:text-slate-500 focus-visible:border-slate-400 focus-visible:ring-0"
+          className="bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus-visible:border-slate-500 dark:focus-visible:border-slate-400 focus-visible:ring-0"
         />
         {error && <p className="text-red-400 text-xs">{error}</p>}
         <Button
@@ -88,7 +88,7 @@ function ResetPasswordContent() {
 export default function ResetPasswordPage() {
   return (
     <Suspense
-      fallback={<p className="text-slate-400 text-sm text-center">Loading...</p>}
+      fallback={<p className="text-slate-500 dark:text-slate-400 text-sm text-center">Loading...</p>}
     >
       <ResetPasswordContent />
     </Suspense>
