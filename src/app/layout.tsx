@@ -15,8 +15,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Sensybull",
-  description: "SEC 8-K Filing Intelligence",
+  title: "Sensybull — SEC 8-K Filing Intelligence",
+  description:
+    "AI-powered intelligence on every SEC 8-K filing. Real-time alerts, AI briefings, and company tracking for investors.",
 };
 
 export default function RootLayout({

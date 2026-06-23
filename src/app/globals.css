@@ -154,6 +154,14 @@
   }
 }
 
+.hero-glow {
+  background: radial-gradient(
+    ellipse 80% 50% at 50% 30%,
+    rgba(139, 92, 246, 0.08) 0%,
+    transparent 70%
+  );
+}
+
 .chat-wallpaper {
   background-color: rgb(241 245 249);
   background-image: radial-gradient(
