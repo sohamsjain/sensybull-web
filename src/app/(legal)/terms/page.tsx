@@ -3,12 +3,12 @@ import { ArrowLeft } from "lucide-react";
 
 export default function TermsOfService() {
   return (
-    <div className="min-h-screen bg-slate-900">
-      <header className="border-b border-slate-700 bg-slate-900/80 backdrop-blur-sm sticky top-0 z-50">
+    <div className="min-h-screen bg-white dark:bg-slate-900">
+      <header className="border-b border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <Link
             href="/feed"
-            className="inline-flex items-center space-x-2 text-slate-300 hover:text-white transition-colors"
+            className="inline-flex items-center space-x-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
             <span>Back to Home</span>
@@ -18,14 +18,14 @@ export default function TermsOfService() {
 
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 max-w-4xl">
         <div className="mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Terms of Use</h1>
-          <p className="text-slate-400 mt-2">Last revised: December 8, 2025</p>
+          <h1 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4">Terms of Use</h1>
+          <p className="text-slate-500 dark:text-slate-400 mt-2">Last revised: December 8, 2025</p>
         </div>
 
-        <div className="prose prose-invert prose-slate max-w-none">
+        <div className="prose dark:prose-invert prose-slate max-w-none">
           {/* Introduction */}
-          <div className="mb-8 p-6 bg-slate-800/50 border border-slate-700 rounded-lg">
-            <p className="text-slate-300 leading-relaxed">
+          <div className="mb-8 p-6 bg-slate-100/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg">
+            <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
               The website located at <strong>www.sensybull.com</strong> (the &quot;Site&quot;) is a
               copyrighted work belonging to Sensybull, LLC (&quot;Company&quot;, &quot;us&quot;,
               &quot;our&quot;, and &quot;we&quot;). Certain features of the Site may be subject to
@@ -33,7 +33,7 @@ export default function TermsOfService() {
               with such features. All such additional terms, guidelines, and rules are incorporated by
               reference into these Terms.
             </p>
-            <p className="text-slate-300 leading-relaxed mt-4">
+            <p className="text-slate-600 dark:text-slate-300 leading-relaxed mt-4">
               These Terms of Use (these &quot;Terms&quot;) set forth the legally binding terms and
               conditions that govern your use of the Site. By accessing or using the Site, you are
               accepting these Terms (on behalf of yourself or the entity that you represent), and you
@@ -68,11 +68,11 @@ export default function TermsOfService() {
 
           {/* Section 1: Accounts */}
           <section className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 text-white">1. Accounts</h2>
+            <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">1. Accounts</h2>
 
             <div className="mb-6">
-              <h3 className="text-xl font-semibold mb-3 text-slate-200">1.1 Account Creation</h3>
-              <p className="text-slate-300 leading-relaxed">
+              <h3 className="text-xl font-semibold mb-3 text-slate-700 dark:text-slate-200">1.1 Account Creation</h3>
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
                 In order to use certain features of the Site, you must register for an account
                 (&quot;Account&quot;) and provide certain information about yourself as prompted by the
                 account registration form. You represent and warrant that: (a) all required registration
@@ -84,10 +84,10 @@ export default function TermsOfService() {
             </div>
 
             <div className="mb-6">
-              <h3 className="text-xl font-semibold mb-3 text-slate-200">
+              <h3 className="text-xl font-semibold mb-3 text-slate-700 dark:text-slate-200">
                 1.2 Account Responsibilities
               </h3>
-              <p className="text-slate-300 leading-relaxed">
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
                 You are responsible for maintaining the confidentiality of your Account login information
                 and are fully responsible for all activities that occur under your Account. You agree to
                 immediately notify Company of any unauthorized use, or suspected unauthorized use of your
@@ -99,11 +99,11 @@ export default function TermsOfService() {
 
           {/* Section 2: Access to the Site */}
           <section className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 text-white">2. Access to the Site</h2>
+            <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">2. Access to the Site</h2>
 
             <div className="mb-6">
-              <h3 className="text-xl font-semibold mb-3 text-slate-200">2.1 License</h3>
-              <p className="text-slate-300 leading-relaxed">
+              <h3 className="text-xl font-semibold mb-3 text-slate-700 dark:text-slate-200">2.1 License</h3>
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
                 Subject to these Terms, Company grants you a non-transferable, non-exclusive, revocable,
                 limited license to use and access the Site solely for your own personal, noncommercial
                 use.
@@ -111,11 +111,11 @@ export default function TermsOfService() {
             </div>
 
             <div className="mb-6">
-              <h3 className="text-xl font-semibold mb-3 text-slate-200">2.2 Certain Restrictions</h3>
-              <p className="text-slate-300 leading-relaxed mb-3">
+              <h3 className="text-xl font-semibold mb-3 text-slate-700 dark:text-slate-200">2.2 Certain Restrictions</h3>
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-3">
                 The rights granted to you in these Terms are subject to the following restrictions:
               </p>
-              <ul className="list-disc list-inside text-slate-300 space-y-2 ml-4">
+              <ul className="list-disc list-inside text-slate-600 dark:text-slate-300 space-y-2 ml-4">
                 <li>
                   You shall not license, sell, rent, lease, transfer, assign, distribute, host, or
                   otherwise commercially exploit the Site
@@ -136,8 +136,8 @@ export default function TermsOfService() {
             </div>
 
             <div className="mb-6">
-              <h3 className="text-xl font-semibold mb-3 text-slate-200">2.3 Modification</h3>
-              <p className="text-slate-300 leading-relaxed">
+              <h3 className="text-xl font-semibold mb-3 text-slate-700 dark:text-slate-200">2.3 Modification</h3>
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
                 Company reserves the right, at any time, to modify, suspend, or discontinue the Site (in
                 whole or in part) with or without notice to you. You agree that Company will not be
                 liable to you or to any third party for any modification, suspension, or discontinuation
@@ -146,18 +146,18 @@ export default function TermsOfService() {
             </div>
 
             <div className="mb-6">
-              <h3 className="text-xl font-semibold mb-3 text-slate-200">
+              <h3 className="text-xl font-semibold mb-3 text-slate-700 dark:text-slate-200">
                 2.4 No Support or Maintenance
               </h3>
-              <p className="text-slate-300 leading-relaxed">
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
                 You acknowledge and agree that Company will have no obligation to provide you with any
                 support or maintenance in connection with the Site.
               </p>
             </div>
 
             <div className="mb-6">
-              <h3 className="text-xl font-semibold mb-3 text-slate-200">2.5 Ownership</h3>
-              <p className="text-slate-300 leading-relaxed">
+              <h3 className="text-xl font-semibold mb-3 text-slate-700 dark:text-slate-200">2.5 Ownership</h3>
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
                 You acknowledge that all the intellectual property rights, including copyrights, patents,
                 trade marks, and trade secrets, in the Site and its content are owned by Company or
                 Company&apos;s suppliers. Neither these Terms (nor your access to the Site) transfers to
@@ -167,8 +167,8 @@ export default function TermsOfService() {
             </div>
 
             <div className="mb-6">
-              <h3 className="text-xl font-semibold mb-3 text-slate-200">2.6 Feedback</h3>
-              <p className="text-slate-300 leading-relaxed">
+              <h3 className="text-xl font-semibold mb-3 text-slate-700 dark:text-slate-200">2.6 Feedback</h3>
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
                 If you provide Company with any feedback or suggestions regarding the Site
                 (&quot;Feedback&quot;), you hereby assign to Company all rights in such Feedback and
                 agree that Company shall have the right to use and fully exploit such Feedback and
@@ -180,8 +180,8 @@ export default function TermsOfService() {
 
           {/* Section 3: Indemnification */}
           <section className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 text-white">3. Indemnification</h2>
-            <p className="text-slate-300 leading-relaxed">
+            <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">3. Indemnification</h2>
+            <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
               You agree to indemnify and hold Company (and its officers, employees, and agents) harmless,
               including costs and attorneys&apos; fees, from any claim or demand made by any third party
               due to or arising out of (a) your use of the Site, (b) your violation of these Terms or
@@ -196,15 +196,15 @@ export default function TermsOfService() {
 
           {/* Section 4: Third-Party Links */}
           <section className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 text-white">
+            <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">
               4. Third-Party Links &amp; Ads; Other Users
             </h2>
 
             <div className="mb-6">
-              <h3 className="text-xl font-semibold mb-3 text-slate-200">
+              <h3 className="text-xl font-semibold mb-3 text-slate-700 dark:text-slate-200">
                 4.1 Third-Party Links &amp; Ads
               </h3>
-              <p className="text-slate-300 leading-relaxed">
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
                 The Site may contain links to third-party websites and services, and/or display
                 advertisements for third parties. Such Third-Party Links &amp; Ads are not under the
                 control of Company, and Company is not responsible for any Third-Party Links &amp; Ads.
@@ -219,8 +219,8 @@ export default function TermsOfService() {
             </div>
 
             <div className="mb-6">
-              <h3 className="text-xl font-semibold mb-3 text-slate-200">4.2 Other Users</h3>
-              <p className="text-slate-300 leading-relaxed">
+              <h3 className="text-xl font-semibold mb-3 text-slate-700 dark:text-slate-200">4.2 Other Users</h3>
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
                 Your interactions with other Site users are solely between you and such users. You agree
                 that Company will not be responsible for any loss or damage incurred as the result of any
                 such interactions. If there is a dispute between you and any Site user, we are under no
@@ -229,8 +229,8 @@ export default function TermsOfService() {
             </div>
 
             <div className="mb-6">
-              <h3 className="text-xl font-semibold mb-3 text-slate-200">4.3 Release</h3>
-              <p className="text-slate-300 leading-relaxed mb-3">
+              <h3 className="text-xl font-semibold mb-3 text-slate-700 dark:text-slate-200">4.3 Release</h3>
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-3">
                 You hereby release and forever discharge Company (and our officers, employees, agents,
                 successors, and assigns) from, and hereby waive and relinquish, each and every past,
                 present and future dispute, claim, controversy, demand, right, obligation, liability,
@@ -239,7 +239,7 @@ export default function TermsOfService() {
                 relates directly or indirectly to, the Site (including any interactions with, or act or
                 omission of, other Site users or any Third-Party Links &amp; Ads).
               </p>
-              <p className="text-slate-300 leading-relaxed text-sm bg-slate-800/30 p-4 rounded">
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-sm bg-slate-100/30 dark:bg-slate-800/30 p-4 rounded">
                 IF YOU ARE A CALIFORNIA RESIDENT, YOU HEREBY WAIVE CALIFORNIA CIVIL CODE SECTION 1542 IN
                 CONNECTION WITH THE FOREGOING, WHICH STATES: &quot;A GENERAL RELEASE DOES NOT EXTEND TO
                 CLAIMS WHICH THE CREDITOR OR RELEASING PARTY DOES NOT KNOW OR SUSPECT TO EXIST IN HIS OR
@@ -251,7 +251,7 @@ export default function TermsOfService() {
 
           {/* Section 5: Disclaimers */}
           <section className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 text-white">5. Disclaimers</h2>
+            <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">5. Disclaimers</h2>
             <div className="p-6 bg-amber-900/20 border border-amber-900/50 rounded-lg">
               <p className="text-amber-200 text-sm leading-relaxed mb-3">
                 THE SITE IS PROVIDED ON AN &quot;AS-IS&quot; AND &quot;AS AVAILABLE&quot; BASIS, AND
@@ -274,7 +274,7 @@ export default function TermsOfService() {
 
           {/* Section 6: Limitation on Liability */}
           <section className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 text-white">6. Limitation on Liability</h2>
+            <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">6. Limitation on Liability</h2>
             <div className="p-6 bg-amber-900/20 border border-amber-900/50 rounded-lg space-y-4">
               <p className="text-amber-200 text-sm leading-relaxed">
                 TO THE MAXIMUM EXTENT PERMITTED BY LAW, IN NO EVENT SHALL COMPANY (OR OUR SUPPLIERS) BE
@@ -303,8 +303,8 @@ export default function TermsOfService() {
 
           {/* Section 7: Term and Termination */}
           <section className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 text-white">7. Term and Termination</h2>
-            <p className="text-slate-300 leading-relaxed">
+            <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">7. Term and Termination</h2>
+            <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
               Subject to this Section, these Terms will remain in full force and effect while you use the
               Site. We may suspend or terminate your rights to use the Site (including your Account) at
               any time for any reason at our sole discretion, including for any use of the Site in
@@ -319,11 +319,11 @@ export default function TermsOfService() {
 
           {/* Section 8: General */}
           <section className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 text-white">8. General</h2>
+            <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">8. General</h2>
 
             <div className="mb-8">
-              <h3 className="text-xl font-semibold mb-3 text-slate-200">8.1 Changes</h3>
-              <p className="text-slate-300 leading-relaxed">
+              <h3 className="text-xl font-semibold mb-3 text-slate-700 dark:text-slate-200">8.1 Changes</h3>
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
                 These Terms are subject to occasional revision, and if we make any substantial changes,
                 we may notify you by sending you an e-mail to the last e-mail address you provided to us
                 (if any), and/or by prominently posting notice of the changes on our Site. You are
@@ -339,8 +339,8 @@ export default function TermsOfService() {
 
             {/* 8.2 Dispute Resolution */}
             <div className="mb-8 p-6 bg-red-900/10 border border-red-900/30 rounded-lg">
-              <h3 className="text-xl font-semibold mb-4 text-slate-200">8.2 Dispute Resolution</h3>
-              <p className="text-slate-300 leading-relaxed mb-6">
+              <h3 className="text-xl font-semibold mb-4 text-slate-700 dark:text-slate-200">8.2 Dispute Resolution</h3>
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-6">
                 Please read the following arbitration agreement in this Section (the &quot;Arbitration
                 Agreement&quot;) carefully. It requires you to arbitrate disputes with Company, its
                 parent companies, subsidiaries, affiliates, successors and assigns and all of their
@@ -350,10 +350,10 @@ export default function TermsOfService() {
               </p>
 
               <div className="mb-6 pl-4 border-l-2 border-red-700">
-                <h4 className="text-lg font-semibold mb-3 text-slate-200">
+                <h4 className="text-lg font-semibold mb-3 text-slate-700 dark:text-slate-200">
                   (a) Applicability of Arbitration Agreement
                 </h4>
-                <p className="text-slate-300 leading-relaxed mb-3">
+                <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-3">
                   You agree that any dispute between you and any of the Company Parties relating in any
                   way to the Site, the services offered on the Site (the &quot;Services&quot;) or these
                   Terms will be resolved by binding arbitration, rather than in court, except that (1)
@@ -363,7 +363,7 @@ export default function TermsOfService() {
                   infringement or other misuse of intellectual property rights (such as trademarks, trade
                   dress, domain names, trade secrets, copyrights, and patents).
                 </p>
-                <p className="text-slate-300 leading-relaxed mb-3">
+                <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-3">
                   <strong>
                     This Arbitration Agreement shall survive the expiration or termination of these Terms
                     and shall apply, without limitation, to all claims that arose or were asserted before
@@ -373,7 +373,7 @@ export default function TermsOfService() {
                   of federal, state or local agencies. Such agencies can, if the law allows, seek relief
                   against the Company Parties on your behalf.
                 </p>
-                <p className="text-slate-300 leading-relaxed">
+                <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
                   For purposes of this Arbitration Agreement, &quot;Dispute&quot; will also include
                   disputes that arose or involve facts occurring before the existence of this or any
                   prior versions of the Agreement as well as claims that may arise after the termination
@@ -382,10 +382,10 @@ export default function TermsOfService() {
               </div>
 
               <div className="mb-6 pl-4 border-l-2 border-red-700">
-                <h4 className="text-lg font-semibold mb-3 text-slate-200">
+                <h4 className="text-lg font-semibold mb-3 text-slate-700 dark:text-slate-200">
                   (b) Informal Dispute Resolution
                 </h4>
-                <p className="text-slate-300 leading-relaxed mb-3">
+                <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-3">
                   There might be instances when a Dispute arises between you and Company. If that occurs,
                   Company is committed to working with you to reach a reasonable resolution. You and
                   Company agree that good faith informal efforts to resolve Disputes can result in a
@@ -397,7 +397,7 @@ export default function TermsOfService() {
                   Conference&quot;). If you are represented by counsel, your counsel may participate in
                   the conference, but you will also participate in the conference.
                 </p>
-                <p className="text-slate-300 leading-relaxed mb-3">
+                <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-3">
                   The party initiating a Dispute must give notice to the other party in writing of its
                   intent to initiate an Informal Dispute Resolution Conference (&quot;Notice&quot;),
                   which shall occur within 45 days after the other party receives such Notice, unless an
@@ -406,13 +406,13 @@ export default function TermsOfService() {
                   info@sensybull.com, or by regular mail to 394 Baldwin Ave, Apt 1, Jersey City, New
                   Jersey 07306.
                 </p>
-                <p className="text-slate-300 leading-relaxed mb-3">
+                <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-3">
                   The Notice must include: (1) your name, telephone number, mailing address, e-mail
                   address associated with your account (if you have one); (2) the name, telephone number,
                   mailing address and e-mail address of your counsel, if any; and (3) a description of
                   your Dispute.
                 </p>
-                <p className="text-slate-300 leading-relaxed">
+                <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
                   The Informal Dispute Resolution Conference shall be individualized such that a separate
                   conference must be held each time either party initiates a Dispute, even if the same
                   law firm or group of law firms represents multiple users in similar cases, unless all
@@ -424,10 +424,10 @@ export default function TermsOfService() {
               </div>
 
               <div className="mb-6 pl-4 border-l-2 border-red-700">
-                <h4 className="text-lg font-semibold mb-3 text-slate-200">
+                <h4 className="text-lg font-semibold mb-3 text-slate-700 dark:text-slate-200">
                   (c) Arbitration Rules and Forum
                 </h4>
-                <p className="text-slate-300 leading-relaxed mb-3">
+                <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-3">
                   These Terms evidence a transaction involving interstate commerce; and notwithstanding
                   any other provision herein with respect to the applicable substantive law, the Federal
                   Arbitration Act, 9 U.S.C. &sect; 1 et seq., will govern the interpretation and
@@ -436,7 +436,7 @@ export default function TermsOfService() {
                   within 60 days after receipt of your Notice, you and Company agree that either party
                   shall have the right to finally resolve the Dispute through binding arbitration.
                 </p>
-                <p className="text-slate-300 leading-relaxed mb-3">
+                <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-3">
                   The arbitration will be conducted by JAMS, an established alternative dispute resolution
                   provider. Disputes involving claims and counterclaims with an amount in controversy
                   under $250,000, not inclusive of attorneys&apos; fees and interest, shall be subject to
@@ -445,7 +445,7 @@ export default function TermsOfService() {
                   Comprehensive Arbitration Rules and Procedures. JAMS&apos;s rules are available at
                   www.jamsadr.com or by calling JAMS at 800-352-5267.
                 </p>
-                <p className="text-slate-300 leading-relaxed mb-3">
+                <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-3">
                   A party who wishes to initiate arbitration must provide the other party with a request
                   for arbitration (the &quot;Request&quot;). The Request must include: (1) the name,
                   telephone number, mailing address, e-mail address of the party seeking arbitration and
@@ -457,14 +457,14 @@ export default function TermsOfService() {
                   above; and (5) evidence that the requesting party has paid any necessary filing fees in
                   connection with such arbitration.
                 </p>
-                <p className="text-slate-300 leading-relaxed mb-3">
+                <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-3">
                   Unless you and Company otherwise agree, or the Batch Arbitration process discussed in
                   Subsection 8.2(h) is triggered, the arbitration will be conducted in the county where
                   you reside. Subject to the JAMS Rules, the arbitrator may direct a limited and
                   reasonable exchange of information between the parties, consistent with the expedited
                   nature of the arbitration.
                 </p>
-                <p className="text-slate-300 leading-relaxed">
+                <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
                   You and Company agree that all materials and documents exchanged during the arbitration
                   proceedings shall be kept confidential and shall not be shared with anyone except the
                   parties&apos; attorneys, accountants, or business advisors, and then subject to the
@@ -474,10 +474,10 @@ export default function TermsOfService() {
               </div>
 
               <div className="mb-6 pl-4 border-l-2 border-red-700">
-                <h4 className="text-lg font-semibold mb-3 text-slate-200">
+                <h4 className="text-lg font-semibold mb-3 text-slate-700 dark:text-slate-200">
                   (d) Authority of Arbitrator
                 </h4>
-                <p className="text-slate-300 leading-relaxed mb-3">
+                <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-3">
                   The arbitrator shall have exclusive authority to resolve all disputes subject to
                   arbitration hereunder including, without limitation, any dispute related to the
                   interpretation, applicability, enforceability or formation of this Arbitration Agreement
@@ -494,7 +494,7 @@ export default function TermsOfService() {
                   Disputes about which version of the Arbitration Agreement applies shall be decided only
                   by a court of competent jurisdiction and not by an arbitrator.
                 </p>
-                <p className="text-slate-300 leading-relaxed">
+                <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
                   The arbitration proceeding will not be consolidated with any other matters or joined
                   with any other cases or parties, except as expressly provided in the subsection
                   entitled &quot;Batch Arbitration.&quot; The arbitrator shall have the authority to grant
@@ -511,10 +511,10 @@ export default function TermsOfService() {
               </div>
 
               <div className="mb-6 pl-4 border-l-2 border-red-700">
-                <h4 className="text-lg font-semibold mb-3 text-slate-200">
+                <h4 className="text-lg font-semibold mb-3 text-slate-700 dark:text-slate-200">
                   (e) Waiver of Jury Trial
                 </h4>
-                <p className="text-slate-300 leading-relaxed">
+                <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
                   EXCEPT AS SPECIFIED IN SECTION 8.2(a) YOU AND THE COMPANY PARTIES HEREBY WAIVE ANY
                   CONSTITUTIONAL AND STATUTORY RIGHTS TO SUE IN COURT AND HAVE A TRIAL IN FRONT OF A
                   JUDGE OR A JURY. You and the Company Parties are instead electing that all covered
@@ -527,10 +527,10 @@ export default function TermsOfService() {
               </div>
 
               <div className="mb-6 pl-4 border-l-2 border-red-700">
-                <h4 className="text-lg font-semibold mb-3 text-slate-200">
+                <h4 className="text-lg font-semibold mb-3 text-slate-700 dark:text-slate-200">
                   (f) Waiver of Class or Other Non-Individualized Relief
                 </h4>
-                <p className="text-slate-300 leading-relaxed mb-3">
+                <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-3">
                   YOU AND COMPANY AGREE THAT, EXCEPT AS SPECIFIED IN SUBSECTION 8.2(h) EACH OF US MAY
                   BRING CLAIMS AGAINST THE OTHER ONLY ON AN INDIVIDUAL BASIS AND NOT ON A CLASS,
                   REPRESENTATIVE, OR COLLECTIVE BASIS, AND THE PARTIES HEREBY WAIVE ALL RIGHTS TO HAVE
@@ -539,14 +539,14 @@ export default function TermsOfService() {
                   AND DISPUTES OF MORE THAN ONE CUSTOMER OR USER CANNOT BE ARBITRATED OR CONSOLIDATED
                   WITH THOSE OF ANY OTHER CUSTOMER OR USER.
                 </p>
-                <p className="text-slate-300 leading-relaxed mb-3">
+                <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-3">
                   Subject to this Arbitration Agreement, the arbitrator may award declaratory or
                   injunctive relief only in favor of the individual party seeking relief and only to the
                   extent necessary to provide relief warranted by the party&apos;s individual claim.
                   Nothing in this paragraph is intended to, nor shall it, affect the terms and conditions
                   under the Subsection 8.2(h) entitled &quot;Batch Arbitration.&quot;
                 </p>
-                <p className="text-slate-300 leading-relaxed">
+                <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
                   Notwithstanding anything to the contrary in this Arbitration Agreement, if a court
                   decides by means of a final decision, not subject to any further appeal or recourse,
                   that the limitations of this subsection are invalid or unenforceable as to a particular
@@ -560,10 +560,10 @@ export default function TermsOfService() {
               </div>
 
               <div className="mb-6 pl-4 border-l-2 border-red-700">
-                <h4 className="text-lg font-semibold mb-3 text-slate-200">
+                <h4 className="text-lg font-semibold mb-3 text-slate-700 dark:text-slate-200">
                   (g) Attorneys&apos; Fees and Costs
                 </h4>
-                <p className="text-slate-300 leading-relaxed">
+                <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
                   The parties shall bear their own attorneys&apos; fees and costs in arbitration unless
                   the arbitrator finds that either the substance of the Dispute or the relief sought in
                   the Request was frivolous or was brought for an improper purpose (as measured by the
@@ -580,10 +580,10 @@ export default function TermsOfService() {
               </div>
 
               <div className="mb-6 pl-4 border-l-2 border-red-700">
-                <h4 className="text-lg font-semibold mb-3 text-slate-200">
+                <h4 className="text-lg font-semibold mb-3 text-slate-700 dark:text-slate-200">
                   (h) Batch Arbitration
                 </h4>
-                <p className="text-slate-300 leading-relaxed mb-3">
+                <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-3">
                   To increase the efficiency of administration and resolution of arbitrations, you and
                   Company agree that in the event that there are 100 or more individual Requests of a
                   substantially similar nature filed against Company by or with the assistance of the
@@ -597,7 +597,7 @@ export default function TermsOfService() {
                   any) in a place to be determined by the arbitrator, and one final award (&quot;Batch
                   Arbitration&quot;).
                 </p>
-                <p className="text-slate-300 leading-relaxed mb-3">
+                <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-3">
                   All parties agree that Requests are of a &quot;substantially similar nature&quot; if
                   they arise out of or relate to the same event or factual scenario and raise the same or
                   similar legal issues and seek the same or similar relief. To the extent the parties
@@ -609,7 +609,7 @@ export default function TermsOfService() {
                   such procedures as are necessary to resolve any disputes promptly. The Administrative
                   Arbitrator&apos;s fees shall be paid by Company.
                 </p>
-                <p className="text-slate-300 leading-relaxed mb-3">
+                <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-3">
                   You and Company agree to cooperate in good faith with the JAMS to implement the Batch
                   Arbitration process including the payment of single filing and administrative fees for
                   batches of Requests, as well as any steps to minimize the time and costs of
@@ -617,7 +617,7 @@ export default function TermsOfService() {
                   assist the arbitrator in the resolution of discovery disputes; and (2) the adoption of
                   an expedited calendar of the arbitration proceedings.
                 </p>
-                <p className="text-slate-300 leading-relaxed">
+                <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
                   This Batch Arbitration provision shall in no way be interpreted as authorizing a class,
                   collective and/or mass arbitration or action of any kind, or arbitration involving joint
                   or consolidated claims under any circumstances, except as expressly set forth in this
@@ -626,10 +626,10 @@ export default function TermsOfService() {
               </div>
 
               <div className="mb-6 pl-4 border-l-2 border-red-700">
-                <h4 className="text-lg font-semibold mb-3 text-slate-200">
+                <h4 className="text-lg font-semibold mb-3 text-slate-700 dark:text-slate-200">
                   (i) 30-Day Right to Opt Out
                 </h4>
-                <p className="text-slate-300 leading-relaxed">
+                <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
                   You have the right to opt out of the provisions of this Arbitration Agreement by
                   sending a timely written notice of your decision to opt out to the following address:
                   394 Baldwin Ave, Apt 1, Jersey City, New Jersey 07306, or email to info@sensybull.com,
@@ -643,10 +643,10 @@ export default function TermsOfService() {
               </div>
 
               <div className="mb-6 pl-4 border-l-2 border-red-700">
-                <h4 className="text-lg font-semibold mb-3 text-slate-200">
+                <h4 className="text-lg font-semibold mb-3 text-slate-700 dark:text-slate-200">
                   (j) Invalidity, Expiration
                 </h4>
-                <p className="text-slate-300 leading-relaxed">
+                <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
                   Except as provided in the subsection entitled &quot;Waiver of Class or Other
                   Non-Individualized Relief,&quot; if any part or parts of this Arbitration Agreement are
                   found under the law to be invalid or unenforceable, then such specific part or parts
@@ -661,10 +661,10 @@ export default function TermsOfService() {
               </div>
 
               <div className="pl-4 border-l-2 border-red-700">
-                <h4 className="text-lg font-semibold mb-3 text-slate-200">
+                <h4 className="text-lg font-semibold mb-3 text-slate-700 dark:text-slate-200">
                   (k) Modification
                 </h4>
-                <p className="text-slate-300 leading-relaxed">
+                <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
                   Notwithstanding any provision in these Terms to the contrary, we agree that if Company
                   makes any future material change to this Arbitration Agreement, you may reject that
                   change within 30 days of such change becoming effective by writing Company at the
@@ -689,8 +689,8 @@ export default function TermsOfService() {
             </div>
 
             <div className="mb-6">
-              <h3 className="text-xl font-semibold mb-3 text-slate-200">8.3 Export</h3>
-              <p className="text-slate-300 leading-relaxed">
+              <h3 className="text-xl font-semibold mb-3 text-slate-700 dark:text-slate-200">8.3 Export</h3>
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
                 The Site may be subject to U.S. export control laws and may be subject to export or
                 import regulations in other countries. You agree not to export, reexport, or transfer,
                 directly or indirectly, any U.S. technical data acquired from Company, or any products
@@ -699,8 +699,8 @@ export default function TermsOfService() {
             </div>
 
             <div className="mb-6">
-              <h3 className="text-xl font-semibold mb-3 text-slate-200">8.4 Disclosures</h3>
-              <p className="text-slate-300 leading-relaxed">
+              <h3 className="text-xl font-semibold mb-3 text-slate-700 dark:text-slate-200">8.4 Disclosures</h3>
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
                 Company is located at the address in Section 8.8. If you are a California resident, you
                 may report complaints to the Complaint Assistance Unit of the Division of Consumer
                 Product of the California Department of Consumer Affairs by contacting them in writing at
@@ -709,10 +709,10 @@ export default function TermsOfService() {
             </div>
 
             <div className="mb-6">
-              <h3 className="text-xl font-semibold mb-3 text-slate-200">
+              <h3 className="text-xl font-semibold mb-3 text-slate-700 dark:text-slate-200">
                 8.5 Electronic Communications
               </h3>
-              <p className="text-slate-300 leading-relaxed">
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
                 The communications between you and Company use electronic means, whether you use the Site
                 or send us emails, or whether Company posts notices on the Site or communicates with you
                 via email. For contractual purposes, you (a) consent to receive communications from
@@ -724,8 +724,8 @@ export default function TermsOfService() {
             </div>
 
             <div className="mb-6">
-              <h3 className="text-xl font-semibold mb-3 text-slate-200">8.6 Entire Terms</h3>
-              <p className="text-slate-300 leading-relaxed">
+              <h3 className="text-xl font-semibold mb-3 text-slate-700 dark:text-slate-200">8.6 Entire Terms</h3>
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
                 These Terms constitute the entire agreement between you and us regarding the use of the
                 Site. Our failure to exercise or enforce any right or provision of these Terms shall not
                 operate as a waiver of such right or provision. The section titles in these Terms are for
@@ -744,10 +744,10 @@ export default function TermsOfService() {
             </div>
 
             <div className="mb-6">
-              <h3 className="text-xl font-semibold mb-3 text-slate-200">
+              <h3 className="text-xl font-semibold mb-3 text-slate-700 dark:text-slate-200">
                 8.7 Copyright/Trademark Information
               </h3>
-              <p className="text-slate-300 leading-relaxed">
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
                 Copyright &copy; 2025 Sensybull, LLC. All rights reserved. All trademarks, logos and
                 service marks (&quot;Marks&quot;) displayed on the Site are our property or the property
                 of other third parties. You are not permitted to use these Marks without our prior
@@ -755,8 +755,8 @@ export default function TermsOfService() {
               </p>
             </div>
 
-            <div className="mb-6 p-6 bg-slate-800/50 border border-slate-700 rounded-lg">
-              <h3 className="text-xl font-semibold mb-4 text-slate-200">8.8 Contact Information</h3>
+            <div className="mb-6 p-6 bg-slate-100/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg">
+              <h3 className="text-xl font-semibold mb-4 text-slate-700 dark:text-slate-200">8.8 Contact Information</h3>
               <div className="text-slate-300 space-y-2">
                 <p>
                   <strong>Soham Siddhesh Jain</strong>
@@ -777,7 +777,7 @@ export default function TermsOfService() {
             </div>
           </section>
 
-          <div className="mt-12 pt-8 border-t border-slate-700 text-center text-slate-400">
+          <div className="mt-12 pt-8 border-t border-slate-200 dark:border-slate-700 text-center text-slate-500 dark:text-slate-400">
             <p>Copyright &copy; 2025 Sensybull, LLC. All rights reserved.</p>
           </div>
         </div>

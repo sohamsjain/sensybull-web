@@ -24,9 +24,9 @@ export function MobileNav({
 }: MobileNavProps) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="left" className="w-64 bg-slate-900 border-slate-700 p-0">
+      <SheetContent side="left" className="w-64 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 p-0">
         <SheetHeader className="px-4 pt-4">
-          <SheetTitle className="text-white">Watchlists</SheetTitle>
+          <SheetTitle className="text-slate-900 dark:text-white">Watchlists</SheetTitle>
         </SheetHeader>
         <Sidebar
           selectedWatchlist={selectedWatchlist}
