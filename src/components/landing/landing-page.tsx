@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { getAppUrl } from "@/lib/urls";
 import {
   Zap,
   Brain,
@@ -33,19 +32,19 @@ function Navbar() {
         <Logo />
         <div className="flex items-center gap-3">
           <Link
-            href={getAppUrl("/feed")}
+            href="/feed"
             className="hidden sm:inline-flex text-sm text-slate-400 hover:text-white transition-colors px-3 py-1.5"
           >
             Live Feed
           </Link>
           <Link
-            href={getAppUrl("/login")}
+            href="/login"
             className="text-sm text-slate-300 hover:text-white transition-colors px-3 py-1.5"
           >
             Sign In
           </Link>
           <Link
-            href={getAppUrl("/register")}
+            href="/register"
             className="text-sm font-medium text-white bg-violet-600 hover:bg-violet-500 transition-colors px-4 py-2 rounded-lg"
           >
             Get Started
@@ -84,14 +83,14 @@ function HeroSection() {
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
-            href={getAppUrl("/register")}
+            href="/register"
             className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-medium text-base transition-all hover:shadow-lg hover:shadow-violet-600/25"
           >
             Get Started Free
             <ArrowRight className="w-4 h-4" />
           </Link>
           <Link
-            href={getAppUrl("/feed")}
+            href="/feed"
             className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl border border-white/10 hover:border-white/20 text-slate-300 hover:text-white font-medium text-base transition-all hover:bg-white/[0.04]"
           >
             View Live Feed
@@ -261,7 +260,7 @@ function CtaSection() {
           minute.
         </p>
         <Link
-          href={getAppUrl("/register")}
+          href="/register"
           className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-medium text-base transition-all hover:shadow-lg hover:shadow-violet-600/25"
         >
           Create Free Account

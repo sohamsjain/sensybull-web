@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
-import { getAppUrl, isAppSubdomain } from "@/lib/urls";
 import LandingPage from "@/components/landing/landing-page";
 
 export default function Home() {
@@ -14,13 +13,8 @@ export default function Home() {
   useEffect(() => {
     if (loading) return;
 
-    if (isAppSubdomain()) {
-      router.replace(user ? "/chats" : "/feed");
-      return;
-    }
-
     if (user) {
-      window.location.href = getAppUrl("/chats");
+      router.replace("/chats");
       return;
     }
 
