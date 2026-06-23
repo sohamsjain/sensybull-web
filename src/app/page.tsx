@@ -1,18 +1,33 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
+import { getAppUrl, isAppSubdomain } from "@/lib/urls";
+import LandingPage from "@/components/landing/landing-page";
 
-// Signed-in users land in their chats; guests get the public feed.
 export default function Home() {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const [showLanding, setShowLanding] = useState(false);
 
   useEffect(() => {
     if (loading) return;
-    router.replace(user ? "/chats" : "/feed");
+
+    if (isAppSubdomain()) {
+      router.replace(user ? "/chats" : "/feed");
+      return;
+    }
+
+    if (user) {
+      window.location.href = getAppUrl("/chats");
+      return;
+    }
+
+    setShowLanding(true);
   }, [user, loading, router]);
 
-  return null;
+  if (!showLanding) return null;
+
+  return <LandingPage />;
 }

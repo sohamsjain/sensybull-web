@@ -21,7 +21,7 @@ export function LoginForm() {
     setLoading(true);
     try {
       await login(email, password);
-      router.push("/feed");
+      router.push("/chats");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
     }
