@@ -8,7 +8,12 @@ export default function RegisterPage() {
         Create your account
       </h1>
       <RegisterForm />
-      <div className="mt-8">
+      <div className="mt-6 flex items-center gap-3">
+        <div className="flex-1 h-px bg-white/10" />
+        <span className="text-white/30 text-sm">or</span>
+        <div className="flex-1 h-px bg-white/10" />
+      </div>
+      <div className="mt-6">
         <GoogleAuthButton />
       </div>
     </div>
