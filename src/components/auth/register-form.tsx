@@ -30,49 +30,56 @@ export function RegisterForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-5">
       <div>
+        <label className="block text-sm font-semibold text-white/80 mb-2">
+          Name
+        </label>
         <Input
           type="text"
-          placeholder="Name"
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
-          className="bg-white dark:bg-[#0a0a12] border-slate-300 dark:border-white/[0.1] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus-visible:border-slate-500 dark:focus-visible:border-violet-500/40 focus-visible:ring-0"
+          className="h-12 bg-[#1a1a2e] border-transparent text-base text-white placeholder:text-white/30 focus-visible:border-violet-500/50 focus-visible:ring-0"
         />
       </div>
       <div>
+        <label className="block text-sm font-semibold text-white/80 mb-2">
+          Email
+        </label>
         <Input
           type="email"
-          placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="bg-white dark:bg-[#0a0a12] border-slate-300 dark:border-white/[0.1] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus-visible:border-slate-500 dark:focus-visible:border-violet-500/40 focus-visible:ring-0"
+          className="h-12 bg-[#1a1a2e] border-transparent text-base text-white placeholder:text-white/30 focus-visible:border-violet-500/50 focus-visible:ring-0"
         />
       </div>
       <div>
+        <label className="block text-sm font-semibold text-white/80 mb-2">
+          Password
+        </label>
         <Input
           type="password"
-          placeholder="Password (6+ characters)"
+          placeholder="6+ characters"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
           minLength={6}
-          className="bg-white dark:bg-[#0a0a12] border-slate-300 dark:border-white/[0.1] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus-visible:border-slate-500 dark:focus-visible:border-violet-500/40 focus-visible:ring-0"
+          className="h-12 bg-[#1a1a2e] border-transparent text-base text-white placeholder:text-white/30 focus-visible:border-violet-500/50 focus-visible:ring-0"
         />
       </div>
-      {error && <p className="text-red-400 text-xs">{error}</p>}
+      {error && <p className="text-red-400 text-sm">{error}</p>}
       <Button
         type="submit"
         disabled={loading}
-        className="w-full bg-violet-600 hover:bg-violet-500"
+        className="w-full h-12 text-base font-semibold bg-violet-600 hover:bg-violet-500"
       >
-        {loading ? "..." : "Create Account"}
+        {loading ? "Creating account..." : "Create Account"}
       </Button>
-      <p className="text-center text-xs text-slate-500 dark:text-slate-400">
+      <p className="text-center text-base text-white/50">
         Already have an account?{" "}
-        <Link href="/login" className="text-violet-400 hover:text-violet-300">
+        <Link href="/login" className="text-violet-400 hover:text-violet-300 font-medium">
           Sign in
         </Link>
       </p>

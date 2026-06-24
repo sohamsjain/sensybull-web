@@ -80,7 +80,10 @@ export function GoogleAuthButton() {
 
   return (
     <div ref={containerRef} className="w-full">
-      <div ref={buttonRef} className="w-full flex justify-center" />
+      <div
+        ref={buttonRef}
+        className="w-full flex justify-center [&>div]:!w-full [&_iframe]:!w-full"
+      />
     </div>
   );
 }

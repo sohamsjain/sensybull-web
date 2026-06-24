@@ -46,11 +46,11 @@ function HeroSection() {
   return (
     <section className="pt-40 pb-24">
       <div className="mx-auto max-w-3xl px-6 text-center">
-        <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight text-white/90 leading-[1.15] mb-6">
+        <h1 className="text-5xl sm:text-6xl font-bold tracking-tight text-white/90 leading-[1.1] mb-6">
           SEC filings, decoded.
         </h1>
 
-        <p className="text-lg text-white/45 max-w-lg mx-auto leading-relaxed mb-10">
+        <p className="text-xl text-white/50 max-w-lg mx-auto leading-relaxed mb-10">
           Every 8-K filing turned into a plain-English briefing, seconds after
           it hits EDGAR. Free to use.
         </p>
@@ -58,13 +58,13 @@ function HeroSection() {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <Link
             href="/register"
-            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-md bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium transition-colors"
+            className="inline-flex items-center gap-2 px-7 py-3 rounded-md bg-violet-600 hover:bg-violet-500 text-white text-base font-semibold transition-colors"
           >
             Start tracking
           </Link>
           <Link
             href="/feed"
-            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-md border border-white/[0.08] hover:border-white/[0.15] text-white/50 hover:text-white/70 text-sm font-medium transition-colors"
+            className="inline-flex items-center gap-2 px-7 py-3 rounded-md border border-white/[0.08] hover:border-white/[0.15] text-white/50 hover:text-white/70 text-base font-medium transition-colors"
           >
             View live feed
           </Link>
@@ -82,30 +82,30 @@ function ValueProps() {
           {/* Left: three value propositions */}
           <div className="space-y-12">
             <div>
-              <p className="text-lg font-semibold text-white/90 mb-1.5">
+              <p className="text-xl font-bold text-white/90 mb-2">
                 Know before the crowd.
               </p>
-              <p className="text-white/40 leading-relaxed">
+              <p className="text-base text-white/50 leading-relaxed">
                 The moment a company files with the SEC, you get the briefing.
                 Not hours later. Seconds.
               </p>
             </div>
 
             <div className="border-t border-white/[0.04] pt-12">
-              <p className="text-lg font-semibold text-white/90 mb-1.5">
+              <p className="text-xl font-bold text-white/90 mb-2">
                 Every filing, in plain English.
               </p>
-              <p className="text-white/40 leading-relaxed">
+              <p className="text-base text-white/50 leading-relaxed">
                 Dense legalese distilled to what matters — the headline, the
                 impact, the key dates. No noise.
               </p>
             </div>
 
             <div className="border-t border-white/[0.04] pt-12">
-              <p className="text-lg font-semibold text-white/90 mb-1.5">
+              <p className="text-xl font-bold text-white/90 mb-2">
                 Your companies. Always watched.
               </p>
-              <p className="text-white/40 leading-relaxed">
+              <p className="text-base text-white/50 leading-relaxed">
                 Build your watchlist. Get alerts. Every filing lands in your
                 company&apos;s thread, so you never lose context.
               </p>
