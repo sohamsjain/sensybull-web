@@ -1,23 +1,67 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import { AuthProvider } from "@/context/auth-context";
 import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const siteUrl = "https://www.sensybull.com";
 
 export const metadata: Metadata = {
-  title: "Sensybull — SEC 8-K Filing Intelligence",
+  title: {
+    default: "Sensybull — SEC 8-K Filings, Decoded",
+    template: "%s | Sensybull",
+  },
   description:
-    "AI-powered intelligence on every SEC 8-K filing. Real-time alerts, AI briefings, and company tracking for investors.",
+    "Every SEC 8-K filing decoded into a plain-English briefing, seconds after it hits EDGAR. Track your companies, get alerts, stay ahead. Free to use.",
+  keywords: [
+    "SEC filings",
+    "8-K filings",
+    "EDGAR",
+    "SEC alerts",
+    "stock filings",
+    "SEC filing tracker",
+    "SEC filing alerts",
+    "investment research",
+    "real-time SEC filings",
+  ],
+  authors: [{ name: "Sensybull, LLC" }],
+  creator: "Sensybull",
+  metadataBase: new URL(siteUrl),
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: siteUrl,
+    siteName: "Sensybull",
+    title: "Sensybull — SEC 8-K Filings, Decoded",
+    description:
+      "Every SEC 8-K filing decoded into a plain-English briefing, seconds after it hits EDGAR. Free to use.",
+    images: [
+      {
+        url: "/logo.png",
+        width: 1024,
+        height: 1024,
+        alt: "Sensybull",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary",
+    title: "Sensybull — SEC 8-K Filings, Decoded",
+    description:
+      "Every SEC 8-K filing decoded into a plain-English briefing, seconds after it hits EDGAR. Free to use.",
+    images: ["/logo.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
 };
 
 export default function RootLayout({
@@ -28,9 +72,31 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className="h-full antialiased"
       suppressHydrationWarning
     >
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebApplication",
+              name: "Sensybull",
+              url: siteUrl,
+              description:
+                "Every SEC 8-K filing decoded into a plain-English briefing, seconds after it hits EDGAR.",
+              applicationCategory: "FinanceApplication",
+              operatingSystem: "Web",
+              offers: {
+                "@type": "Offer",
+                price: "0",
+                priceCurrency: "USD",
+              },
+            }),
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <ThemeProvider>
           <AuthProvider>{children}</AuthProvider>

@@ -18,7 +18,7 @@ export default function PrivacyPolicy() {
 
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 max-w-4xl">
         <div className="mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4">
+          <h1 className="text-3xl md:text-4xl font-semibold text-slate-900 dark:text-white/90 mb-4">
             Privacy Policy
           </h1>
           <p className="text-slate-500 dark:text-slate-400">Last updated: December 8, 2025</p>
@@ -58,7 +58,7 @@ export default function PrivacyPolicy() {
 
           {/* Section I */}
           <section className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">I. Information We Collect</h2>
+            <h2 className="text-xl font-semibold mb-6 text-slate-900 dark:text-white/90">I. Information We Collect</h2>
 
             <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
               We collect &quot;Non-Personal Information&quot; and &quot;Personal Information.&quot;
@@ -153,7 +153,7 @@ export default function PrivacyPolicy() {
 
           {/* Section II */}
           <section className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">
+            <h2 className="text-xl font-semibold mb-6 text-slate-900 dark:text-white/90">
               II. How We Use and Share Information
             </h2>
 
@@ -206,7 +206,7 @@ export default function PrivacyPolicy() {
 
           {/* Section III */}
           <section className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">III. How We Protect Information</h2>
+            <h2 className="text-xl font-semibold mb-6 text-slate-900 dark:text-white/90">III. How We Protect Information</h2>
             <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-3">
               We implement security measures designed to protect your information from unauthorized
               access. Your account is protected by your account password and we urge you to take steps
@@ -225,7 +225,7 @@ export default function PrivacyPolicy() {
 
           {/* Section IV */}
           <section className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">
+            <h2 className="text-xl font-semibold mb-6 text-slate-900 dark:text-white/90">
               IV. Your Rights Regarding the Use of Your Personal Information
             </h2>
             <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-3">
@@ -245,7 +245,7 @@ export default function PrivacyPolicy() {
 
           {/* Section V */}
           <section className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">V. Links to Other Websites</h2>
+            <h2 className="text-xl font-semibold mb-6 text-slate-900 dark:text-white/90">V. Links to Other Websites</h2>
             <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-3">
               As part of the Service, we may provide links to or compatibility with other websites or
               applications. However, we are not responsible for the privacy practices employed by those
@@ -264,7 +264,7 @@ export default function PrivacyPolicy() {
 
           {/* Section VI */}
           <section className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">VI. Changes to Our Privacy Policy</h2>
+            <h2 className="text-xl font-semibold mb-6 text-slate-900 dark:text-white/90">VI. Changes to Our Privacy Policy</h2>
             <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-3">
               The Company reserves the right to change this policy and our Terms of Service at any time.
               We will notify you of significant changes to our Privacy Policy by sending a notice to the
@@ -280,7 +280,7 @@ export default function PrivacyPolicy() {
 
           {/* Section VII */}
           <section className="mb-12 p-6 bg-slate-100/50 dark:bg-[#12121e]/50 border border-slate-200 dark:border-white/[0.06] rounded-lg">
-            <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">VII. Contact Us</h2>
+            <h2 className="text-xl font-semibold mb-6 text-slate-900 dark:text-white/90">VII. Contact Us</h2>
             <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
               If you have any questions regarding this Privacy Policy or the practices of this Site,
               please contact us by sending an email to{" "}

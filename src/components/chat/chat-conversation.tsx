@@ -139,7 +139,7 @@ export function ChatConversation({
           size="sm"
         />
         <div className="min-w-0 flex-1">
-          <p className="text-slate-900 dark:text-white text-sm font-semibold truncate leading-tight">
+          <p className="text-slate-900 dark:text-white/90 text-sm font-medium truncate leading-tight">
             {company.name}
           </p>
           <p className="text-slate-400 dark:text-slate-500 text-xs truncate">

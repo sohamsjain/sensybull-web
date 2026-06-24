@@ -66,7 +66,7 @@ export function ChatAvatar({
 
   return (
     <div
-      className={`${sizeClass} ${radius} ${colorFor(label)} flex items-center justify-center font-mono font-bold shrink-0 select-none`}
+      className={`${sizeClass} ${radius} ${colorFor(label)} flex items-center justify-center font-mono font-semibold shrink-0 select-none`}
       aria-hidden="true"
     >
       {label.slice(0, 4)}

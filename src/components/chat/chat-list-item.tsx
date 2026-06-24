@@ -52,7 +52,7 @@ export function ChatListItem({
         <div className="flex items-baseline justify-between gap-2">
           <span
             className={`truncate text-[15px] leading-5 ${
-              hasUnread ? "text-slate-900 dark:text-white font-semibold" : "text-slate-800 dark:text-slate-100"
+              hasUnread ? "text-slate-900 dark:text-white/90 font-medium" : "text-slate-800 dark:text-slate-200/90"
             }`}
           >
             {company.name}

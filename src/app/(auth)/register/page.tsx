@@ -5,7 +5,7 @@ import { Separator } from "@/components/ui/separator";
 export default function RegisterPage() {
   return (
     <div className="space-y-4">
-      <h2 className="text-slate-900 dark:text-white font-semibold text-lg">Create Account</h2>
+      <h2 className="text-slate-900 dark:text-white/90 font-medium text-base">Create Account</h2>
       <GoogleAuthButton />
       <div className="flex items-center gap-3">
         <Separator className="flex-1 bg-slate-200 dark:bg-white/[0.08]" />

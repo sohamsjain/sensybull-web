@@ -4,7 +4,7 @@ export function SignificanceBadge({ level }: { level: Significance }) {
   const config = SIGNIFICANCE_CONFIG[level] || SIGNIFICANCE_CONFIG.Medium;
   return (
     <span
-      className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold border ${config.badge}`}
+      className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${config.badge}`}
     >
       {config.label}
     </span>

@@ -18,13 +18,13 @@ export default function Disclaimer() {
 
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 max-w-4xl">
         <div className="mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4">Disclaimer</h1>
+          <h1 className="text-3xl md:text-4xl font-semibold text-slate-900 dark:text-white/90 mb-4">Disclaimer</h1>
           <p className="text-slate-500 dark:text-slate-400">Last updated: December 8, 2025</p>
         </div>
 
         <div className="prose dark:prose-invert prose-slate max-w-none">
           <div className="p-6 bg-slate-100/50 dark:bg-[#12121e]/50 border border-slate-200 dark:border-white/[0.06] rounded-lg">
-            <h2 className="text-2xl font-bold mb-4 text-slate-900 dark:text-white">Investment Disclaimer</h2>
+            <h2 className="text-xl font-semibold mb-4 text-slate-900 dark:text-white/90">Investment Disclaimer</h2>
             <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
               <strong>
                 Sensybull provides financial news and information for educational purposes only.
@@ -50,7 +50,7 @@ export default function Disclaimer() {
           </div>
 
           <section className="mt-12 p-6 bg-slate-100/50 dark:bg-[#12121e]/50 border border-slate-200 dark:border-white/[0.06] rounded-lg">
-            <h2 className="text-2xl font-bold mb-4 text-slate-900 dark:text-white">No Warranties</h2>
+            <h2 className="text-xl font-semibold mb-4 text-slate-900 dark:text-white/90">No Warranties</h2>
             <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
               While we strive to provide accurate and timely information, Sensybull makes no
               representations or warranties of any kind, express or implied, about the completeness,
@@ -60,7 +60,7 @@ export default function Disclaimer() {
           </section>
 
           <section className="mt-8 p-6 bg-slate-100/50 dark:bg-[#12121e]/50 border border-slate-200 dark:border-white/[0.06] rounded-lg">
-            <h2 className="text-2xl font-bold mb-4 text-slate-900 dark:text-white">Limitation of Liability</h2>
+            <h2 className="text-xl font-semibold mb-4 text-slate-900 dark:text-white/90">Limitation of Liability</h2>
             <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
               In no event will Sensybull be liable for any loss or damage including without limitation,
               indirect or consequential loss or damage, or any loss or damage whatsoever arising from
@@ -69,7 +69,7 @@ export default function Disclaimer() {
           </section>
 
           <section className="mt-12 p-6 bg-slate-100/50 dark:bg-[#12121e]/50 border border-slate-200 dark:border-white/[0.06] rounded-lg">
-            <h2 className="text-2xl font-bold mb-4 text-slate-900 dark:text-white">Contact Information</h2>
+            <h2 className="text-xl font-semibold mb-4 text-slate-900 dark:text-white/90">Contact Information</h2>
             <div className="text-slate-600 dark:text-slate-300 space-y-2">
               <p>
                 <strong>Soham Siddhesh Jain</strong>

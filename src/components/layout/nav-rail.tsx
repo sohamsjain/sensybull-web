@@ -107,7 +107,7 @@ export function NavRail() {
     <aside className="hidden md:flex w-14 shrink-0 flex-col items-center gap-1.5 py-3 border-r border-slate-200 dark:border-white/[0.04] bg-slate-100 dark:bg-[#07070e]">
       <Link href="/" title="Sensybull" className="mb-2">
         {logoFailed ? (
-          <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm select-none">
+          <span className="w-9 h-9 rounded-xl bg-violet-600 flex items-center justify-center text-white font-semibold text-sm select-none">
             S
           </span>
         ) : (

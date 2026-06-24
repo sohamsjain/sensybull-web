@@ -90,7 +90,7 @@ export function ChatList({
       {/* Header */}
       <div className="px-3 pt-3 pb-2 shrink-0">
         <div className="flex items-center justify-between mb-2">
-          <h2 className="text-slate-900 dark:text-white font-semibold text-base flex items-center gap-2">
+          <h2 className="text-slate-900 dark:text-white/90 font-medium text-base flex items-center gap-2">
             Chats
             <span
               className={`w-1.5 h-1.5 rounded-full ${connected ? "bg-green-400" : "bg-slate-300 dark:bg-white/[0.1]"}`}

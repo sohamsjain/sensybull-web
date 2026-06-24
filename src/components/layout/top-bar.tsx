@@ -109,7 +109,7 @@ export function TopBar({
             }}
           />
         </span>
-        <h1 className="text-slate-900 dark:text-white font-bold text-lg">Sensybull</h1>
+        <h1 className="text-slate-900 dark:text-white/90 font-semibold text-base">Sensybull</h1>
       </Link>
 
       {/* Primary nav — desktop uses the left rail; keep links on mobile */}

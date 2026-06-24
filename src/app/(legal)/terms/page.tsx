@@ -18,7 +18,7 @@ export default function TermsOfService() {
 
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 max-w-4xl">
         <div className="mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4">Terms of Use</h1>
+          <h1 className="text-3xl md:text-4xl font-semibold text-slate-900 dark:text-white/90 mb-4">Terms of Use</h1>
           <p className="text-slate-500 dark:text-slate-400 mt-2">Last revised: December 8, 2025</p>
         </div>
 
@@ -68,7 +68,7 @@ export default function TermsOfService() {
 
           {/* Section 1: Accounts */}
           <section className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">1. Accounts</h2>
+            <h2 className="text-xl font-semibold mb-6 text-slate-900 dark:text-white/90">1. Accounts</h2>
 
             <div className="mb-6">
               <h3 className="text-xl font-semibold mb-3 text-slate-700 dark:text-slate-200">1.1 Account Creation</h3>
@@ -99,7 +99,7 @@ export default function TermsOfService() {
 
           {/* Section 2: Access to the Site */}
           <section className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">2. Access to the Site</h2>
+            <h2 className="text-xl font-semibold mb-6 text-slate-900 dark:text-white/90">2. Access to the Site</h2>
 
             <div className="mb-6">
               <h3 className="text-xl font-semibold mb-3 text-slate-700 dark:text-slate-200">2.1 License</h3>
@@ -180,7 +180,7 @@ export default function TermsOfService() {
 
           {/* Section 3: Indemnification */}
           <section className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">3. Indemnification</h2>
+            <h2 className="text-xl font-semibold mb-6 text-slate-900 dark:text-white/90">3. Indemnification</h2>
             <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
               You agree to indemnify and hold Company (and its officers, employees, and agents) harmless,
               including costs and attorneys&apos; fees, from any claim or demand made by any third party
@@ -196,7 +196,7 @@ export default function TermsOfService() {
 
           {/* Section 4: Third-Party Links */}
           <section className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">
+            <h2 className="text-xl font-semibold mb-6 text-slate-900 dark:text-white/90">
               4. Third-Party Links &amp; Ads; Other Users
             </h2>
 
@@ -251,7 +251,7 @@ export default function TermsOfService() {
 
           {/* Section 5: Disclaimers */}
           <section className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">5. Disclaimers</h2>
+            <h2 className="text-xl font-semibold mb-6 text-slate-900 dark:text-white/90">5. Disclaimers</h2>
             <div className="p-6 bg-amber-900/20 border border-amber-900/50 rounded-lg">
               <p className="text-amber-200 text-sm leading-relaxed mb-3">
                 THE SITE IS PROVIDED ON AN &quot;AS-IS&quot; AND &quot;AS AVAILABLE&quot; BASIS, AND
@@ -274,7 +274,7 @@ export default function TermsOfService() {
 
           {/* Section 6: Limitation on Liability */}
           <section className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">6. Limitation on Liability</h2>
+            <h2 className="text-xl font-semibold mb-6 text-slate-900 dark:text-white/90">6. Limitation on Liability</h2>
             <div className="p-6 bg-amber-900/20 border border-amber-900/50 rounded-lg space-y-4">
               <p className="text-amber-200 text-sm leading-relaxed">
                 TO THE MAXIMUM EXTENT PERMITTED BY LAW, IN NO EVENT SHALL COMPANY (OR OUR SUPPLIERS) BE
@@ -303,7 +303,7 @@ export default function TermsOfService() {
 
           {/* Section 7: Term and Termination */}
           <section className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">7. Term and Termination</h2>
+            <h2 className="text-xl font-semibold mb-6 text-slate-900 dark:text-white/90">7. Term and Termination</h2>
             <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
               Subject to this Section, these Terms will remain in full force and effect while you use the
               Site. We may suspend or terminate your rights to use the Site (including your Account) at
@@ -319,7 +319,7 @@ export default function TermsOfService() {
 
           {/* Section 8: General */}
           <section className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">8. General</h2>
+            <h2 className="text-xl font-semibold mb-6 text-slate-900 dark:text-white/90">8. General</h2>
 
             <div className="mb-8">
               <h3 className="text-xl font-semibold mb-3 text-slate-700 dark:text-slate-200">8.1 Changes</h3>
