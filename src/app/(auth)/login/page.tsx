@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { LoginForm } from "@/components/auth/login-form";
 import { GoogleAuthButton } from "@/components/auth/google-auth-button";
+import { AppleAuthButton } from "@/components/auth/apple-auth-button";
 
 export default function LoginPage() {
   return (
@@ -16,6 +17,7 @@ export default function LoginPage() {
       </div>
       <div className="mt-6 space-y-3">
         <GoogleAuthButton />
+        <AppleAuthButton />
         <Link
           href="/magic-link"
           className="flex items-center justify-center gap-2 w-full h-11 rounded-lg border border-white/10 text-white/70 hover:text-white hover:border-white/20 transition-colors text-sm font-medium"

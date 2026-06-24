@@ -1,5 +1,6 @@
 import { RegisterForm } from "@/components/auth/register-form";
 import { GoogleAuthButton } from "@/components/auth/google-auth-button";
+import { AppleAuthButton } from "@/components/auth/apple-auth-button";
 
 export default function RegisterPage() {
   return (
@@ -13,8 +14,9 @@ export default function RegisterPage() {
         <span className="text-white/30 text-sm">or</span>
         <div className="flex-1 h-px bg-white/10" />
       </div>
-      <div className="mt-6">
+      <div className="mt-6 space-y-3">
         <GoogleAuthButton />
+        <AppleAuthButton />
       </div>
     </div>
   );

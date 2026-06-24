@@ -34,6 +34,20 @@ For full endpoint details, read the route files directly at `~/Projects/sensybul
 
 ### Changed: GET /api/v1/alerts/channels
 - Now returns all available channels including: `["email", "push", "sms", "telegram", "discord", "slack", "whatsapp", "webhook"]`
+## 2026-06-24: Apple Sign-In
+
+### New: POST /api/v1/auth/apple
+- Sign in or register via Apple ID
+- Body: `{ id_token, user?: { firstName, lastName } }`
+  - `id_token`: JWT from Apple's JS SDK (verified against Apple's JWKS)
+  - `user`: only sent on first authorization (Apple quirk — name is not in subsequent tokens)
+- Response: `{ message, user, access_token, refresh_token }` (same shape as `/auth/login`)
+- Auto-creates account if email not found; links `apple_id` to existing accounts by email
+- Auto-verifies email (Apple already verified it)
+- Requires `APPLE_CLIENT_ID` env var (your Services ID from Apple Developer Portal)
+
+### Migration
+- New `apple_id` column on `user` table (nullable, unique, indexed)
 
 ---
 
