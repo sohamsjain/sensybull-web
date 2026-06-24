@@ -6,22 +6,17 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white dark:bg-[#0a0a12] p-4">
-      <div className="w-full max-w-sm">
-        <Link href="/" className="flex items-center justify-center gap-2.5 mb-8">
+    <div className="min-h-screen flex items-center justify-center bg-[#0a0a12] p-4">
+      <div className="w-full max-w-md">
+        <Link href="/" className="flex justify-center mb-10">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/logo.png"
-            alt=""
-            className="w-7 h-7 dark:invert opacity-80"
+            alt="Sensybull"
+            className="w-20 h-20 invert opacity-90"
           />
-          <span className="text-slate-900 dark:text-white/90 font-semibold text-lg">
-            Sensybull
-          </span>
         </Link>
-        <div className="bg-slate-100 dark:bg-[#12121e] border border-slate-200 dark:border-white/[0.06] rounded-lg p-6">
-          {children}
-        </div>
+        {children}
       </div>
     </div>
   );

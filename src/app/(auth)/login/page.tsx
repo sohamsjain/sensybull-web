@@ -1,18 +1,16 @@
 import { LoginForm } from "@/components/auth/login-form";
 import { GoogleAuthButton } from "@/components/auth/google-auth-button";
-import { Separator } from "@/components/ui/separator";
 
 export default function LoginPage() {
   return (
-    <div className="space-y-4">
-      <h2 className="text-slate-900 dark:text-white/90 font-medium text-base">Sign In</h2>
-      <GoogleAuthButton />
-      <div className="flex items-center gap-3">
-        <Separator className="flex-1 bg-slate-200 dark:bg-white/[0.08]" />
-        <span className="text-slate-400 dark:text-slate-500 text-xs">or</span>
-        <Separator className="flex-1 bg-slate-200 dark:bg-white/[0.08]" />
-      </div>
+    <div>
+      <h1 className="text-white/90 font-bold text-3xl text-center mb-8">
+        Sign in to your account
+      </h1>
       <LoginForm />
+      <div className="mt-8">
+        <GoogleAuthButton />
+      </div>
     </div>
   );
 }

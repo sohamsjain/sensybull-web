@@ -30,14 +30,14 @@ export function ForgotPasswordForm() {
 
   if (success) {
     return (
-      <div className="text-center space-y-3">
-        <p className="text-slate-700 dark:text-slate-200 text-sm">
+      <div className="text-center space-y-4">
+        <p className="text-white/70 text-base">
           If an account with that email exists, we&apos;ve sent a password reset
           link.
         </p>
         <Link
           href="/login"
-          className="text-violet-400 hover:text-violet-300 text-sm"
+          className="text-violet-400 hover:text-violet-300 text-base font-medium"
         >
           Back to sign in
         </Link>
@@ -46,32 +46,34 @@ export function ForgotPasswordForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <p className="text-slate-500 dark:text-slate-400 text-sm">
+    <form onSubmit={handleSubmit} className="space-y-5">
+      <p className="text-white/50 text-base text-center">
         Enter your email and we&apos;ll send you a reset link.
       </p>
       <div>
+        <label className="block text-sm font-semibold text-white/80 mb-2">
+          Email
+        </label>
         <Input
           type="email"
-          placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="bg-white dark:bg-[#0a0a12] border-slate-300 dark:border-white/[0.1] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus-visible:border-slate-500 dark:focus-visible:border-violet-500/40 focus-visible:ring-0"
+          className="h-12 bg-[#1a1a2e] border-transparent text-base text-white placeholder:text-white/30 focus-visible:border-violet-500/50 focus-visible:ring-0"
         />
       </div>
-      {error && <p className="text-red-400 text-xs">{error}</p>}
+      {error && <p className="text-red-400 text-sm">{error}</p>}
       <Button
         type="submit"
         disabled={loading}
-        className="w-full bg-violet-600 hover:bg-violet-500"
+        className="w-full h-12 text-base font-semibold bg-violet-600 hover:bg-violet-500"
       >
-        {loading ? "..." : "Send Reset Link"}
+        {loading ? "Sending..." : "Send Reset Link"}
       </Button>
-      <p className="text-center text-xs">
+      <p className="text-center text-base text-white/50">
         <Link
           href="/login"
-          className="text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+          className="text-violet-400 hover:text-violet-300 font-medium"
         >
           Back to sign in
         </Link>
