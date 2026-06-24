@@ -19,7 +19,7 @@ export default function AlertsPage() {
   return (
     <div className="h-full overflow-y-auto p-6 space-y-6 max-w-2xl mx-auto">
       <div>
-        <h1 className="text-slate-900 dark:text-white text-lg font-semibold">Alerts</h1>
+        <h1 className="text-slate-900 dark:text-white/90 text-base font-medium">Alerts</h1>
         <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
           Manage your alert preferences and view notification history.
         </p>

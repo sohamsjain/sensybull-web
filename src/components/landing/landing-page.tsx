@@ -14,11 +14,11 @@ import {
 
 function Logo() {
   return (
-    <Link href="/" className="flex items-center gap-2.5 group">
-      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/20">
-        <span className="text-white font-bold text-sm">S</span>
+    <Link href="/" className="flex items-center gap-2">
+      <div className="w-7 h-7 rounded-md bg-violet-600 flex items-center justify-center">
+        <span className="text-white font-semibold text-sm">S</span>
       </div>
-      <span className="text-lg font-semibold text-white tracking-tight">
+      <span className="text-[15px] font-medium text-white/90">
         Sensybull
       </span>
     </Link>
@@ -27,25 +27,25 @@ function Logo() {
 
 function Navbar() {
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#0a0a0f]/80 backdrop-blur-xl">
-      <div className="mx-auto max-w-6xl px-6 h-16 flex items-center justify-between">
+    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#0a0a0f]/90 backdrop-blur-sm">
+      <div className="mx-auto max-w-5xl px-6 h-14 flex items-center justify-between">
         <Logo />
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <Link
             href="/feed"
-            className="hidden sm:inline-flex text-sm text-slate-400 hover:text-white transition-colors px-3 py-1.5"
+            className="hidden sm:inline-flex text-sm text-white/40 hover:text-white/70 transition-colors px-3 py-1.5"
           >
             Live Feed
           </Link>
           <Link
             href="/login"
-            className="text-sm text-slate-300 hover:text-white transition-colors px-3 py-1.5"
+            className="text-sm text-white/50 hover:text-white/80 transition-colors px-3 py-1.5"
           >
             Sign In
           </Link>
           <Link
             href="/register"
-            className="text-sm font-medium text-white bg-violet-600 hover:bg-violet-500 transition-colors px-4 py-2 rounded-lg"
+            className="text-sm font-medium text-white bg-violet-600 hover:bg-violet-500 transition-colors px-4 py-1.5 rounded-md"
           >
             Get Started
           </Link>
@@ -57,41 +57,33 @@ function Navbar() {
 
 function HeroSection() {
   return (
-    <section className="relative pt-40 pb-24 overflow-hidden">
-      <div className="absolute inset-0 hero-glow pointer-events-none" />
-      <div className="absolute top-32 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full bg-violet-600/[0.07] blur-[120px] pointer-events-none" />
-
-      <div className="relative mx-auto max-w-4xl px-6 text-center">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-violet-500/20 bg-violet-500/[0.08] text-violet-300 text-xs font-medium mb-8">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+    <section className="pt-36 pb-20">
+      <div className="mx-auto max-w-3xl px-6 text-center">
+        <p className="text-sm text-white/40 mb-8 tracking-wide">
           Monitoring SEC filings in real-time
-        </div>
+        </p>
 
-        <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight text-white leading-[1.08] mb-6">
-          Never miss a{" "}
-          <span className="bg-gradient-to-r from-violet-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent">
-            market-moving
-          </span>{" "}
-          SEC filing
+        <h1 className="text-3xl sm:text-4xl md:text-[2.75rem] font-semibold tracking-tight text-white/90 leading-[1.2] mb-6">
+          Never miss a market-moving SEC filing
         </h1>
 
-        <p className="text-lg sm:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed mb-10">
+        <p className="text-base text-white/45 max-w-xl mx-auto leading-relaxed mb-10">
           AI-powered intelligence on every 8-K filing, delivered the moment it
           hits EDGAR. Track your companies, get instant briefings, act before the
           crowd.
         </p>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <Link
             href="/register"
-            className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-medium text-base transition-all hover:shadow-lg hover:shadow-violet-600/25"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium transition-colors"
           >
             Get Started Free
-            <ArrowRight className="w-4 h-4" />
+            <ArrowRight className="w-3.5 h-3.5" />
           </Link>
           <Link
             href="/feed"
-            className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl border border-white/10 hover:border-white/20 text-slate-300 hover:text-white font-medium text-base transition-all hover:bg-white/[0.04]"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md border border-white/[0.08] hover:border-white/[0.15] text-white/50 hover:text-white/70 text-sm font-medium transition-colors"
           >
             View Live Feed
           </Link>
@@ -103,22 +95,22 @@ function HeroSection() {
 
 function TrustBar() {
   return (
-    <section className="border-y border-white/[0.04] bg-white/[0.01]">
-      <div className="mx-auto max-w-5xl px-6 py-10 flex flex-wrap items-center justify-center gap-x-12 gap-y-4 text-sm text-slate-500">
+    <section className="border-y border-white/[0.04]">
+      <div className="mx-auto max-w-5xl px-6 py-8 flex flex-wrap items-center justify-center gap-x-10 gap-y-3 text-sm text-white/35">
         <div className="flex items-center gap-2">
-          <FileText className="w-4 h-4 text-violet-400" />
+          <FileText className="w-4 h-4" />
           <span>Direct from SEC EDGAR</span>
         </div>
         <div className="flex items-center gap-2">
-          <Clock className="w-4 h-4 text-violet-400" />
+          <Clock className="w-4 h-4" />
           <span>Sub-minute latency</span>
         </div>
         <div className="flex items-center gap-2">
-          <Brain className="w-4 h-4 text-violet-400" />
+          <Brain className="w-4 h-4" />
           <span>AI-generated briefings</span>
         </div>
         <div className="flex items-center gap-2">
-          <Shield className="w-4 h-4 text-violet-400" />
+          <Shield className="w-4 h-4" />
           <span>Free to use</span>
         </div>
       </div>
@@ -155,33 +147,28 @@ const FEATURES = [
 
 function FeaturesSection() {
   return (
-    <section className="py-28 relative">
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-indigo-600/[0.04] blur-[100px] pointer-events-none" />
-
-      <div className="relative mx-auto max-w-6xl px-6">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+    <section className="py-24">
+      <div className="mx-auto max-w-5xl px-6">
+        <div className="text-center mb-14">
+          <h2 className="text-2xl sm:text-3xl font-semibold text-white/90 mb-3">
             Everything you need to track SEC filings
           </h2>
-          <p className="text-slate-400 text-lg max-w-2xl mx-auto">
-            From raw filings to actionable intelligence in seconds. Built for
-            investors who need an edge.
+          <p className="text-white/40 text-base max-w-xl mx-auto">
+            From raw filings to actionable intelligence in seconds.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-white/[0.04] rounded-lg overflow-hidden border border-white/[0.06]">
           {FEATURES.map((feature) => (
             <div
               key={feature.title}
-              className="group p-7 rounded-2xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/[0.1] transition-all duration-300"
+              className="p-6 bg-[#0a0a0f]"
             >
-              <div className="w-11 h-11 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center mb-5 group-hover:bg-violet-500/15 transition-colors">
-                <feature.icon className="w-5 h-5 text-violet-400" />
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-2.5">
+              <feature.icon className="w-5 h-5 text-white/25 mb-4" />
+              <h3 className="text-[15px] font-medium text-white/85 mb-2">
                 {feature.title}
               </h3>
-              <p className="text-slate-400 leading-relaxed text-[15px]">
+              <p className="text-white/40 text-sm leading-relaxed">
                 {feature.description}
               </p>
             </div>
@@ -203,39 +190,39 @@ const STEPS = [
     step: "02",
     title: "Get AI briefings instantly",
     description:
-      "Every new filing is analyzed by AI within seconds. Key points, catalysts, and sentiment—extracted automatically.",
+      "Every new filing is analyzed by AI within seconds. Key points, catalysts, and sentiment — extracted automatically.",
   },
   {
     step: "03",
     title: "Never miss what matters",
     description:
-      "Real-time push notifications for your watchlist. Filter by significance so only high-impact filings hit your phone.",
+      "Real-time push notifications for your watchlist. Filter by significance so only high-impact filings reach you.",
   },
 ];
 
 function HowItWorksSection() {
   return (
-    <section className="py-28 border-t border-white/[0.04]">
-      <div className="mx-auto max-w-5xl px-6">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+    <section className="py-24 border-t border-white/[0.04]">
+      <div className="mx-auto max-w-4xl px-6">
+        <div className="text-center mb-14">
+          <h2 className="text-2xl sm:text-3xl font-semibold text-white/90 mb-3">
             How it works
           </h2>
-          <p className="text-slate-400 text-lg">
+          <p className="text-white/40 text-base">
             Three steps. Zero noise. Complete coverage.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {STEPS.map((item) => (
-            <div key={item.step} className="relative">
-              <span className="text-5xl font-bold text-violet-500/10 block mb-4">
+            <div key={item.step}>
+              <span className="text-4xl font-semibold text-white/[0.06] block mb-3">
                 {item.step}
               </span>
-              <h3 className="text-lg font-semibold text-white mb-2">
+              <h3 className="text-[15px] font-medium text-white/85 mb-2">
                 {item.title}
               </h3>
-              <p className="text-slate-400 text-[15px] leading-relaxed">
+              <p className="text-white/40 text-sm leading-relaxed">
                 {item.description}
               </p>
             </div>
@@ -248,23 +235,21 @@ function HowItWorksSection() {
 
 function CtaSection() {
   return (
-    <section className="py-28 relative">
-      <div className="absolute inset-0 bg-gradient-to-b from-violet-600/[0.05] to-transparent pointer-events-none" />
-
-      <div className="relative mx-auto max-w-3xl px-6 text-center">
-        <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+    <section className="py-24 border-t border-white/[0.04]">
+      <div className="mx-auto max-w-3xl px-6 text-center">
+        <h2 className="text-2xl sm:text-3xl font-semibold text-white/90 mb-3">
           Start tracking SEC filings today
         </h2>
-        <p className="text-slate-400 text-lg mb-10">
+        <p className="text-white/40 text-base mb-10">
           Free to use. No credit card required. Set up your watchlist in under a
           minute.
         </p>
         <Link
           href="/register"
-          className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-medium text-base transition-all hover:shadow-lg hover:shadow-violet-600/25"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium transition-colors"
         >
           Create Free Account
-          <ArrowRight className="w-4 h-4" />
+          <ArrowRight className="w-3.5 h-3.5" />
         </Link>
       </div>
     </section>
@@ -273,32 +258,32 @@ function CtaSection() {
 
 function Footer() {
   return (
-    <footer className="border-t border-white/[0.06] bg-[#0a0a0f]">
-      <div className="mx-auto max-w-6xl px-6 py-12">
+    <footer className="border-t border-white/[0.06]">
+      <div className="mx-auto max-w-5xl px-6 py-10">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
           <Logo />
-          <div className="flex items-center gap-6 text-sm text-slate-500">
+          <div className="flex items-center gap-6 text-sm text-white/30">
             <Link
               href="/terms"
-              className="hover:text-slate-300 transition-colors"
+              className="hover:text-white/60 transition-colors"
             >
               Terms of Use
             </Link>
             <Link
               href="/privacy"
-              className="hover:text-slate-300 transition-colors"
+              className="hover:text-white/60 transition-colors"
             >
               Privacy Policy
             </Link>
             <Link
               href="/disclaimer"
-              className="hover:text-slate-300 transition-colors"
+              className="hover:text-white/60 transition-colors"
             >
               Disclaimer
             </Link>
           </div>
         </div>
-        <div className="mt-8 pt-6 border-t border-white/[0.04] text-center text-xs text-slate-600">
+        <div className="mt-8 pt-6 border-t border-white/[0.04] text-center text-xs text-white/20">
           &copy; {new Date().getFullYear()} Sensybull, LLC. All rights
           reserved.
         </div>

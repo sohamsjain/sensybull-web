@@ -49,7 +49,7 @@ export function FilingCard({ event }: { event: FilingEvent }) {
         <div className="flex items-center gap-2 min-w-0">
           <SignificanceBadge level={significance} />
           {ticker && (
-            <span className="font-mono font-bold text-slate-900 dark:text-white">{ticker}</span>
+            <span className="font-mono font-semibold text-slate-900 dark:text-white/90">{ticker}</span>
           )}
           <span className="text-slate-500 dark:text-slate-400 text-sm truncate">
             {company_name}

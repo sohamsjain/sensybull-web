@@ -48,7 +48,7 @@ export function ChatMessage({ event }: { event: FilingEvent }) {
         {/* Briefing body */}
         {briefing ? (
           <>
-            <p className="text-slate-900 dark:text-slate-50 text-[14px] font-semibold leading-snug">
+            <p className="text-slate-900 dark:text-slate-100/90 text-[14px] font-medium leading-snug">
               {briefing.headline}
             </p>
             {briefing.investor_takeaway && (
