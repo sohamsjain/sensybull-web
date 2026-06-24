@@ -5,7 +5,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
 
 const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
-const GOOGLE_BUTTON_MAX_WIDTH = 400;
+const GOOGLE_BUTTON_API_MAX_WIDTH = 400;
 
 declare global {
   interface Window {
@@ -69,18 +69,14 @@ export function GoogleAuthButton() {
     const renderGoogleButton = () => {
       if (!buttonRef.current || !containerRef.current) return;
 
-      const width = Math.min(
-        Math.floor(containerRef.current.offsetWidth),
-        GOOGLE_BUTTON_MAX_WIDTH
-      );
-      if (width <= 0) return;
+      const containerWidth = Math.floor(containerRef.current.offsetWidth);
+      if (containerWidth <= 0) return;
 
-      buttonRef.current.style.width = `${width}px`;
       buttonRef.current.innerHTML = "";
       window.google?.accounts.id.renderButton(buttonRef.current, {
         theme: "filled_black",
         size: "large",
-        width,
+        width: Math.min(containerWidth, GOOGLE_BUTTON_API_MAX_WIDTH),
         text: "continue_with",
       });
     };
@@ -96,10 +92,10 @@ export function GoogleAuthButton() {
   if (!GOOGLE_CLIENT_ID) return null;
 
   return (
-    <div ref={containerRef} className="w-full flex justify-center">
+    <div ref={containerRef} className="w-full">
       <div
         ref={buttonRef}
-        className="overflow-hidden [&>div]:!w-full [&_iframe]:!w-full"
+        className="w-full overflow-hidden rounded-lg [&>div]:!w-full [&_iframe]:!w-full"
       />
     </div>
   );
