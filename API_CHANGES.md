@@ -5,6 +5,23 @@ For full endpoint details, read the route files directly at `~/Projects/sensybul
 
 ---
 
+## 2026-06-24: Magic Link (Passwordless Email Login)
+
+### New: POST /api/v1/auth/magic-link
+- Sends a sign-in link to the user's email (no password required)
+- Body: `{ email }` — rate-limited 5/hour per IP
+- Response: `{ message }` — always 200 (anti-enumeration)
+- Token expires in 15 minutes (configurable via `MAGIC_LINK_TOKEN_MINUTES`)
+
+### New: POST /api/v1/auth/magic-link/verify
+- Verifies the magic link token and returns JWT tokens
+- Body: `{ token }` — rate-limited 10/hour per IP
+- Response: `{ message, user, access_token, refresh_token }` (same shape as `/auth/login`)
+- Also auto-verifies email if not already verified
+- Returns 400 for invalid/expired tokens
+
+---
+
 ## 2026-06-20: Company Logos — Switched to Logo.dev
 
 - `company.logo_url` field still exists in API responses but is **no longer

@@ -22,6 +22,8 @@ interface AuthContextValue {
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
   googleAuth: (credential: string) => Promise<void>;
+  magicLinkRequest: (email: string) => Promise<void>;
+  magicLinkVerify: (token: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -77,6 +79,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(data.user);
   };
 
+  const magicLinkRequest = async (email: string) => {
+    await api("/auth/magic-link", {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    });
+  };
+
+  const magicLinkVerify = async (token: string) => {
+    const data = await api<AuthResponse>("/auth/magic-link/verify", {
+      method: "POST",
+      body: JSON.stringify({ token }),
+    });
+    setTokens(data.access_token, data.refresh_token);
+    setUser(data.user);
+  };
+
   const logout = () => {
     clearTokens();
     setUser(null);
@@ -84,7 +102,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, loading, login, register, googleAuth, logout }}
+      value={{ user, loading, login, register, googleAuth, magicLinkRequest, magicLinkVerify, logout }}
     >
       {children}
     </AuthContext.Provider>
