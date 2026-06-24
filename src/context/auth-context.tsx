@@ -21,7 +21,7 @@ interface AuthContextValue {
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
-  googleAuth: (credential: string) => Promise<void>;
+  googleAuth: (code: string) => Promise<void>;
   appleAuth: (idToken: string, user?: { firstName: string; lastName: string }) => Promise<void>;
   magicLinkRequest: (email: string) => Promise<void>;
   magicLinkVerify: (token: string) => Promise<void>;
@@ -71,10 +71,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(data.user);
   };
 
-  const googleAuth = async (credential: string) => {
+  const googleAuth = async (code: string) => {
     const data = await api<AuthResponse>("/auth/google", {
       method: "POST",
-      body: JSON.stringify({ token: credential }),
+      body: JSON.stringify({ code }),
     });
     setTokens(data.access_token, data.refresh_token);
     setUser(data.user);
