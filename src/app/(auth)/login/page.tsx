@@ -8,9 +8,9 @@ export default function LoginPage() {
       <h2 className="text-slate-900 dark:text-white font-semibold text-lg">Sign In</h2>
       <GoogleAuthButton />
       <div className="flex items-center gap-3">
-        <Separator className="flex-1 bg-slate-200 dark:bg-slate-700" />
+        <Separator className="flex-1 bg-slate-200 dark:bg-white/[0.08]" />
         <span className="text-slate-400 dark:text-slate-500 text-xs">or</span>
-        <Separator className="flex-1 bg-slate-200 dark:bg-slate-700" />
+        <Separator className="flex-1 bg-slate-200 dark:bg-white/[0.08]" />
       </div>
       <LoginForm />
     </div>

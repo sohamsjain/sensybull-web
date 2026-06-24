@@ -3,8 +3,8 @@ import { ArrowLeft } from "lucide-react";
 
 export default function PrivacyPolicy() {
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-900">
-      <header className="border-b border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm sticky top-0 z-50">
+    <div className="min-h-screen bg-white dark:bg-[#0a0a12]">
+      <header className="border-b border-slate-200 dark:border-white/[0.06] bg-white/80 dark:bg-[#0a0a12]/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <Link
             href="/"
@@ -26,7 +26,7 @@ export default function PrivacyPolicy() {
 
         <div className="prose dark:prose-invert prose-slate max-w-none">
           {/* Introduction */}
-          <div className="mb-8 p-6 bg-slate-100/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg">
+          <div className="mb-8 p-6 bg-slate-100/50 dark:bg-[#12121e]/50 border border-slate-200 dark:border-white/[0.06] rounded-lg">
             <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
               Sensybull, LLC (&quot;Company&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;) is committed to maintaining robust
               privacy protections for its users. Our Privacy Policy is designed to help you understand
@@ -48,7 +48,7 @@ export default function PrivacyPolicy() {
             </p>
             <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
               By accessing our Site or our Service, you accept our Privacy Policy and{" "}
-              <Link href="/terms" className="text-blue-400 hover:text-blue-300">
+              <Link href="/terms" className="text-violet-400 hover:text-violet-300">
                 Terms of Use
               </Link>
               , and you consent to our collection, storage, use and disclosure of your Personal
@@ -142,7 +142,7 @@ export default function PrivacyPolicy() {
                 believe we have collected such information, please contact us at{" "}
                 <a
                   href="mailto:info@sensybull.com"
-                  className="text-blue-400 hover:text-blue-300"
+                  className="text-violet-400 hover:text-violet-300"
                 >
                   info@sensybull.com
                 </a>
@@ -279,14 +279,14 @@ export default function PrivacyPolicy() {
           </section>
 
           {/* Section VII */}
-          <section className="mb-12 p-6 bg-slate-100/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg">
+          <section className="mb-12 p-6 bg-slate-100/50 dark:bg-[#12121e]/50 border border-slate-200 dark:border-white/[0.06] rounded-lg">
             <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">VII. Contact Us</h2>
             <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
               If you have any questions regarding this Privacy Policy or the practices of this Site,
               please contact us by sending an email to{" "}
               <a
                 href="mailto:info@sensybull.com"
-                className="text-blue-400 hover:text-blue-300"
+                className="text-violet-400 hover:text-violet-300"
               >
                 info@sensybull.com
               </a>
@@ -303,7 +303,7 @@ export default function PrivacyPolicy() {
                 Email:{" "}
                 <a
                   href="mailto:info@sensybull.com"
-                  className="text-blue-400 hover:text-blue-300"
+                  className="text-violet-400 hover:text-violet-300"
                 >
                   info@sensybull.com
                 </a>
@@ -311,7 +311,7 @@ export default function PrivacyPolicy() {
             </div>
           </section>
 
-          <div className="mt-12 pt-8 border-t border-slate-200 dark:border-slate-700 text-center text-slate-500 dark:text-slate-400">
+          <div className="mt-12 pt-8 border-t border-slate-200 dark:border-white/[0.06] text-center text-slate-500 dark:text-slate-400">
             <p>Copyright &copy; 2025 Sensybull, LLC. All rights reserved.</p>
           </div>
         </div>

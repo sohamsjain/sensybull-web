@@ -24,10 +24,10 @@ export function NotificationList() {
 
   if (loading && notifications.length === 0) {
     return (
-      <div className="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-6">
+      <div className="bg-slate-100 dark:bg-[#12121e] border border-slate-200 dark:border-white/[0.06] rounded-lg p-6">
         <div className="animate-pulse space-y-3">
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="h-16 bg-slate-200 dark:bg-slate-700 rounded" />
+            <div key={i} className="h-16 bg-slate-200 dark:bg-white/[0.06] rounded" />
           ))}
         </div>
       </div>
@@ -36,7 +36,7 @@ export function NotificationList() {
 
   if (notifications.length === 0) {
     return (
-      <div className="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-8 text-center">
+      <div className="bg-slate-100 dark:bg-[#12121e] border border-slate-200 dark:border-white/[0.06] rounded-lg p-8 text-center">
         <p className="text-slate-500 dark:text-slate-400 text-sm">No notifications yet.</p>
         <p className="text-slate-400 dark:text-slate-500 text-xs mt-1">
           Notifications will appear here when filing events trigger your alerts.
@@ -46,8 +46,8 @@ export function NotificationList() {
   }
 
   return (
-    <div className="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden">
-      <div className="divide-y divide-slate-200 dark:divide-slate-700">
+    <div className="bg-slate-100 dark:bg-[#12121e] border border-slate-200 dark:border-white/[0.06] rounded-lg overflow-hidden">
+      <div className="divide-y divide-slate-200 dark:divide-white/[0.06]">
         {notifications.map((n) => {
           const sigKey = TIER_TO_SIGNIFICANCE[n.filing_event.max_tier] || "Low";
           const sigConfig = SIGNIFICANCE_CONFIG[sigKey];
@@ -103,7 +103,7 @@ export function NotificationList() {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="px-4 py-3 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between">
+        <div className="px-4 py-3 border-t border-slate-200 dark:border-white/[0.06] flex items-center justify-between">
           <span className="text-slate-400 dark:text-slate-500 text-xs">
             {total} notification{total !== 1 ? "s" : ""}
           </span>
@@ -111,7 +111,7 @@ export function NotificationList() {
             <button
               onClick={() => goToPage(page - 1)}
               disabled={page <= 1 || loading}
-              className="px-2.5 py-1 rounded text-xs text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="px-2.5 py-1 rounded text-xs text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/[0.06] disabled:opacity-40 disabled:cursor-not-allowed"
             >
               Prev
             </button>
@@ -121,7 +121,7 @@ export function NotificationList() {
             <button
               onClick={() => goToPage(page + 1)}
               disabled={page >= totalPages || loading}
-              className="px-2.5 py-1 rounded text-xs text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="px-2.5 py-1 rounded text-xs text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/[0.06] disabled:opacity-40 disabled:cursor-not-allowed"
             >
               Next
             </button>

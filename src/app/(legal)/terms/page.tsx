@@ -3,8 +3,8 @@ import { ArrowLeft } from "lucide-react";
 
 export default function TermsOfService() {
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-900">
-      <header className="border-b border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm sticky top-0 z-50">
+    <div className="min-h-screen bg-white dark:bg-[#0a0a12]">
+      <header className="border-b border-slate-200 dark:border-white/[0.06] bg-white/80 dark:bg-[#0a0a12]/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <Link
             href="/"
@@ -24,7 +24,7 @@ export default function TermsOfService() {
 
         <div className="prose dark:prose-invert prose-slate max-w-none">
           {/* Introduction */}
-          <div className="mb-8 p-6 bg-slate-100/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg">
+          <div className="mb-8 p-6 bg-slate-100/50 dark:bg-[#12121e]/50 border border-slate-200 dark:border-white/[0.06] rounded-lg">
             <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
               The website located at <strong>www.sensybull.com</strong> (the &quot;Site&quot;) is a
               copyrighted work belonging to Sensybull, LLC (&quot;Company&quot;, &quot;us&quot;,
@@ -239,7 +239,7 @@ export default function TermsOfService() {
                 relates directly or indirectly to, the Site (including any interactions with, or act or
                 omission of, other Site users or any Third-Party Links &amp; Ads).
               </p>
-              <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-sm bg-slate-100/30 dark:bg-slate-800/30 p-4 rounded">
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-sm bg-slate-100/30 dark:bg-[#12121e]/30 p-4 rounded">
                 IF YOU ARE A CALIFORNIA RESIDENT, YOU HEREBY WAIVE CALIFORNIA CIVIL CODE SECTION 1542 IN
                 CONNECTION WITH THE FOREGOING, WHICH STATES: &quot;A GENERAL RELEASE DOES NOT EXTEND TO
                 CLAIMS WHICH THE CREDITOR OR RELEASING PARTY DOES NOT KNOW OR SUSPECT TO EXIST IN HIS OR
@@ -755,7 +755,7 @@ export default function TermsOfService() {
               </p>
             </div>
 
-            <div className="mb-6 p-6 bg-slate-100/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg">
+            <div className="mb-6 p-6 bg-slate-100/50 dark:bg-[#12121e]/50 border border-slate-200 dark:border-white/[0.06] rounded-lg">
               <h3 className="text-xl font-semibold mb-4 text-slate-700 dark:text-slate-200">8.8 Contact Information</h3>
               <div className="text-slate-300 space-y-2">
                 <p>
@@ -768,7 +768,7 @@ export default function TermsOfService() {
                   Email:{" "}
                   <a
                     href="mailto:info@sensybull.com"
-                    className="text-blue-400 hover:text-blue-300"
+                    className="text-violet-400 hover:text-violet-300"
                   >
                     info@sensybull.com
                   </a>
@@ -777,7 +777,7 @@ export default function TermsOfService() {
             </div>
           </section>
 
-          <div className="mt-12 pt-8 border-t border-slate-200 dark:border-slate-700 text-center text-slate-500 dark:text-slate-400">
+          <div className="mt-12 pt-8 border-t border-slate-200 dark:border-white/[0.06] text-center text-slate-500 dark:text-slate-400">
             <p>Copyright &copy; 2025 Sensybull, LLC. All rights reserved.</p>
           </div>
         </div>
