@@ -5,6 +5,38 @@ For full endpoint details, read the route files directly at `~/Projects/sensybul
 
 ---
 
+## 2026-06-24: Notification Channel Configuration (SMS, Telegram, Discord, Slack, WhatsApp, Webhook)
+
+### New: GET /api/v1/alerts/channels/:channelName/config
+- Returns the current config and verification status for a notification channel
+- Response: `{ config: { ...channelSpecificFields }, verified: boolean }`
+- Channel-specific config shapes:
+  - SMS: `{ phone: string }`
+  - Telegram: no direct config (uses link flow below)
+  - Discord: `{ webhook_url: string }`
+  - Slack: `{ webhook_url: string }`
+  - WhatsApp: `{ phone: string }`
+  - Webhook: `{ url: string, secret?: string }`
+
+### New: PUT /api/v1/alerts/channels/:channelName/config
+- Creates or updates a channel's configuration
+- Body: `{ config: { ...channelSpecificFields } }`
+- Response: `{ config: {...}, verified: boolean, message: string }`
+
+### New: DELETE /api/v1/alerts/channels/:channelName/config
+- Removes a channel configuration (disconnects it)
+- Response: `{ message: string }`
+
+### New: POST /api/v1/alerts/telegram/link
+- Generates a one-time code for linking a Telegram account
+- Response: `{ code: string, bot_username: string }`
+- User sends the code to the bot on Telegram to complete linking
+
+### Changed: GET /api/v1/alerts/channels
+- Now returns all available channels including: `["email", "push", "sms", "telegram", "discord", "slack", "whatsapp", "webhook"]`
+
+---
+
 ## 2026-06-24: Magic Link (Passwordless Email Login)
 
 ### New: POST /api/v1/auth/magic-link

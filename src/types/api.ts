@@ -124,6 +124,22 @@ export interface AlertChannelsResponse {
   channels: string[];
 }
 
+export interface ChannelConfig {
+  config: Record<string, string>;
+  verified: boolean;
+}
+
+export interface ChannelConfigResponse {
+  config: Record<string, string>;
+  verified: boolean;
+  message?: string;
+}
+
+export interface TelegramLinkResponse {
+  code: string;
+  bot_username: string;
+}
+
 export interface ChatCompany {
   id: string;
   ticker: string | null;
