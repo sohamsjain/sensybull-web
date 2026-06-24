@@ -443,7 +443,7 @@ export function ChannelSetupWebhook({ channelName, onConnected, onDisconnect }: 
         />
       </div>
       <p className={helperClass}>
-        Events are POSTed as JSON. The optional secret is sent in the X-Webhook-Secret header for verification.
+        Events are POSTed as JSON. If a secret is set, payloads are signed with HMAC-SHA256 in the X-Sensybull-Signature header.
       </p>
       {error && <p className={errorClass}>{error}</p>}
     </div>
