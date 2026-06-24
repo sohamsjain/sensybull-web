@@ -5,6 +5,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
 
 const APPLE_CLIENT_ID = process.env.NEXT_PUBLIC_APPLE_CLIENT_ID;
+const APPLE_REDIRECT_URI =
+  process.env.NEXT_PUBLIC_APPLE_REDIRECT_URI || (typeof window !== "undefined" ? window.location.origin + "/login" : "");
 
 declare global {
   interface Window {
@@ -39,7 +41,7 @@ export function AppleAuthButton() {
       window.AppleID?.auth.init({
         clientId: APPLE_CLIENT_ID,
         scope: "name email",
-        redirectURI: window.location.origin + "/login",
+        redirectURI: APPLE_REDIRECT_URI,
         usePopup: true,
       });
       setReady(true);
