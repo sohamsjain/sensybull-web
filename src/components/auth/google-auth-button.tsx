@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
 
@@ -25,7 +25,9 @@ declare global {
 export function GoogleAuthButton() {
   const { googleAuth } = useAuth();
   const router = useRouter();
+  const containerRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLDivElement>(null);
+  const [initialized, setInitialized] = useState(false);
 
   const handleCredentialResponse = useCallback(
     async (response: { credential: string }) => {
@@ -51,14 +53,7 @@ export function GoogleAuthButton() {
         client_id: GOOGLE_CLIENT_ID,
         callback: handleCredentialResponse,
       });
-      if (buttonRef.current) {
-        window.google?.accounts.id.renderButton(buttonRef.current, {
-          theme: "filled_black",
-          size: "large",
-          width: "100%",
-          text: "continue_with",
-        });
-      }
+      setInitialized(true);
     };
     document.head.appendChild(script);
 
@@ -67,11 +62,25 @@ export function GoogleAuthButton() {
     };
   }, [handleCredentialResponse]);
 
+  useEffect(() => {
+    if (!initialized || !buttonRef.current || !containerRef.current) return;
+    const width = containerRef.current.offsetWidth;
+    if (width <= 0) return;
+
+    buttonRef.current.innerHTML = "";
+    window.google?.accounts.id.renderButton(buttonRef.current, {
+      theme: "filled_black",
+      size: "large",
+      width: Math.floor(width),
+      text: "continue_with",
+    });
+  }, [initialized]);
+
   if (!GOOGLE_CLIENT_ID) return null;
 
   return (
-    <div className="w-full">
-      <div ref={buttonRef} className="w-full" />
+    <div ref={containerRef} className="w-full">
+      <div ref={buttonRef} className="w-full flex justify-center" />
     </div>
   );
 }
