@@ -29,7 +29,7 @@ export function ChatMessage({ event }: { event: FilingEvent }) {
   return (
     <div className="flex justify-start">
       <div
-        className="max-w-[92%] md:max-w-[70%] bg-slate-100 dark:bg-slate-800 rounded-lg rounded-tl-none px-3 py-2 shadow-md shadow-slate-300/30 dark:shadow-black/20 cursor-pointer transition-colors hover:bg-slate-100/90 dark:hover:bg-slate-800/90"
+        className="max-w-[92%] md:max-w-[70%] bg-slate-100 dark:bg-[#12121e] rounded-lg rounded-tl-none px-3 py-2 shadow-md shadow-slate-300/30 dark:shadow-black/20 cursor-pointer transition-colors hover:bg-slate-100/90 dark:hover:bg-[#12121e]/90"
         onClick={toggleExpanded}
       >
         {/* Meta row */}
@@ -76,7 +76,7 @@ export function ChatMessage({ event }: { event: FilingEvent }) {
         {/* Expanded: exhibits */}
         {expanded && exhibits?.length > 0 && (
           <div
-            className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700"
+            className="mt-3 pt-3 border-t border-slate-200 dark:border-white/[0.06]"
             onClick={(e) => e.stopPropagation()}
           >
             <p className="text-slate-400 dark:text-slate-500 text-xs uppercase tracking-wide mb-1">
@@ -88,7 +88,7 @@ export function ChatMessage({ event }: { event: FilingEvent }) {
                 href={ex.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block text-blue-400 hover:text-blue-300 text-xs mb-0.5"
+                className="block text-violet-400 hover:text-violet-300 text-xs mb-0.5"
               >
                 {ex.type} &mdash; {ex.description}
               </a>
@@ -108,7 +108,7 @@ export function ChatMessage({ event }: { event: FilingEvent }) {
                 href={edgar_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-400/80 hover:text-blue-300 underline underline-offset-2"
+                className="text-violet-400/80 hover:text-violet-300 underline underline-offset-2"
               >
                 verify on SEC EDGAR
               </a>

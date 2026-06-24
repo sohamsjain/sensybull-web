@@ -67,8 +67,8 @@ function RailLink({
       aria-label={label}
       className={`relative flex items-center justify-center w-10 h-10 rounded-xl transition-colors ${
         active
-          ? "bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white"
-          : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800"
+          ? "bg-slate-200 dark:bg-white/[0.08] text-slate-900 dark:text-white"
+          : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/[0.05]"
       }`}
     >
       {children}
@@ -104,10 +104,10 @@ export function NavRail() {
   if (!user) return null;
 
   return (
-    <aside className="hidden md:flex w-14 shrink-0 flex-col items-center gap-1.5 py-3 border-r border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-950">
+    <aside className="hidden md:flex w-14 shrink-0 flex-col items-center gap-1.5 py-3 border-r border-slate-200 dark:border-white/[0.04] bg-slate-100 dark:bg-[#07070e]">
       <Link href="/" title="Sensybull" className="mb-2">
         {logoFailed ? (
-          <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-emerald-500 flex items-center justify-center text-white font-bold text-sm select-none">
+          <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm select-none">
             S
           </span>
         ) : (

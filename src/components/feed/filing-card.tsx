@@ -41,7 +41,7 @@ export function FilingCard({ event }: { event: FilingEvent }) {
 
   return (
     <div
-      className={`bg-slate-100 dark:bg-slate-800 rounded-lg border ${sigConfig.border} p-4 cursor-pointer transition-colors hover:bg-slate-100/80 dark:hover:bg-slate-800/80 ${isLow ? "opacity-60" : ""}`}
+      className={`bg-slate-100 dark:bg-[#12121e] rounded-lg border ${sigConfig.border} p-4 cursor-pointer transition-colors hover:bg-slate-100/80 dark:hover:bg-[#12121e]/80 ${isLow ? "opacity-60" : ""}`}
       onClick={() => setExpanded((e) => !e)}
     >
       {/* Header row */}
@@ -115,7 +115,7 @@ export function FilingCard({ event }: { event: FilingEvent }) {
           {items.map((item, i) => (
             <span
               key={i}
-              className="px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400 rounded text-xs"
+              className="px-1.5 py-0.5 bg-slate-200 dark:bg-white/[0.06] text-slate-500 dark:text-slate-400 rounded text-xs"
             >
               {item.category}
             </span>
@@ -126,7 +126,7 @@ export function FilingCard({ event }: { event: FilingEvent }) {
       {/* Expanded details */}
       {expanded && (exhibits?.length > 0 || edgar_url) && (
         <div
-          className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700"
+          className="mt-3 pt-3 border-t border-slate-200 dark:border-white/[0.06]"
           onClick={(e) => e.stopPropagation()}
         >
           {exhibits?.length > 0 && (
@@ -140,7 +140,7 @@ export function FilingCard({ event }: { event: FilingEvent }) {
                   href={ex.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block text-blue-400 hover:text-blue-300 text-xs mb-0.5"
+                  className="block text-violet-400 hover:text-violet-300 text-xs mb-0.5"
                 >
                   {ex.type} &mdash; {ex.description}
                 </a>
@@ -153,7 +153,7 @@ export function FilingCard({ event }: { event: FilingEvent }) {
               href={edgar_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block mt-3 px-3 py-1.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 rounded text-xs font-semibold uppercase tracking-wide transition-colors"
+              className="inline-block mt-3 px-3 py-1.5 bg-slate-200 dark:bg-white/[0.06] hover:bg-slate-300 dark:hover:bg-white/[0.08] text-slate-700 dark:text-slate-200 rounded text-xs font-semibold uppercase tracking-wide transition-colors"
             >
               Read SEC Filing &rarr;
             </a>

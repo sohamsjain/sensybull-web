@@ -19,8 +19,8 @@ export function WatchlistList({
         onClick={() => onSelect(null)}
         className={`w-full text-left px-3 py-2 rounded text-sm mb-1 transition-colors ${
           !selected
-            ? "bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white"
-            : "text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+            ? "bg-slate-200 dark:bg-white/[0.08] text-slate-900 dark:text-white"
+            : "text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/[0.05]"
         }`}
       >
         All Events
@@ -31,8 +31,8 @@ export function WatchlistList({
           onClick={() => onSelect(wl)}
           className={`w-full text-left px-3 py-2 rounded text-sm mb-1 transition-colors ${
             selected?.id === wl.id
-              ? "bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white"
-              : "text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+              ? "bg-slate-200 dark:bg-white/[0.08] text-slate-900 dark:text-white"
+              : "text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/[0.05]"
           }`}
         >
           {wl.name}

@@ -3,8 +3,8 @@ import { ArrowLeft } from "lucide-react";
 
 export default function Disclaimer() {
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-900">
-      <header className="border-b border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm sticky top-0 z-50">
+    <div className="min-h-screen bg-white dark:bg-[#0a0a12]">
+      <header className="border-b border-slate-200 dark:border-white/[0.06] bg-white/80 dark:bg-[#0a0a12]/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <Link
             href="/"
@@ -23,7 +23,7 @@ export default function Disclaimer() {
         </div>
 
         <div className="prose dark:prose-invert prose-slate max-w-none">
-          <div className="p-6 bg-slate-100/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg">
+          <div className="p-6 bg-slate-100/50 dark:bg-[#12121e]/50 border border-slate-200 dark:border-white/[0.06] rounded-lg">
             <h2 className="text-2xl font-bold mb-4 text-slate-900 dark:text-white">Investment Disclaimer</h2>
             <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
               <strong>
@@ -49,7 +49,7 @@ export default function Disclaimer() {
             </p>
           </div>
 
-          <section className="mt-12 p-6 bg-slate-100/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg">
+          <section className="mt-12 p-6 bg-slate-100/50 dark:bg-[#12121e]/50 border border-slate-200 dark:border-white/[0.06] rounded-lg">
             <h2 className="text-2xl font-bold mb-4 text-slate-900 dark:text-white">No Warranties</h2>
             <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
               While we strive to provide accurate and timely information, Sensybull makes no
@@ -59,7 +59,7 @@ export default function Disclaimer() {
             </p>
           </section>
 
-          <section className="mt-8 p-6 bg-slate-100/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg">
+          <section className="mt-8 p-6 bg-slate-100/50 dark:bg-[#12121e]/50 border border-slate-200 dark:border-white/[0.06] rounded-lg">
             <h2 className="text-2xl font-bold mb-4 text-slate-900 dark:text-white">Limitation of Liability</h2>
             <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
               In no event will Sensybull be liable for any loss or damage including without limitation,
@@ -68,7 +68,7 @@ export default function Disclaimer() {
             </p>
           </section>
 
-          <section className="mt-12 p-6 bg-slate-100/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg">
+          <section className="mt-12 p-6 bg-slate-100/50 dark:bg-[#12121e]/50 border border-slate-200 dark:border-white/[0.06] rounded-lg">
             <h2 className="text-2xl font-bold mb-4 text-slate-900 dark:text-white">Contact Information</h2>
             <div className="text-slate-600 dark:text-slate-300 space-y-2">
               <p>
@@ -80,7 +80,7 @@ export default function Disclaimer() {
                 Email:{" "}
                 <a
                   href="mailto:info@sensybull.com"
-                  className="text-blue-400 hover:text-blue-300"
+                  className="text-violet-400 hover:text-violet-300"
                 >
                   info@sensybull.com
                 </a>

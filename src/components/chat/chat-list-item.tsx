@@ -39,8 +39,8 @@ export function ChatListItem({
     <button
       onClick={onSelect}
       data-company-id={company.id}
-      className={`w-full flex items-center gap-3 px-3 py-3 text-left transition-colors outline-none focus-visible:bg-slate-100/80 dark:focus-visible:bg-slate-800/80 ${
-        active ? "bg-slate-100 dark:bg-slate-800" : "hover:bg-slate-100/60 dark:hover:bg-slate-800/60"
+      className={`w-full flex items-center gap-3 px-3 py-3 text-left transition-colors outline-none focus-visible:bg-slate-100/80 dark:focus-visible:bg-[#12121e]/80 ${
+        active ? "bg-slate-100 dark:bg-[#12121e]" : "hover:bg-slate-100/60 dark:hover:bg-white/[0.04]"
       }`}
     >
       <ChatAvatar
@@ -48,7 +48,7 @@ export function ChatListItem({
         name={company.name}
       />
 
-      <div className="flex-1 min-w-0 border-b border-slate-200/70 dark:border-slate-800/70 pb-3 -mb-3">
+      <div className="flex-1 min-w-0 border-b border-slate-200/70 dark:border-white/[0.04] pb-3 -mb-3">
         <div className="flex items-baseline justify-between gap-2">
           <span
             className={`truncate text-[15px] leading-5 ${
@@ -86,7 +86,7 @@ export function ChatListItem({
               <span
                 className={`min-w-[19px] h-[19px] rounded-full flex items-center justify-center text-[11px] font-semibold leading-none px-1.5 ${
                   muted
-                    ? "bg-slate-300 dark:bg-slate-600 text-slate-700 dark:text-slate-200"
+                    ? "bg-slate-300 dark:bg-white/[0.1] text-slate-700 dark:text-slate-200"
                     : "bg-emerald-500 text-emerald-950"
                 }`}
               >

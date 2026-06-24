@@ -37,7 +37,7 @@ export function ForgotPasswordForm() {
         </p>
         <Link
           href="/login"
-          className="text-blue-400 hover:text-blue-300 text-sm"
+          className="text-violet-400 hover:text-violet-300 text-sm"
         >
           Back to sign in
         </Link>
@@ -57,14 +57,14 @@ export function ForgotPasswordForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus-visible:border-slate-500 dark:focus-visible:border-slate-400 focus-visible:ring-0"
+          className="bg-white dark:bg-[#0a0a12] border-slate-300 dark:border-white/[0.1] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus-visible:border-slate-500 dark:focus-visible:border-violet-500/40 focus-visible:ring-0"
         />
       </div>
       {error && <p className="text-red-400 text-xs">{error}</p>}
       <Button
         type="submit"
         disabled={loading}
-        className="w-full bg-blue-600 hover:bg-blue-500"
+        className="w-full bg-violet-600 hover:bg-violet-500"
       >
         {loading ? "..." : "Send Reset Link"}
       </Button>

@@ -112,7 +112,7 @@ export default function ChatsPage() {
             never miss the one that matters.
           </p>
           <Link href="/login">
-            <Button className="bg-blue-600 hover:bg-blue-500">Sign in to start</Button>
+            <Button className="bg-violet-600 hover:bg-violet-500">Sign in to start</Button>
           </Link>
         </div>
       </div>

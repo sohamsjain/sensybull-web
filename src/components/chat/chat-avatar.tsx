@@ -6,7 +6,7 @@ import { useTheme } from "next-themes";
 const LOGO_DEV_TOKEN = process.env.NEXT_PUBLIC_LOGO_DEV_TOKEN;
 
 const AVATAR_COLORS = [
-  "bg-blue-500/30 text-blue-300",
+  "bg-fuchsia-500/30 text-fuchsia-300",
   "bg-emerald-500/30 text-emerald-300",
   "bg-violet-500/30 text-violet-300",
   "bg-amber-500/30 text-amber-300",
