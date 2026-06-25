@@ -11,6 +11,7 @@ import { DealTerms } from "./deal-terms";
 import { CatalystsTable } from "./catalysts-table";
 import { EventTypeTag } from "./event-type-tag";
 import { CompanyLogo } from "./company-logo";
+import { AnalysisSection } from "./analysis-section";
 
 interface FilingCardProps {
   event: FilingEvent;
@@ -188,6 +189,9 @@ export function FilingCard({
 
             {/* Catalysts */}
             {catalysts.length > 0 && <CatalystsTable catalysts={catalysts} />}
+
+            {/* Second-order analysis */}
+            <AnalysisSection analysis={event.analysis} />
           </div>
         )}
 

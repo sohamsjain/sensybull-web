@@ -9,6 +9,7 @@ import { SentimentDot } from "@/components/feed/sentiment-dot";
 import { DealTerms } from "@/components/feed/deal-terms";
 import { CatalystsTable } from "@/components/feed/catalysts-table";
 import { EventTypeTag } from "@/components/feed/event-type-tag";
+import { AnalysisSection } from "@/components/feed/analysis-section";
 
 /** One filing event rendered as an incoming chat message. */
 export function ChatMessage({ event }: { event: FilingEvent }) {
@@ -66,6 +67,7 @@ export function ChatMessage({ event }: { event: FilingEvent }) {
                 <DealTerms terms={briefing.deal_terms} />
               )}
             {catalysts.length > 0 && <CatalystsTable catalysts={catalysts} />}
+            <AnalysisSection analysis={event.analysis} />
           </>
         ) : (
           <p className="text-slate-600 dark:text-slate-300 text-sm">
