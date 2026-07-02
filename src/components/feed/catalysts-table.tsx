@@ -26,7 +26,7 @@ export function CatalystsTable({ catalysts }: { catalysts: Catalyst[] }) {
               </div>
 
               <div className={`flex-1 min-w-0 ${isLast ? "pb-0" : "pb-2.5"}`}>
-                <p className="text-[10px] text-slate-500 leading-none mb-0.5 font-mono tabular-nums">
+                <p className="text-[10.5px] text-slate-500 leading-none mb-0.5 font-mono tabular-nums">
                   {formatCatalystDate(cat.date)}
                 </p>
                 <p className="text-[13px] text-slate-700 dark:text-slate-200 leading-snug">

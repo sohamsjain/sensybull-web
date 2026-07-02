@@ -52,8 +52,8 @@ export function ChatMessage({ event }: { event: FilingEvent }) {
             briefing.primary_event_type !== "Other" && (
               <EventTypeTag type={briefing.primary_event_type} primary />
             )}
-          <SentimentDot sentiment={sentiment} />
-          <span className="text-slate-400 dark:text-slate-500 text-[10px] ml-auto whitespace-nowrap uppercase tracking-wide">
+          <SentimentDot sentiment={sentiment} label={expanded} />
+          <span className="text-slate-400 dark:text-slate-500 text-[10.5px] ml-auto whitespace-nowrap uppercase tracking-wide">
             {event.signal_type}
           </span>
         </div>
@@ -134,7 +134,7 @@ export function ChatMessage({ event }: { event: FilingEvent }) {
           className="flex items-center justify-between gap-3 mt-1.5"
           onClick={(e) => e.stopPropagation()}
         >
-          <span className="text-slate-400 dark:text-slate-500 text-[10.5px]">
+          <span className="text-slate-400 dark:text-slate-500 text-[11px]">
             AI briefing &middot;{" "}
             {edgar_url ? (
               <a
@@ -150,7 +150,7 @@ export function ChatMessage({ event }: { event: FilingEvent }) {
             )}
           </span>
           <span
-            className="text-slate-400/80 dark:text-slate-500/80 text-[10.5px] whitespace-nowrap tabular-nums"
+            className="text-slate-400/80 dark:text-slate-500/80 text-[11px] whitespace-nowrap tabular-nums"
             title={fullDateTime(event.received_at || event.filing_date)}
           >
             {messageTime(event.received_at || event.filing_date)}

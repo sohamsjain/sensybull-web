@@ -187,7 +187,7 @@ export function FilingCard({
             {/* Meta line: significance + sentiment + event type */}
             <div className="flex items-center gap-2 flex-wrap">
               <SignificanceBadge level={significance} />
-              <SentimentDot sentiment={sentiment} />
+              <SentimentDot sentiment={sentiment} label={expanded} />
               {briefing?.primary_event_type &&
                 briefing.primary_event_type !== "Other" && (
                   <EventTypeTag type={briefing.primary_event_type} primary />

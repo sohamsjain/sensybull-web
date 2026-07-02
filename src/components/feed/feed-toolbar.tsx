@@ -86,7 +86,7 @@ export function FeedToolbar() {
       </div>
 
       {/* Event type filter dropdown */}
-      <div className="relative hidden sm:block" ref={dropdownRef}>
+      <div className="relative" ref={dropdownRef}>
         <button
           onClick={() => setDropdownOpen((prev) => !prev)}
           className={`flex px-3 py-1.5 rounded text-xs font-medium transition-colors items-center gap-1.5 ${

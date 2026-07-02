@@ -11,6 +11,7 @@ import {
 import { usePathname, useSearchParams } from "next/navigation";
 import type { Watchlist } from "@/types/api";
 import { NavRail } from "@/components/layout/nav-rail";
+import { BottomTabs } from "@/components/layout/bottom-tabs";
 import { Sidebar } from "@/components/layout/sidebar";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { useAuth } from "@/hooks/use-auth";
@@ -139,8 +140,14 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
               />
             </div>
           )}
-          <main className="flex-1 overflow-hidden">{children}</main>
+          {/* pb clears the mobile bottom tab bar */}
+          <main
+            className={`flex-1 overflow-hidden ${user ? "pb-14 md:pb-0" : ""}`}
+          >
+            {children}
+          </main>
         </div>
+        <BottomTabs />
         {user && !isChats && (
           <MobileNav
             open={mobileNavOpen}
