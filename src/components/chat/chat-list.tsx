@@ -171,7 +171,7 @@ export function ChatList({
                         {r.name}
                       </span>
                     </span>
-                    <span className="text-[11px] text-violet-400 shrink-0">
+                    <span className="text-[11px] text-violet-600 dark:text-violet-400 shrink-0">
                       {addingId === r.id ? "Adding..." : "+ Track"}
                     </span>
                   </button>

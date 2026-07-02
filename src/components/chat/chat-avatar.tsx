@@ -6,14 +6,14 @@ import { useTheme } from "next-themes";
 const LOGO_DEV_TOKEN = process.env.NEXT_PUBLIC_LOGO_DEV_TOKEN;
 
 const AVATAR_COLORS = [
-  "bg-fuchsia-500/30 text-fuchsia-300",
-  "bg-emerald-500/30 text-emerald-300",
-  "bg-violet-500/30 text-violet-300",
-  "bg-amber-500/30 text-amber-300",
-  "bg-rose-500/30 text-rose-300",
-  "bg-cyan-500/30 text-cyan-300",
-  "bg-indigo-500/30 text-indigo-300",
-  "bg-teal-500/30 text-teal-300",
+  "bg-fuchsia-500/15 text-fuchsia-700 dark:bg-fuchsia-500/30 dark:text-fuchsia-300",
+  "bg-emerald-500/15 text-emerald-700 dark:bg-emerald-500/30 dark:text-emerald-300",
+  "bg-violet-500/15 text-violet-700 dark:bg-violet-500/30 dark:text-violet-300",
+  "bg-amber-500/15 text-amber-700 dark:bg-amber-500/30 dark:text-amber-300",
+  "bg-rose-500/15 text-rose-700 dark:bg-rose-500/30 dark:text-rose-300",
+  "bg-cyan-500/15 text-cyan-700 dark:bg-cyan-500/30 dark:text-cyan-300",
+  "bg-indigo-500/15 text-indigo-700 dark:bg-indigo-500/30 dark:text-indigo-300",
+  "bg-teal-500/15 text-teal-700 dark:bg-teal-500/30 dark:text-teal-300",
 ];
 
 function colorFor(key: string): string {

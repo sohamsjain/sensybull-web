@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 
 function Key({ children }: { children: React.ReactNode }) {
   return (
-    <kbd className="px-1.5 py-0.5 bg-slate-800 border border-slate-700 rounded text-slate-400 text-[10px] font-mono leading-none">
+    <kbd className="px-1.5 py-0.5 bg-white border border-slate-300 shadow-sm text-slate-600 dark:bg-slate-800 dark:border-slate-700 dark:shadow-none dark:text-slate-400 rounded text-[10px] font-mono leading-none">
       {children}
     </kbd>
   );
@@ -103,10 +103,10 @@ export default function ChatsPage() {
     return (
       <div className="h-full flex items-center justify-center px-6">
         <div className="text-center max-w-sm">
-          <h2 className="text-white text-lg font-semibold mb-2">
+          <h2 className="text-slate-900 dark:text-white text-lg font-semibold mb-2">
             Your companies, as chats
           </h2>
-          <p className="text-slate-400 text-sm leading-relaxed mb-4">
+          <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-4">
             Every company you follow gets its own conversation. SEC filings
             arrive as plain-English messages — with unread counts, so you
             never miss the one that matters.
@@ -125,7 +125,7 @@ export default function ChatsPage() {
       <div
         className={`${
           activeCompanyId ? "hidden md:flex" : "flex"
-        } w-full md:w-80 lg:w-96 md:border-r md:border-slate-700 flex-col shrink-0`}
+        } w-full md:w-80 lg:w-96 md:border-r md:border-slate-200 dark:md:border-white/[0.06] flex-col shrink-0`}
       >
         <ChatList
           chats={chats}
@@ -161,10 +161,10 @@ export default function ChatsPage() {
         ) : (
           <div className="chat-wallpaper flex-1 flex items-center justify-center">
             <div className="text-center max-w-sm px-6">
-              <div className="mx-auto w-16 h-16 rounded-full bg-slate-800/80 flex items-center justify-center mb-4 text-2xl">
+              <div className="mx-auto w-16 h-16 rounded-full bg-white ring-1 ring-slate-200 shadow-sm dark:bg-slate-800/80 dark:ring-0 dark:shadow-none flex items-center justify-center mb-4 text-2xl">
                 📈
               </div>
-              <p className="text-slate-200 text-base font-medium mb-1.5">
+              <p className="text-slate-800 dark:text-slate-200 text-base font-medium mb-1.5">
                 Sensybull Chats
               </p>
               <p className="text-slate-500 text-[13px] leading-relaxed">
@@ -172,14 +172,14 @@ export default function ChatsPage() {
                 Every briefing links back to the original document on SEC
                 EDGAR.
               </p>
-              <p className="text-slate-600 text-xs mt-5 flex items-center justify-center gap-2">
+              <p className="text-slate-500 dark:text-slate-600 text-xs mt-5 flex items-center justify-center gap-2">
                 <Key>↑</Key>
                 <Key>↓</Key>
                 <span>switch chats</span>
-                <span className="text-slate-700">·</span>
+                <span className="text-slate-300 dark:text-slate-700">·</span>
                 <Key>/</Key>
                 <span>search</span>
-                <span className="text-slate-700">·</span>
+                <span className="text-slate-300 dark:text-slate-700">·</span>
                 <Key>esc</Key>
                 <span>close</span>
               </p>

@@ -123,8 +123,8 @@ export function FilingCard({
                     disabled={addingToWatchlist}
                     className="
                       flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium
-                      bg-violet-500/10 text-violet-400
-                      hover:bg-violet-500/20 hover:text-violet-300
+                      bg-violet-500/10 text-violet-600 dark:text-violet-400
+                      hover:bg-violet-500/20 hover:text-violet-700 dark:hover:text-violet-300
                       disabled:opacity-50
                       transition-colors
                     "
@@ -262,8 +262,8 @@ export function FilingCard({
                 rel="noopener noreferrer"
                 className="
                   inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold
-                  bg-violet-500/10 text-violet-400
-                  hover:bg-violet-500/20 hover:text-violet-300
+                  bg-violet-500/10 text-violet-600 dark:text-violet-400
+                  hover:bg-violet-500/20 hover:text-violet-700 dark:hover:text-violet-300
                   ring-1 ring-violet-500/20 hover:ring-violet-500/30
                   transition-all
                 "

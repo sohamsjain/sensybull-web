@@ -30,7 +30,7 @@ export function ChatMessage({ event }: { event: FilingEvent }) {
   return (
     <div className="flex justify-start">
       <div
-        className="max-w-[92%] md:max-w-[70%] bg-slate-100 dark:bg-[#12121e] rounded-lg rounded-tl-none px-3 py-2 shadow-md shadow-slate-300/30 dark:shadow-black/20 cursor-pointer transition-colors hover:bg-slate-100/90 dark:hover:bg-[#12121e]/90"
+        className="max-w-[92%] md:max-w-[70%] bg-white ring-1 ring-slate-200/80 dark:ring-0 dark:bg-[#12121e] rounded-lg rounded-tl-none px-3 py-2 shadow-sm shadow-slate-300/40 dark:shadow-md dark:shadow-black/20 cursor-pointer transition-colors hover:bg-slate-50 dark:hover:bg-[#12121e]/90"
         onClick={toggleExpanded}
       >
         {/* Meta row */}
@@ -91,7 +91,7 @@ export function ChatMessage({ event }: { event: FilingEvent }) {
                 href={ex.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block text-violet-400 hover:text-violet-300 text-xs mb-0.5"
+                className="block text-violet-600 hover:text-violet-700 dark:text-violet-400 dark:hover:text-violet-300 text-xs mb-0.5"
               >
                 {ex.type} &mdash; {ex.description}
               </a>
@@ -111,7 +111,7 @@ export function ChatMessage({ event }: { event: FilingEvent }) {
                 href={edgar_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-violet-400/80 hover:text-violet-300 underline underline-offset-2"
+                className="text-violet-600/90 hover:text-violet-700 dark:text-violet-400/80 dark:hover:text-violet-300 underline underline-offset-2"
               >
                 verify on SEC EDGAR
               </a>

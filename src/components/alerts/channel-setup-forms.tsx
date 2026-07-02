@@ -14,16 +14,16 @@ interface SetupFormProps {
 /* ------------------------------------------------------------------ */
 
 const inputClass =
-  "w-full px-3 py-2 text-sm rounded-lg bg-[#0a0a12] border border-white/[0.06] text-slate-200 placeholder-slate-500 focus:outline-none focus:border-violet-500/50";
+  "w-full px-3 py-2 text-sm rounded-lg bg-white border border-slate-200 text-slate-800 placeholder-slate-400 dark:bg-[#0a0a12] dark:border-white/[0.06] dark:text-slate-200 dark:placeholder-slate-500 focus:outline-none focus:border-violet-500/50";
 
 const btnPrimaryClass =
   "px-4 py-2 text-sm font-medium rounded-lg bg-violet-600 hover:bg-violet-700 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors";
 
 const btnDangerClass =
-  "px-4 py-2 text-sm font-medium rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors";
+  "px-4 py-2 text-sm font-medium rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors";
 
 const helperClass = "text-xs text-slate-500 mt-1";
-const errorClass = "text-xs text-red-400 mt-1";
+const errorClass = "text-xs text-red-600 dark:text-red-400 mt-1";
 
 /* ------------------------------------------------------------------ */
 /*  SMS                                                                */
@@ -54,11 +54,11 @@ export function ChannelSetupSms({ channelName, onConnected, onDisconnect }: Setu
   if (isConnected) {
     return (
       <div className="flex items-center gap-3 pt-2">
-        <span className="text-sm text-slate-400">
+        <span className="text-sm text-slate-500 dark:text-slate-400">
           {config.phone}
         </span>
         {verified && (
-          <span className="text-xs text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+          <span className="text-xs text-emerald-700 bg-emerald-500/10 dark:text-emerald-400 px-2 py-0.5 rounded-full">
             Verified
           </span>
         )}
@@ -119,9 +119,9 @@ export function ChannelSetupTelegram({ channelName, onConnected, onDisconnect }:
   if (isConnected) {
     return (
       <div className="flex items-center gap-3 pt-2">
-        <span className="text-sm text-slate-400">Telegram connected</span>
+        <span className="text-sm text-slate-500 dark:text-slate-400">Telegram connected</span>
         {verified && (
-          <span className="text-xs text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+          <span className="text-xs text-emerald-700 bg-emerald-500/10 dark:text-emerald-400 px-2 py-0.5 rounded-full">
             Verified
           </span>
         )}
@@ -136,19 +136,19 @@ export function ChannelSetupTelegram({ channelName, onConnected, onDisconnect }:
   if (linkData) {
     return (
       <div className="space-y-2 pt-2">
-        <p className="text-sm text-slate-300">
+        <p className="text-sm text-slate-600 dark:text-slate-300">
           Send this code to{" "}
           <a
             href={`https://t.me/${linkData.bot_username}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-violet-400 hover:text-violet-300 underline"
+            className="text-violet-600 hover:text-violet-700 dark:text-violet-400 dark:hover:text-violet-300 underline"
           >
             @{linkData.bot_username}
           </a>{" "}
           on Telegram:
         </p>
-        <code className="block px-3 py-2 bg-[#0a0a12] border border-white/[0.06] rounded-lg text-violet-300 text-sm font-mono tracking-widest">
+        <code className="block px-3 py-2 bg-slate-100 border border-slate-200 dark:bg-[#0a0a12] dark:border-white/[0.06] rounded-lg text-violet-700 dark:text-violet-300 text-sm font-mono tracking-widest">
           {linkData.code}
         </code>
         <p className={helperClass}>
@@ -200,11 +200,11 @@ export function ChannelSetupDiscord({ channelName, onConnected, onDisconnect }: 
   if (isConnected) {
     return (
       <div className="flex items-center gap-3 pt-2">
-        <span className="text-sm text-slate-400 truncate max-w-xs">
+        <span className="text-sm text-slate-500 dark:text-slate-400 truncate max-w-xs">
           {config.webhook_url}
         </span>
         {verified && (
-          <span className="text-xs text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+          <span className="text-xs text-emerald-700 bg-emerald-500/10 dark:text-emerald-400 px-2 py-0.5 rounded-full">
             Verified
           </span>
         )}
@@ -267,11 +267,11 @@ export function ChannelSetupSlack({ channelName, onConnected, onDisconnect }: Se
   if (isConnected) {
     return (
       <div className="flex items-center gap-3 pt-2">
-        <span className="text-sm text-slate-400 truncate max-w-xs">
+        <span className="text-sm text-slate-500 dark:text-slate-400 truncate max-w-xs">
           {config.webhook_url}
         </span>
         {verified && (
-          <span className="text-xs text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+          <span className="text-xs text-emerald-700 bg-emerald-500/10 dark:text-emerald-400 px-2 py-0.5 rounded-full">
             Verified
           </span>
         )}
@@ -334,11 +334,11 @@ export function ChannelSetupWhatsapp({ channelName, onConnected, onDisconnect }:
   if (isConnected) {
     return (
       <div className="flex items-center gap-3 pt-2">
-        <span className="text-sm text-slate-400">
+        <span className="text-sm text-slate-500 dark:text-slate-400">
           {config.phone}
         </span>
         {verified && (
-          <span className="text-xs text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+          <span className="text-xs text-emerald-700 bg-emerald-500/10 dark:text-emerald-400 px-2 py-0.5 rounded-full">
             Verified
           </span>
         )}
@@ -403,11 +403,11 @@ export function ChannelSetupWebhook({ channelName, onConnected, onDisconnect }: 
   if (isConnected) {
     return (
       <div className="flex items-center gap-3 pt-2">
-        <span className="text-sm text-slate-400 truncate max-w-xs">
+        <span className="text-sm text-slate-500 dark:text-slate-400 truncate max-w-xs">
           {config.url}
         </span>
         {verified && (
-          <span className="text-xs text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+          <span className="text-xs text-emerald-700 bg-emerald-500/10 dark:text-emerald-400 px-2 py-0.5 rounded-full">
             Verified
           </span>
         )}
