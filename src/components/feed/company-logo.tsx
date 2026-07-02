@@ -44,7 +44,7 @@ export function CompanyLogo({
   if (showImg) {
     return (
       <div
-        className="w-10 h-10 rounded-xl bg-white dark:bg-white/5 overflow-hidden shrink-0 select-none ring-1 ring-slate-200/60 dark:ring-white/[0.06]"
+        className="w-10 h-10 rounded-full bg-white dark:bg-white/5 overflow-hidden shrink-0 select-none ring-1 ring-slate-200/60 dark:ring-white/[0.06]"
         aria-hidden="true"
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -61,7 +61,7 @@ export function CompanyLogo({
 
   return (
     <div
-      className={`w-10 h-10 rounded-xl ${colorFor(label)} flex items-center justify-center font-mono font-bold text-xs shrink-0 select-none ring-1 ring-slate-200/60 dark:ring-white/[0.06]`}
+      className={`w-10 h-10 rounded-full ${colorFor(label)} flex items-center justify-center font-mono font-bold text-xs shrink-0 select-none ring-1 ring-slate-200/60 dark:ring-white/[0.06]`}
       aria-hidden="true"
     >
       {label.slice(0, 4)}

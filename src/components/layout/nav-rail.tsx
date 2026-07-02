@@ -7,6 +7,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { api } from "@/lib/api-client";
 import type { ChatsResponse } from "@/types/api";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { FontSizeToggle } from "./font-size-toggle";
+import { ProfileMenu } from "./profile-menu";
 
 function ChatsIcon() {
   return (
@@ -85,7 +87,6 @@ export function NavRail() {
   const { user } = useAuth();
   const pathname = usePathname();
   const [unread, setUnread] = useState(0);
-  const [logoFailed, setLogoFailed] = useState(false);
 
   // Refresh the unread badge whenever the user navigates
   useEffect(() => {
@@ -104,26 +105,7 @@ export function NavRail() {
   if (!user) return null;
 
   return (
-    <aside className="hidden md:flex w-14 shrink-0 flex-col items-center gap-1.5 py-3 border-r border-slate-200 dark:border-white/[0.04] bg-slate-100 dark:bg-[#07070e]">
-      <Link href="/" title="Sensybull" className="mb-2">
-        {logoFailed ? (
-          <span className="w-9 h-9 rounded-xl bg-violet-600 flex items-center justify-center text-white font-semibold text-sm select-none">
-            S
-          </span>
-        ) : (
-          /* White chip — the logo mark is black and needs a light surface */
-          <span className="w-9 h-9 rounded-xl bg-white flex items-center justify-center overflow-hidden">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/logo.png"
-              alt="Sensybull"
-              className="w-7 h-7 object-contain"
-              onError={() => setLogoFailed(true)}
-            />
-          </span>
-        )}
-      </Link>
-
+    <aside className="flex w-14 shrink-0 flex-col items-center gap-1.5 py-3 border-r border-slate-200 dark:border-white/[0.04] bg-slate-100 dark:bg-[#07070e]">
       <RailLink
         href="/chats"
         label="Chats"
@@ -140,7 +122,7 @@ export function NavRail() {
         <FeedIcon />
       </RailLink>
 
-      <div className="mt-auto">
+      <div className="mt-auto flex flex-col items-center gap-1.5">
         <RailLink
           href="/alerts"
           label="Alerts"
@@ -148,7 +130,9 @@ export function NavRail() {
         >
           <BellIcon />
         </RailLink>
+        <FontSizeToggle className="w-10 h-10" />
         <ThemeToggle className="w-10 h-10" />
+        <ProfileMenu />
       </div>
     </aside>
   );

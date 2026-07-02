@@ -3,7 +3,6 @@
 import { useState, useCallback, createContext, useContext } from "react";
 import { usePathname } from "next/navigation";
 import type { Watchlist } from "@/types/api";
-import { TopBar } from "@/components/layout/top-bar";
 import { NavRail } from "@/components/layout/nav-rail";
 import { Sidebar } from "@/components/layout/sidebar";
 import { MobileNav } from "@/components/layout/mobile-nav";
@@ -14,6 +13,11 @@ interface DashboardContextValue {
   eventTypeFilter: Set<string>;
   search: string;
   selectedWatchlist: Watchlist | null;
+  toggleSignificance: (level: string) => void;
+  toggleEventType: (type: string) => void;
+  clearEventTypes: () => void;
+  setSearch: (value: string) => void;
+  openMobileNav: () => void;
 }
 
 const DashboardContext = createContext<DashboardContextValue>({
@@ -21,6 +25,11 @@ const DashboardContext = createContext<DashboardContextValue>({
   eventTypeFilter: new Set(),
   search: "",
   selectedWatchlist: null,
+  toggleSignificance: () => {},
+  toggleEventType: () => {},
+  clearEventTypes: () => {},
+  setSearch: () => {},
+  openMobileNav: () => {},
 });
 
 export const useDashboard = () => useContext(DashboardContext);
@@ -45,7 +54,7 @@ export default function DashboardLayout({
   );
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
-  const handleSignificanceToggle = useCallback((level: string) => {
+  const toggleSignificance = useCallback((level: string) => {
     setSignificanceFilter((prev) => {
       const next = new Set(prev);
       if (next.has(level)) next.delete(level);
@@ -54,7 +63,7 @@ export default function DashboardLayout({
     });
   }, []);
 
-  const handleEventTypeToggle = useCallback((type: string) => {
+  const toggleEventType = useCallback((type: string) => {
     setEventTypeFilter((prev) => {
       const next = new Set(prev);
       if (next.has(type)) next.delete(type);
@@ -63,39 +72,40 @@ export default function DashboardLayout({
     });
   }, []);
 
-  const handleEventTypeClear = useCallback(() => {
+  const clearEventTypes = useCallback(() => {
     setEventTypeFilter(new Set());
   }, []);
 
+  const openMobileNav = useCallback(() => setMobileNavOpen(true), []);
+
   return (
     <DashboardContext.Provider
-      value={{ significanceFilter, eventTypeFilter, search, selectedWatchlist }}
+      value={{
+        significanceFilter,
+        eventTypeFilter,
+        search,
+        selectedWatchlist,
+        toggleSignificance,
+        toggleEventType,
+        clearEventTypes,
+        setSearch,
+        openMobileNav,
+      }}
     >
-      <div className="h-screen flex bg-white dark:bg-[#0a0a12] text-slate-800 dark:text-slate-100">
+      {/* overflow-hidden pins the app shell to the viewport so the document
+          itself never grows a second scrollbar */}
+      <div className="h-dvh overflow-hidden flex bg-white dark:bg-[#0a0a12] text-slate-800 dark:text-slate-100">
         <NavRail />
-        <div className="flex-1 flex flex-col min-w-0">
-          <TopBar
-            significanceFilter={significanceFilter}
-            onSignificanceToggle={handleSignificanceToggle}
-            eventTypeFilter={eventTypeFilter}
-            onEventTypeToggle={handleEventTypeToggle}
-            onEventTypeClear={handleEventTypeClear}
-            search={search}
-            onSearchChange={setSearch}
-            onMobileMenuToggle={isChats ? undefined : () => setMobileNavOpen(true)}
-            showFilters={!isChats}
-          />
-          <div className="flex flex-1 overflow-hidden">
-            {user && !isChats && (
-              <div className="hidden md:block">
-                <Sidebar
-                  selectedWatchlist={selectedWatchlist}
-                  onSelectWatchlist={setSelectedWatchlist}
-                />
-              </div>
-            )}
-            <main className="flex-1 overflow-hidden">{children}</main>
-          </div>
+        <div className="flex-1 flex min-w-0 overflow-hidden">
+          {user && !isChats && (
+            <div className="hidden md:block">
+              <Sidebar
+                selectedWatchlist={selectedWatchlist}
+                onSelectWatchlist={setSelectedWatchlist}
+              />
+            </div>
+          )}
+          <main className="flex-1 overflow-hidden">{children}</main>
         </div>
         {user && !isChats && (
           <MobileNav

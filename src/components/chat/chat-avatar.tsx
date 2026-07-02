@@ -44,7 +44,7 @@ export function ChatAvatar({
 
   const label = ticker || name.slice(0, 2).toUpperCase();
   const sizeClass = size === "sm" ? "w-9 h-9 text-[10px]" : "w-12 h-12 text-xs";
-  const radius = size === "sm" ? "rounded-lg" : "rounded-xl";
+  const radius = "rounded-full";
 
   if (showImg) {
     return (

@@ -28,7 +28,7 @@ export function ChatMessage({ event }: { event: FilingEvent }) {
   };
 
   return (
-    <div className="flex justify-start">
+    <div className="flex justify-start pl-2 md:pl-4">
       <div
         className="max-w-[92%] md:max-w-[70%] bg-white ring-1 ring-slate-200/80 dark:ring-0 dark:bg-[#12121e] rounded-lg rounded-tl-none px-3 py-2 shadow-sm shadow-slate-300/40 dark:shadow-md dark:shadow-black/20 cursor-pointer transition-colors hover:bg-slate-50 dark:hover:bg-[#12121e]/90"
         onClick={toggleExpanded}
