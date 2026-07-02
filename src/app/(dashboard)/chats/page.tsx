@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import { useAuth } from "@/hooks/use-auth";
 import { useChats } from "@/hooks/use-chats";
@@ -20,6 +20,12 @@ function Key({ children }: { children: React.ReactNode }) {
 export default function ChatsPage() {
   const { user, loading: authLoading } = useAuth();
   const [activeCompanyId, setActiveCompanyId] = useState<string | null>(null);
+  // Deep link: /chats?c=<companyId> opens that conversation once chats load
+  const initialCompanyRef = useRef<string | null>(
+    typeof window === "undefined"
+      ? null
+      : new URLSearchParams(window.location.search).get("c")
+  );
 
   const {
     chats,
@@ -53,6 +59,13 @@ export default function ChatsPage() {
     },
     [markRead]
   );
+
+  useEffect(() => {
+    const id = initialCompanyRef.current;
+    if (!id || chats.length === 0) return;
+    initialCompanyRef.current = null;
+    if (chats.some((c) => c.company.id === id)) handleSelect(id);
+  }, [chats, handleSelect]);
 
   const handleRemove = useCallback(async () => {
     if (!activeCompanyId) return;

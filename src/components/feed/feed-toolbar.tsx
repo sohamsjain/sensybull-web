@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { SIGNIFICANCE_LEVELS, SIGNIFICANCE_CONFIG } from "@/config/constants";
+import { useDensity } from "@/hooks/use-density";
 import type { EventTypesResponse } from "@/types/api";
 
 /** Filter row at the top of the feed: significance, event types, search. */
@@ -28,6 +29,7 @@ export function FeedToolbar() {
   const [eventTypes, setEventTypes] = useState<string[]>([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [density, setDensity] = useDensity();
 
   useEffect(() => {
     api<EventTypesResponse>("/events/types")
@@ -135,12 +137,37 @@ export function FeedToolbar() {
 
       {/* Search */}
       <Input
+        id="feed-search"
         type="text"
         placeholder="Search ticker or company..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         className="flex-1 max-w-xs bg-slate-100 dark:bg-[#12121e] border-slate-200 dark:border-white/[0.06] text-sm text-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus-visible:border-violet-500/40 dark:focus-visible:border-violet-500/40 focus-visible:ring-0"
       />
+
+      {/* Density: compact collapses summaries/deal terms behind a click */}
+      <button
+        onClick={() =>
+          setDensity(density === "compact" ? "comfortable" : "compact")
+        }
+        className="hidden sm:flex items-center justify-center w-8 h-8 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/[0.05] transition-colors"
+        title={
+          density === "compact"
+            ? "Density: Compact — click for Comfortable"
+            : "Density: Comfortable — click for Compact"
+        }
+        aria-label={`Density: ${density}. Activate to change.`}
+      >
+        {density === "compact" ? (
+          <svg className="w-4.5 h-4.5" viewBox="0 0 20 20" fill="none" stroke="currentColor">
+            <path strokeLinecap="round" strokeWidth={1.5} d="M3 4.5h14M3 8.5h14M3 12.5h14M3 16.5h14" />
+          </svg>
+        ) : (
+          <svg className="w-4.5 h-4.5" viewBox="0 0 20 20" fill="none" stroke="currentColor">
+            <path strokeLinecap="round" strokeWidth={1.5} d="M3 5.5h14M3 11h14M3 16.5h14" />
+          </svg>
+        )}
+      </button>
 
       {/* Guests have no nav rail; give them theme + sign-in here */}
       {!user && (

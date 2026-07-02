@@ -1,7 +1,14 @@
 "use client";
 
-import { useState, useCallback, createContext, useContext } from "react";
-import { usePathname } from "next/navigation";
+import {
+  useState,
+  useEffect,
+  useCallback,
+  createContext,
+  useContext,
+  Suspense,
+} from "react";
+import { usePathname, useSearchParams } from "next/navigation";
 import type { Watchlist } from "@/types/api";
 import { NavRail } from "@/components/layout/nav-rail";
 import { Sidebar } from "@/components/layout/sidebar";
@@ -34,25 +41,52 @@ const DashboardContext = createContext<DashboardContextValue>({
 
 export const useDashboard = () => useContext(DashboardContext);
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+const ALL_SIGNIFICANCE = ["High", "Medium", "Low"];
+
+function DashboardInner({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   // The chats page brings its own list pane; the watchlist sidebar and feed
   // filters only apply to the feed.
   const isChats = pathname?.startsWith("/chats") ?? false;
-  const [significanceFilter, setSignificanceFilter] = useState(
-    new Set(["High", "Medium", "Low"])
+
+  // Filters initialize from the URL so filtered views are shareable
+  const [significanceFilter, setSignificanceFilter] = useState<Set<string>>(
+    () => {
+      const sig = searchParams.get("sig");
+      if (sig === null) return new Set(ALL_SIGNIFICANCE);
+      return new Set(
+        sig.split(",").filter((s) => ALL_SIGNIFICANCE.includes(s))
+      );
+    }
   );
-  const [eventTypeFilter, setEventTypeFilter] = useState(new Set<string>());
-  const [search, setSearch] = useState("");
+  const [eventTypeFilter, setEventTypeFilter] = useState<Set<string>>(() => {
+    const types = searchParams.get("types");
+    return types
+      ? new Set(types.split(",").filter(Boolean))
+      : new Set<string>();
+  });
+  const [search, setSearch] = useState(() => searchParams.get("q") ?? "");
   const [selectedWatchlist, setSelectedWatchlist] = useState<Watchlist | null>(
     null
   );
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+
+  // Mirror filter state back into the URL (shallow, no navigation)
+  useEffect(() => {
+    if (!pathname?.startsWith("/feed")) return;
+    const params = new URLSearchParams();
+    if (significanceFilter.size !== ALL_SIGNIFICANCE.length) {
+      params.set("sig", [...significanceFilter].join(","));
+    }
+    if (eventTypeFilter.size > 0) {
+      params.set("types", [...eventTypeFilter].join(","));
+    }
+    if (search) params.set("q", search);
+    const qs = params.toString();
+    window.history.replaceState(null, "", qs ? `${pathname}?${qs}` : pathname);
+  }, [significanceFilter, eventTypeFilter, search, pathname]);
 
   const toggleSignificance = useCallback((level: string) => {
     setSignificanceFilter((prev) => {
@@ -117,5 +151,18 @@ export default function DashboardLayout({
         )}
       </div>
     </DashboardContext.Provider>
+  );
+}
+
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  // useSearchParams requires a Suspense boundary on statically rendered pages
+  return (
+    <Suspense fallback={null}>
+      <DashboardInner>{children}</DashboardInner>
+    </Suspense>
   );
 }

@@ -14,7 +14,7 @@ import { InvestorTakeaway } from "@/components/feed/investor-takeaway";
 /** One filing event rendered as an incoming chat message. */
 export function ChatMessage({ event }: { event: FilingEvent }) {
   const [expanded, setExpanded] = useState(false);
-  const { briefing, items, exhibits, edgar_url } = event;
+  const { briefing, exhibits, edgar_url } = event;
 
   const significance = (briefing?.significance as Significance) || "Medium";
   const sentiment = (briefing?.sentiment as Sentiment) || "Neutral";

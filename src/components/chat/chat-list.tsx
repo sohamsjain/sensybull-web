@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import type { Chat, CompanySearchResult, CompanySearchResponse } from "@/types/api";
 import { api } from "@/lib/api-client";
+import { usePinnedChats } from "@/hooks/use-pinned-chats";
 import { ChatListItem } from "./chat-list-item";
 
 interface ChatListProps {
@@ -26,6 +27,8 @@ export function ChatList({
   const [results, setResults] = useState<CompanySearchResult[]>([]);
   const [searching, setSearching] = useState(false);
   const [addingId, setAddingId] = useState<string | null>(null);
+  const [unreadOnly, setUnreadOnly] = useState(false);
+  const { pinned } = usePinnedChats();
 
   // One search box, two scopes: filters your chats locally and runs a
   // typeahead over the whole SEC company universe in parallel.
@@ -62,15 +65,24 @@ export function ChatList({
 
   const existingIds = new Set(chats.map((c) => c.company.id));
   const query = filter.trim();
-  const matchingChats = query
-    ? chats.filter((c) => {
-        const q = query.toLowerCase();
-        return (
-          c.company.name.toLowerCase().includes(q) ||
-          c.company.ticker?.toLowerCase().includes(q)
-        );
-      })
-    : chats;
+  const totalUnread = chats.reduce((sum, c) => sum + c.unread_count, 0);
+  const matchingChats = useMemo(() => {
+    let list = query
+      ? chats.filter((c) => {
+          const q = query.toLowerCase();
+          return (
+            c.company.name.toLowerCase().includes(q) ||
+            c.company.ticker?.toLowerCase().includes(q)
+          );
+        })
+      : chats;
+    if (unreadOnly) list = list.filter((c) => c.unread_count > 0);
+    // Pinned chats float to the top, keeping recency order within each group
+    return [...list].sort(
+      (a, b) =>
+        Number(pinned.has(b.company.id)) - Number(pinned.has(a.company.id))
+    );
+  }, [chats, query, unreadOnly, pinned]);
   const newCompanies = results.filter((r) => !existingIds.has(r.id));
 
   const handleAdd = async (companyId: string) => {
@@ -97,6 +109,17 @@ export function ChatList({
               title={connected ? "Live — connected to the filing feed" : "Connecting..."}
             />
           </h2>
+          <button
+            onClick={() => setUnreadOnly((v) => !v)}
+            className={`px-2 py-0.5 rounded-full text-[11px] font-medium transition-colors ${
+              unreadOnly
+                ? "bg-violet-500/15 text-violet-700 dark:bg-violet-500/25 dark:text-violet-300"
+                : "text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300"
+            }`}
+            title={unreadOnly ? "Show all chats" : "Show unread only"}
+          >
+            Unread{totalUnread > 0 ? ` (${totalUnread})` : ""}
+          </button>
         </div>
         <input
           id="chat-search"
@@ -141,11 +164,17 @@ export function ChatList({
                 Your chats
               </p>
             )}
+            {unreadOnly && matchingChats.length === 0 && !query && (
+              <p className="px-6 py-8 text-center text-xs text-slate-400 dark:text-slate-500">
+                You&apos;re all caught up — no unread chats.
+              </p>
+            )}
             {matchingChats.map((chat) => (
               <ChatListItem
                 key={chat.company.id}
                 chat={chat}
                 active={chat.company.id === activeCompanyId}
+                pinned={pinned.has(chat.company.id)}
                 onSelect={() => onSelect(chat.company.id)}
               />
             ))}

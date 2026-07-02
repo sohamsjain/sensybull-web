@@ -4,6 +4,7 @@ import { useState, useRef, useLayoutEffect, useMemo } from "react";
 import type { Chat } from "@/types/api";
 import type { FilingEvent } from "@/types/events";
 import { dayLabel, formatCatalystDate } from "@/lib/utils";
+import { usePinnedChats } from "@/hooks/use-pinned-chats";
 import { ChatAvatar } from "./chat-avatar";
 import { ChatMessage } from "./chat-message";
 import {
@@ -72,6 +73,8 @@ export function ChatConversation({
   onRemove,
 }: ChatConversationProps) {
   const { company, muted } = chat;
+  const { pinned, togglePin } = usePinnedChats();
+  const isPinned = pinned.has(company.id);
   const [confirmRemove, setConfirmRemove] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const loadingEarlierRef = useRef(false);
@@ -205,6 +208,9 @@ export function ChatConversation({
               <MoreIcon />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="min-w-48">
+              <DropdownMenuItem onClick={() => togglePin(company.id)}>
+                {isPinned ? "Unpin chat" : "Pin chat"}
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={onToggleMute}>
                 {muted ? "Unmute alerts" : "Mute alerts"}
               </DropdownMenuItem>
