@@ -7,6 +7,7 @@ import { useWatchlists } from "@/hooks/use-watchlists";
 import { useAuth } from "@/hooks/use-auth";
 import { FilingList } from "@/components/feed/filing-list";
 import { FeedToolbar } from "@/components/feed/feed-toolbar";
+import { UpcomingCatalysts } from "@/components/feed/upcoming-catalysts";
 
 export default function FeedPage() {
   const { user } = useAuth();
@@ -54,19 +55,24 @@ export default function FeedPage() {
   return (
     <div className="h-full flex flex-col min-w-0">
       <FeedToolbar />
-      <div className="flex-1 overflow-hidden">
-        <FilingList
-          events={events}
-          allCount={allEvents.length}
-          loading={loading}
-          hasMore={hasMore}
-          connected={connected}
-          onLoadMore={loadMore}
-          watchlistedCompanyIds={watchlistedCompanyIds}
-          onAddToWatchlist={handleAddToWatchlist}
-          addingCompanyId={addingCompanyId}
-          isLoggedIn={!!user}
-        />
+      <div className="flex-1 flex overflow-hidden">
+        <div className="flex-1 min-w-0 overflow-hidden">
+          <FilingList
+            events={events}
+            allCount={allEvents.length}
+            loading={loading}
+            hasMore={hasMore}
+            connected={connected}
+            onLoadMore={loadMore}
+            watchlistedCompanyIds={watchlistedCompanyIds}
+            onAddToWatchlist={handleAddToWatchlist}
+            addingCompanyId={addingCompanyId}
+            isLoggedIn={!!user}
+          />
+        </div>
+        <aside className="hidden xl:block w-80 shrink-0 border-l border-slate-200 dark:border-white/[0.06]">
+          <UpcomingCatalysts />
+        </aside>
       </div>
     </div>
   );

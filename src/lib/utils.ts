@@ -124,7 +124,13 @@ export function formatCatalystDate(dateStr: string | null): string {
   if (!dateStr) return "TBD";
   try {
     const d = new Date(dateStr + "T00:00:00");
-    return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    return d.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      ...(d.getFullYear() !== new Date().getFullYear()
+        ? { year: "numeric" }
+        : {}),
+    });
   } catch {
     return dateStr;
   }

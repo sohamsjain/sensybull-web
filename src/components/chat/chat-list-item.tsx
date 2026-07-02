@@ -23,23 +23,45 @@ function MutedIcon() {
   );
 }
 
+const SIG_ACCENT: Record<string, string> = {
+  High: "border-l-red-500/70",
+  Medium: "border-l-amber-500/60",
+  Low: "border-l-transparent",
+};
+
+function PinIcon() {
+  return (
+    <svg
+      className="w-3 h-3 text-slate-400 dark:text-slate-500 shrink-0"
+      viewBox="0 0 16 16"
+      fill="currentColor"
+      aria-label="Pinned"
+    >
+      <path d="M9.5 1.5 14.5 6.5l-1.2 1.2-.7-.23-2.5 2.5.35 2.83-1.2 1.2-3-3L3 14.25 1.75 13l3.25-3.25-3-3 1.2-1.2 2.83.35 2.5-2.5-.23-.7L9.5 1.5Z" />
+    </svg>
+  );
+}
+
 export function ChatListItem({
   chat,
   active,
+  pinned = false,
   onSelect,
 }: {
   chat: Chat;
   active: boolean;
+  pinned?: boolean;
   onSelect: () => void;
 }) {
   const { company, last_event, last_activity_at, unread_count, muted } = chat;
   const hasUnread = unread_count > 0;
+  const accent = SIG_ACCENT[last_event?.significance ?? ""] ?? "border-l-transparent";
 
   return (
     <button
       onClick={onSelect}
       data-company-id={company.id}
-      className={`w-full flex items-center gap-3 px-3 py-3 text-left transition-colors outline-none focus-visible:bg-slate-100/80 dark:focus-visible:bg-[#12121e]/80 ${
+      className={`w-full flex items-center gap-3 px-3 py-3 text-left transition-colors outline-none border-l-2 ${accent} focus-visible:bg-slate-100/80 dark:focus-visible:bg-[#12121e]/80 ${
         active ? "bg-slate-100 dark:bg-[#12121e]" : "hover:bg-slate-100/60 dark:hover:bg-white/[0.04]"
       }`}
     >
@@ -82,6 +104,7 @@ export function ChatListItem({
             {last_event ? last_event.headline : "No filings yet"}
           </span>
           <span className="flex items-center gap-1.5 shrink-0">
+            {pinned && <PinIcon />}
             {muted && <MutedIcon />}
             {hasUnread && (
               <span

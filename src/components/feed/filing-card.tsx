@@ -3,7 +3,6 @@
 import { useState } from "react";
 import type { FilingEvent } from "@/types/events";
 import type { Significance, Sentiment } from "@/config/constants";
-import { SIGNIFICANCE_CONFIG } from "@/config/constants";
 import { timeAgo, fullDateTime, marketSession } from "@/lib/utils";
 import { SignificanceBadge } from "./significance-badge";
 import { SentimentDot } from "./sentiment-dot";
@@ -19,6 +18,13 @@ interface FilingCardProps {
   onAddToWatchlist?: (companyId: string) => void;
   addingToWatchlist?: boolean;
   isLoggedIn?: boolean;
+  /** Compact hides summary/deal terms/catalysts until expanded. */
+  density?: "compact" | "comfortable";
+  /** Controlled expansion (used by the feed's keyboard navigation). */
+  expanded?: boolean;
+  onToggleExpanded?: () => void;
+  /** Keyboard-navigation cursor highlight. */
+  selected?: boolean;
 }
 
 const SIG_ACCENT: Record<string, string> = {
@@ -39,6 +45,10 @@ export function FilingCard({
   onAddToWatchlist,
   addingToWatchlist,
   isLoggedIn,
+  density = "comfortable",
+  expanded: expandedProp,
+  onToggleExpanded,
+  selected = false,
 }: FilingCardProps) {
   const {
     ticker,
@@ -56,12 +66,15 @@ export function FilingCard({
 
   const significance: Significance =
     (briefing?.significance as Significance) || "Medium";
-  const sigConfig = SIGNIFICANCE_CONFIG[significance] || SIGNIFICANCE_CONFIG.Medium;
   const sentiment: Sentiment =
     (briefing?.sentiment as Sentiment) || "Neutral";
   const isLow = significance === "Low";
+  const compact = density === "compact";
 
-  const [expanded, setExpanded] = useState(false);
+  const [internalExpanded, setInternalExpanded] = useState(false);
+  const expanded = expandedProp ?? internalExpanded;
+  const toggleExpanded =
+    onToggleExpanded ?? (() => setInternalExpanded((e) => !e));
 
   const catalysts =
     eventCatalysts?.length > 0
@@ -73,7 +86,15 @@ export function FilingCard({
   ) || [];
 
   const hasExhibits = exhibits?.length > 0;
-  const hasExpandedContent = items?.length > 0 || (isLow && briefing?.summary);
+  const hasDealTerms =
+    !!briefing?.deal_terms && Object.keys(briefing.deal_terms).length > 0;
+  const hasExpandedContent = compact
+    ? !!(briefing?.summary || hasDealTerms || catalysts.length > 0 || items?.length > 0)
+    : items?.length > 0 || (isLow && !!briefing?.summary);
+
+  const showSummary =
+    !!briefing?.summary && (expanded || (!compact && !isLow));
+  const showDetails = expanded || !compact;
 
   const eventTimestamp = received_at || filing_date;
   const session = marketSession(eventTimestamp);
@@ -90,9 +111,10 @@ export function FilingCard({
         hover:bg-slate-100/80 dark:hover:bg-[#13132a]
         hover:border-slate-300 dark:hover:border-white/[0.1]
         ${isLow ? "opacity-65" : ""}
+        ${selected ? "ring-2 ring-violet-500/50 dark:ring-violet-400/40" : ""}
         cursor-pointer
       `}
-      onClick={() => setExpanded((e) => !e)}
+      onClick={toggleExpanded}
     >
       <div className="p-4 sm:p-5">
         {/* ---- Header: Logo + Info + Actions ---- */}
@@ -194,20 +216,21 @@ export function FilingCard({
             )}
 
             {/* Summary */}
-            {briefing.summary && (!isLow || expanded) && (
+            {showSummary && (
               <p className="mt-2 text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
                 {briefing.summary}
               </p>
             )}
 
             {/* Deal Terms */}
-            {briefing.deal_terms &&
-              Object.keys(briefing.deal_terms).length > 0 && (
-                <DealTerms terms={briefing.deal_terms} />
-              )}
+            {showDetails && hasDealTerms && (
+              <DealTerms terms={briefing.deal_terms} />
+            )}
 
             {/* Catalysts */}
-            {catalysts.length > 0 && <CatalystsTable catalysts={catalysts} />}
+            {showDetails && catalysts.length > 0 && (
+              <CatalystsTable catalysts={catalysts} />
+            )}
           </div>
         )}
 
@@ -281,12 +304,19 @@ export function FilingCard({
           </div>
         )}
 
-        {/* ---- Expand hint ---- */}
-        {!expanded && hasExpandedContent && (
-          <div className="mt-2 pl-[3.375rem]">
-            <span className="text-[11px] text-slate-400 dark:text-slate-600 group-hover/card:text-slate-500 dark:group-hover/card:text-slate-400 transition-colors">
-              Click to expand
-            </span>
+        {/* ---- Expand affordance ---- */}
+        {hasExpandedContent && (
+          <div className="mt-2 pl-[3.375rem] flex items-center gap-1 text-[11px] text-slate-400 dark:text-slate-600 group-hover/card:text-slate-500 dark:group-hover/card:text-slate-400 transition-colors select-none">
+            <svg
+              width="10"
+              height="10"
+              viewBox="0 0 10 10"
+              fill="none"
+              className={`transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
+            >
+              <path d="M2 3.5 5 6.5 8 3.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            {expanded ? "Less" : "Details"}
           </div>
         )}
       </div>
