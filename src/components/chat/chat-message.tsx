@@ -3,12 +3,13 @@
 import { useState } from "react";
 import type { FilingEvent } from "@/types/events";
 import type { Significance, Sentiment } from "@/config/constants";
-import { messageTime } from "@/lib/utils";
+import { messageTime, fullDateTime } from "@/lib/utils";
 import { SignificanceBadge } from "@/components/feed/significance-badge";
 import { SentimentDot } from "@/components/feed/sentiment-dot";
 import { DealTerms } from "@/components/feed/deal-terms";
 import { CatalystsTable } from "@/components/feed/catalysts-table";
 import { EventTypeTag } from "@/components/feed/event-type-tag";
+import { InvestorTakeaway } from "@/components/feed/investor-takeaway";
 
 /** One filing event rendered as an incoming chat message. */
 export function ChatMessage({ event }: { event: FilingEvent }) {
@@ -52,9 +53,11 @@ export function ChatMessage({ event }: { event: FilingEvent }) {
               {briefing.headline}
             </p>
             {briefing.investor_takeaway && (
-              <p className="text-emerald-200/80 text-[13px] leading-snug mt-1">
-                {briefing.investor_takeaway}
-              </p>
+              <InvestorTakeaway
+                text={briefing.investor_takeaway}
+                sentiment={sentiment}
+                className="mt-1 text-[13px]"
+              />
             )}
             {briefing.summary && (
               <p className="text-slate-600/90 dark:text-slate-300/90 text-[13px] leading-[1.5] mt-1.5">
@@ -116,7 +119,10 @@ export function ChatMessage({ event }: { event: FilingEvent }) {
               "sourced from SEC EDGAR"
             )}
           </span>
-          <span className="text-slate-400/80 dark:text-slate-500/80 text-[10.5px] whitespace-nowrap tabular-nums">
+          <span
+            className="text-slate-400/80 dark:text-slate-500/80 text-[10.5px] whitespace-nowrap tabular-nums"
+            title={fullDateTime(event.received_at || event.filing_date)}
+          >
             {messageTime(event.received_at || event.filing_date)}
           </span>
         </div>

@@ -6,6 +6,12 @@ import type { FilingEvent } from "@/types/events";
 import { dayLabel, formatCatalystDate } from "@/lib/utils";
 import { ChatAvatar } from "./chat-avatar";
 import { ChatMessage } from "./chat-message";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 
 interface ChatConversationProps {
   chat: Chat;
@@ -26,9 +32,15 @@ function BackIcon() {
   );
 }
 
-function BellIcon({ off }: { off: boolean }) {
-  return off ? (
-    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+function MutedBellIcon() {
+  return (
+    <svg
+      className="w-4 h-4 text-amber-400/80 shrink-0"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+      aria-label="Alerts muted"
+    >
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -36,14 +48,15 @@ function BellIcon({ off }: { off: boolean }) {
         d="M9.143 17.082a24 24 0 003.844.148m-3.844-.148a23.856 23.856 0 01-5.455-1.31 8.964 8.964 0 002.3-5.542m3.155 6.852a3 3 0 005.667 1.97m1.965-2.277L21 21m-4.225-4.225a23.81 23.81 0 003.536-1.003A8.967 8.967 0 0118 9.75V9A6 6 0 006.53 6.53m10.245 10.245L6.53 6.53M3 3l3.53 3.53"
       />
     </svg>
-  ) : (
-    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"
-      />
+  );
+}
+
+function MoreIcon() {
+  return (
+    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+      <circle cx="12" cy="5" r="1.75" />
+      <circle cx="12" cy="12" r="1.75" />
+      <circle cx="12" cy="19" r="1.75" />
     </svg>
   );
 }
@@ -161,19 +174,12 @@ export function ChatConversation({
             )}
           </p>
         </div>
-        <button
-          onClick={onToggleMute}
-          className={`p-1.5 rounded transition-colors ${
-            muted
-              ? "text-amber-400/80 hover:text-amber-300"
-              : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-          }`}
-          title={muted ? "Unmute alerts for this company" : "Mute alerts for this company"}
-        >
-          <BellIcon off={muted} />
-        </button>
+        {muted && <MutedBellIcon />}
         {confirmRemove ? (
           <span className="flex items-center gap-1.5 text-xs shrink-0">
+            <span className="text-slate-500 dark:text-slate-400 hidden sm:inline">
+              Remove from watchlist?
+            </span>
             <button
               onClick={() => {
                 setConfirmRemove(false);
@@ -191,13 +197,25 @@ export function ChatConversation({
             </button>
           </span>
         ) : (
-          <button
-            onClick={() => setConfirmRemove(true)}
-            className="text-slate-400 dark:text-slate-500 hover:text-red-400 text-xs shrink-0"
-            title="Remove from watchlist"
-          >
-            Remove
-          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              className="p-1.5 rounded transition-colors text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+              aria-label="Conversation options"
+            >
+              <MoreIcon />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="min-w-48">
+              <DropdownMenuItem onClick={onToggleMute}>
+                {muted ? "Unmute alerts" : "Mute alerts"}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                variant="destructive"
+                onClick={() => setConfirmRemove(true)}
+              >
+                Remove from watchlist
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         )}
       </div>
 
