@@ -6,7 +6,7 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0a0a12] p-4">
+    <div className="min-h-screen flex items-center justify-center bg-[#0b0d12] p-4">
       <div className="w-full max-w-md">
         <Link href="/" className="flex justify-center mb-10">
           {/* eslint-disable-next-line @next/next/no-img-element */}

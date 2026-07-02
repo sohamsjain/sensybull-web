@@ -141,7 +141,7 @@ export function ChatConversation({
   return (
     <div className="flex flex-col h-full min-w-0">
       {/* Header */}
-      <div className="flex items-center gap-3 px-3 py-2 border-b border-slate-200 dark:border-white/[0.06] bg-white dark:bg-[#0a0a12] shrink-0">
+      <div className="flex items-center gap-3 px-3 py-2 border-b border-slate-200 dark:border-white/[0.06] bg-white dark:bg-[#0b0d12] shrink-0">
         <button
           onClick={onBack}
           className="md:hidden text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white shrink-0"
@@ -227,11 +227,11 @@ export function ChatConversation({
 
       {/* Pinned upcoming catalysts */}
       {pinnedCatalysts.length > 0 && (
-        <div className="px-3 py-1.5 bg-slate-100/80 dark:bg-[#12121e]/80 border-b border-slate-200 dark:border-white/[0.06] shrink-0">
+        <div className="px-3 py-1.5 bg-slate-100/80 dark:bg-[#14161c]/80 border-b border-slate-200 dark:border-white/[0.06] shrink-0">
           {pinnedCatalysts.map((c, i) => (
             <p key={i} className="text-xs text-slate-600 dark:text-slate-300 truncate">
               <span className="mr-1.5" aria-hidden="true">📌</span>
-              <span className="text-violet-600 dark:text-violet-300 font-medium">
+              <span className="text-indigo-600 dark:text-indigo-300 font-medium">
                 {formatCatalystDate(c.date)}
               </span>
               {" — "}
@@ -251,7 +251,7 @@ export function ChatConversation({
             <button
               onClick={handleLoadEarlier}
               disabled={loading}
-              className="text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 bg-white ring-1 ring-slate-200/80 dark:ring-0 dark:bg-[#12121e] px-3 py-1 rounded-full disabled:opacity-50"
+              className="text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 bg-white ring-1 ring-slate-200/80 dark:ring-0 dark:bg-[#14161c] px-3 py-1 rounded-full disabled:opacity-50"
             >
               {loading ? "Loading..." : "Load earlier filings"}
             </button>
@@ -261,7 +261,7 @@ export function ChatConversation({
         {loading && events.length === 0 ? (
           <div className="space-y-3 animate-pulse pt-2">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="max-w-[75%] h-24 bg-slate-200/70 dark:bg-[#12121e] rounded-lg" />
+              <div key={i} className="max-w-[75%] h-24 bg-slate-200/70 dark:bg-[#14161c] rounded-lg" />
             ))}
           </div>
         ) : ordered.length === 0 ? (
@@ -288,7 +288,7 @@ export function ChatConversation({
               <div key={event.id}>
                 {showDay && ts && (
                   <div className="flex justify-center my-3">
-                    <span className="text-[11px] text-slate-600 dark:text-slate-300 bg-white/95 ring-1 ring-slate-200/80 dark:ring-0 dark:bg-[#12121e]/90 px-3 py-1 rounded-md shadow-sm shadow-slate-300/30 dark:shadow-black/20">
+                    <span className="text-[11px] text-slate-600 dark:text-slate-300 bg-white/95 ring-1 ring-slate-200/80 dark:ring-0 dark:bg-[#14161c]/90 px-3 py-1 rounded-md shadow-sm shadow-slate-300/30 dark:shadow-black/20">
                       {dayLabel(ts)}
                     </span>
                   </div>

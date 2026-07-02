@@ -125,7 +125,7 @@ export default function ChatsPage() {
             never miss the one that matters.
           </p>
           <Link href="/login">
-            <Button className="bg-violet-600 hover:bg-violet-500">Sign in to start</Button>
+            <Button className="bg-indigo-600 hover:bg-indigo-500">Sign in to start</Button>
           </Link>
         </div>
       </div>
@@ -138,7 +138,7 @@ export default function ChatsPage() {
       <div
         className={`${
           activeCompanyId ? "hidden md:flex" : "flex"
-        } w-full md:w-80 lg:w-96 md:border-r md:border-slate-200 dark:md:border-white/[0.06] flex-col shrink-0`}
+        } w-full md:w-80 lg:w-96 md:border-r md:border-slate-200 dark:md:border-white/[0.06] bg-white dark:bg-transparent flex-col shrink-0`}
       >
         <ChatList
           chats={chats}

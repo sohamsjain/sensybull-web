@@ -113,7 +113,7 @@ export function ChatList({
             onClick={() => setUnreadOnly((v) => !v)}
             className={`px-2 py-0.5 rounded-full text-[11px] font-medium transition-colors ${
               unreadOnly
-                ? "bg-violet-500/15 text-violet-700 dark:bg-violet-500/25 dark:text-violet-300"
+                ? "bg-indigo-500/15 text-indigo-700 dark:bg-indigo-500/25 dark:text-indigo-300"
                 : "text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300"
             }`}
             title={unreadOnly ? "Show all chats" : "Show unread only"}
@@ -127,7 +127,7 @@ export function ChatList({
           placeholder="Search or add a company..."
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          className="w-full bg-slate-100 dark:bg-[#12121e] border border-slate-200 dark:border-white/[0.06] rounded-lg px-3 py-1.5 text-sm text-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none focus:border-violet-500/40 dark:focus:border-violet-500/40"
+          className="w-full bg-slate-100 dark:bg-[#14161c] border border-slate-200 dark:border-white/[0.06] rounded-lg px-3 py-1.5 text-sm text-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none focus:border-indigo-500/40 dark:focus:border-indigo-500/40"
         />
       </div>
 
@@ -137,10 +137,10 @@ export function ChatList({
           <div className="space-y-0 animate-pulse">
             {[...Array(6)].map((_, i) => (
               <div key={i} className="flex items-center gap-3 px-3 py-3">
-                <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-[#12121e]" />
+                <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-[#14161c]" />
                 <div className="flex-1 space-y-2">
-                  <div className="h-3 bg-slate-100 dark:bg-[#12121e] rounded w-2/3" />
-                  <div className="h-2.5 bg-slate-100 dark:bg-[#12121e] rounded w-full" />
+                  <div className="h-3 bg-slate-100 dark:bg-[#14161c] rounded w-2/3" />
+                  <div className="h-2.5 bg-slate-100 dark:bg-[#14161c] rounded w-full" />
                 </div>
               </div>
             ))}
@@ -200,7 +200,7 @@ export function ChatList({
                         {r.name}
                       </span>
                     </span>
-                    <span className="text-[11px] text-violet-600 dark:text-violet-400 shrink-0">
+                    <span className="text-[11px] text-indigo-600 dark:text-indigo-400 shrink-0">
                       {addingId === r.id ? "Adding..." : "+ Track"}
                     </span>
                   </button>

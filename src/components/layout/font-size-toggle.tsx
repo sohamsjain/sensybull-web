@@ -60,7 +60,7 @@ export function FontSizeToggle({ className = "" }: { className?: string }) {
         />
       </svg>
       {scale !== "md" && (
-        <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-violet-500" />
+        <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-indigo-500" />
       )}
     </button>
   );

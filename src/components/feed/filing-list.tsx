@@ -163,7 +163,7 @@ export function FilingList({
       {newCount > 0 && (
         <button
           onClick={showNewEvents}
-          className="absolute top-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-violet-600 hover:bg-violet-500 text-white text-xs font-semibold shadow-lg shadow-violet-900/30 transition-colors"
+          className="absolute top-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-lg shadow-indigo-900/30 transition-colors"
         >
           <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
             <path d="M5 8.5v-7M2 4.5 5 1.5l3 3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
@@ -220,18 +220,18 @@ export function FilingList({
                 <div key={event.edgar_id || event.id} data-feed-idx={i}>
                   {showDay && (
                     <div className="sticky top-0 z-10 flex justify-center py-1 pointer-events-none">
-                      <span className="text-[11px] px-3 py-1 rounded-full bg-white/90 dark:bg-[#0a0a12]/90 backdrop-blur border border-slate-200 dark:border-white/[0.06] text-slate-500 dark:text-slate-400 shadow-sm">
+                      <span className="text-[11px] px-3 py-1 rounded-full bg-white/90 dark:bg-[#0b0d12]/90 backdrop-blur border border-slate-200 dark:border-white/[0.06] text-slate-500 dark:text-slate-400 shadow-sm">
                         {dayLabel(ts)}
                       </span>
                     </div>
                   )}
                   {showLastVisit && (
                     <div className="flex items-center gap-3 my-3" aria-label="Events below were already visible on your last visit">
-                      <span className="flex-1 h-px bg-violet-500/25" />
-                      <span className="text-[11px] text-violet-600/80 dark:text-violet-400/80 font-medium">
+                      <span className="flex-1 h-px bg-indigo-500/25" />
+                      <span className="text-[11px] text-indigo-600/80 dark:text-indigo-400/80 font-medium">
                         last visit
                       </span>
-                      <span className="flex-1 h-px bg-violet-500/25" />
+                      <span className="flex-1 h-px bg-indigo-500/25" />
                     </div>
                   )}
                   <FilingCard
@@ -301,7 +301,7 @@ export function FilingList({
           )}
           {loading && allCount === 0 && (
             <div className="flex flex-col items-center gap-3 mt-16">
-              <div className="w-6 h-6 border-2 border-slate-300 dark:border-slate-600 border-t-violet-500 rounded-full animate-spin" />
+              <div className="w-6 h-6 border-2 border-slate-300 dark:border-slate-600 border-t-indigo-500 rounded-full animate-spin" />
               <p className="text-slate-400 dark:text-slate-500 text-sm">
                 Loading events...
               </p>

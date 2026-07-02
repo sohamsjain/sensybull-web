@@ -49,7 +49,7 @@ function VerifyEmailContent() {
           <p className="text-green-400 text-sm">{message}</p>
           <Link
             href="/login"
-            className="text-violet-400 hover:text-violet-300 text-sm"
+            className="text-indigo-400 hover:text-indigo-300 text-sm"
           >
             Sign in
           </Link>
@@ -61,7 +61,7 @@ function VerifyEmailContent() {
           <p className="text-red-400 text-sm">{message}</p>
           <Link
             href="/login"
-            className="text-violet-400 hover:text-violet-300 text-sm"
+            className="text-indigo-400 hover:text-indigo-300 text-sm"
           >
             Back to sign in
           </Link>

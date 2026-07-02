@@ -35,7 +35,7 @@ export function ProfileMenu() {
         className="w-8 h-8 rounded-full object-cover"
       />
     ) : (
-      <span className="w-8 h-8 rounded-full bg-violet-500/15 text-violet-700 dark:bg-violet-500/30 dark:text-violet-300 flex items-center justify-center text-[11px] font-semibold select-none">
+      <span className="w-8 h-8 rounded-full bg-indigo-500/15 text-indigo-700 dark:bg-indigo-500/30 dark:text-indigo-300 flex items-center justify-center text-[11px] font-semibold select-none">
         {initials}
       </span>
     );
@@ -43,7 +43,7 @@ export function ProfileMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        className="flex items-center justify-center w-10 h-10 rounded-full transition-shadow hover:ring-2 hover:ring-violet-500/40"
+        className="flex items-center justify-center w-10 h-10 rounded-full transition-shadow hover:ring-2 hover:ring-indigo-500/40"
         aria-label={`Account: ${user.name}`}
         title={user.name}
       >

@@ -25,12 +25,12 @@ export function WatchlistCreate({ onCreate, onCancel }: WatchlistCreateProps) {
         value={name}
         onChange={(e) => setName(e.target.value)}
         autoFocus
-        className="w-full bg-white dark:bg-[#0a0a12] border border-slate-300 dark:border-white/[0.1] rounded px-2 py-1.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none focus:border-slate-500 dark:focus:border-violet-500/40"
+        className="w-full bg-white dark:bg-[#0b0d12] border border-slate-300 dark:border-white/[0.1] rounded px-2 py-1.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none focus:border-slate-500 dark:focus:border-indigo-500/40"
       />
       <div className="flex gap-1 mt-1">
         <button
           type="submit"
-          className="text-xs text-violet-400 hover:text-violet-300 px-2 py-1"
+          className="text-xs text-indigo-400 hover:text-indigo-300 px-2 py-1"
         >
           Create
         </button>

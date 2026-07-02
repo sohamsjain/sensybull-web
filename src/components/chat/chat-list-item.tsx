@@ -61,8 +61,8 @@ export function ChatListItem({
     <button
       onClick={onSelect}
       data-company-id={company.id}
-      className={`w-full flex items-center gap-3 px-3 py-3 text-left transition-colors outline-none border-l-2 ${accent} focus-visible:bg-slate-100/80 dark:focus-visible:bg-[#12121e]/80 ${
-        active ? "bg-slate-100 dark:bg-[#12121e]" : "hover:bg-slate-100/60 dark:hover:bg-white/[0.04]"
+      className={`w-full flex items-center gap-3 px-3 py-3 text-left transition-colors outline-none border-l-2 ${accent} focus-visible:bg-slate-100/80 dark:focus-visible:bg-[#14161c]/80 ${
+        active ? "bg-slate-100 dark:bg-[#14161c]" : "hover:bg-slate-100/60 dark:hover:bg-white/[0.04]"
       }`}
     >
       <ChatAvatar
@@ -82,7 +82,7 @@ export function ChatListItem({
           <span
             className={`text-[11px] whitespace-nowrap shrink-0 tabular-nums ${
               hasUnread && !muted
-                ? "text-emerald-600 dark:text-emerald-400 font-medium"
+                ? "text-indigo-600 dark:text-indigo-400 font-medium"
                 : "text-slate-400 dark:text-slate-500"
             }`}
             title={fullDateTime(last_activity_at)}
@@ -111,7 +111,7 @@ export function ChatListItem({
                 className={`min-w-[19px] h-[19px] rounded-full flex items-center justify-center text-[11px] font-semibold leading-none px-1.5 ${
                   muted
                     ? "bg-slate-300 dark:bg-white/[0.1] text-slate-700 dark:text-slate-200"
-                    : "bg-emerald-500 text-emerald-950"
+                    : "bg-indigo-500 text-white"
                 }`}
               >
                 {unread_count > 99 ? "99+" : unread_count}

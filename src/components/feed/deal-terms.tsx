@@ -35,9 +35,9 @@ export function DealTerms({ terms }: { terms: Record<string, string> }) {
   if (entries.length === 0) return null;
 
   return (
-    <div className="mt-3 rounded-lg bg-slate-100/60 dark:bg-[#0a0a12]/40 ring-1 ring-slate-300/40 dark:ring-white/[0.06] p-3">
+    <div className="mt-3 rounded-lg bg-slate-100/60 dark:bg-[#0b0d12]/40 ring-1 ring-slate-300/40 dark:ring-white/[0.06] p-3">
       <div className="flex items-center gap-1.5 mb-2.5">
-        <span className="w-1 h-3.5 rounded-full bg-violet-400/60" />
+        <span className="w-1 h-3.5 rounded-full bg-indigo-400/60" />
         <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400 tracking-wide">
           Deal Terms
         </span>

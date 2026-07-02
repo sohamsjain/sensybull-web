@@ -28,15 +28,9 @@ interface FilingCardProps {
 }
 
 const SIG_ACCENT: Record<string, string> = {
-  High: "border-l-red-500",
-  Medium: "border-l-amber-500",
-  Low: "border-l-slate-500",
-};
-
-const SIG_GLOW: Record<string, string> = {
-  High: "shadow-[inset_0_1px_0_0_rgba(239,68,68,0.08),0_0_24px_-6px_rgba(239,68,68,0.12)]",
-  Medium: "shadow-[inset_0_1px_0_0_rgba(245,158,11,0.06)]",
-  Low: "",
+  High: "border-l-red-500/80 dark:border-l-red-400/70",
+  Medium: "border-l-amber-500/70 dark:border-l-amber-400/60",
+  Low: "border-l-slate-300 dark:border-l-slate-600",
 };
 
 export function FilingCard({
@@ -88,13 +82,25 @@ export function FilingCard({
   const hasExhibits = exhibits?.length > 0;
   const hasDealTerms =
     !!briefing?.deal_terms && Object.keys(briefing.deal_terms).length > 0;
+  // Collapsed compact card = materiality + category + headline only;
+  // everything else opens on demand.
   const hasExpandedContent = compact
-    ? !!(briefing?.summary || hasDealTerms || catalysts.length > 0 || items?.length > 0)
+    ? !!(
+        briefing?.investor_takeaway ||
+        briefing?.summary ||
+        hasDealTerms ||
+        catalysts.length > 0 ||
+        items?.length > 0 ||
+        hasExhibits ||
+        edgar_url
+      )
     : items?.length > 0 || (isLow && !!briefing?.summary);
 
+  const showDetails = expanded || !compact;
+  const showTakeaway = !!briefing?.investor_takeaway && showDetails;
   const showSummary =
     !!briefing?.summary && (expanded || (!compact && !isLow));
-  const showDetails = expanded || !compact;
+  const showActions = (hasExhibits || !!edgar_url) && showDetails;
 
   const eventTimestamp = received_at || filing_date;
   const session = marketSession(eventTimestamp);
@@ -103,15 +109,14 @@ export function FilingCard({
     <div
       className={`
         group/card relative
-        bg-slate-50 dark:bg-[#0f0f1a]
+        bg-white dark:bg-[#12141b]
         rounded-xl border-l-[3px] ${SIG_ACCENT[significance] || SIG_ACCENT.Medium}
-        border border-l-0 border-slate-200 dark:border-white/[0.06]
-        ${SIG_GLOW[significance] || ""}
+        border border-l-0 border-slate-200/80 dark:border-white/[0.06]
+        shadow-sm shadow-slate-200/50 dark:shadow-none
         transition-all duration-200
-        hover:bg-slate-100/80 dark:hover:bg-[#13132a]
-        hover:border-slate-300 dark:hover:border-white/[0.1]
-        ${isLow ? "opacity-65" : ""}
-        ${selected ? "ring-2 ring-violet-500/50 dark:ring-violet-400/40" : ""}
+        hover:border-slate-300 dark:hover:bg-[#15181f] dark:hover:border-white/[0.1]
+        ${isLow ? "opacity-70" : ""}
+        ${selected ? "ring-2 ring-indigo-500/50 dark:ring-indigo-400/40" : ""}
         cursor-pointer
       `}
       onClick={toggleExpanded}
@@ -145,8 +150,8 @@ export function FilingCard({
                     disabled={addingToWatchlist}
                     className="
                       flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium
-                      bg-violet-500/10 text-violet-600 dark:text-violet-400
-                      hover:bg-violet-500/20 hover:text-violet-700 dark:hover:text-violet-300
+                      bg-indigo-500/10 text-indigo-600 dark:text-indigo-400
+                      hover:bg-indigo-500/20 hover:text-indigo-700 dark:hover:text-indigo-300
                       disabled:opacity-50
                       transition-colors
                     "
@@ -187,7 +192,7 @@ export function FilingCard({
                 briefing.primary_event_type !== "Other" && (
                   <EventTypeTag type={briefing.primary_event_type} primary />
                 )}
-              {secondaryTypes.length > 0 && (
+              {showDetails && secondaryTypes.length > 0 && (
                 <div className="flex items-center gap-1 flex-wrap">
                   {secondaryTypes.map((type, i) => (
                     <EventTypeTag key={i} type={type} />
@@ -207,7 +212,7 @@ export function FilingCard({
             </h3>
 
             {/* Investor takeaway */}
-            {briefing.investor_takeaway && (
+            {showTakeaway && (
               <InvestorTakeaway
                 text={briefing.investor_takeaway}
                 sentiment={sentiment}
@@ -248,8 +253,8 @@ export function FilingCard({
           </div>
         )}
 
-        {/* ---- Action row: Exhibits + SEC Filing (always visible) ---- */}
-        {(hasExhibits || edgar_url) && (
+        {/* ---- Action row: Exhibits + SEC Filing ---- */}
+        {showActions && (
           <div
             className="mt-3.5 pl-[3.375rem] flex items-center gap-2 flex-wrap"
             onClick={(e) => e.stopPropagation()}
@@ -285,9 +290,9 @@ export function FilingCard({
                 rel="noopener noreferrer"
                 className="
                   inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold
-                  bg-violet-500/10 text-violet-600 dark:text-violet-400
-                  hover:bg-violet-500/20 hover:text-violet-700 dark:hover:text-violet-300
-                  ring-1 ring-violet-500/20 hover:ring-violet-500/30
+                  bg-indigo-500/10 text-indigo-600 dark:text-indigo-400
+                  hover:bg-indigo-500/20 hover:text-indigo-700 dark:hover:text-indigo-300
+                  ring-1 ring-indigo-500/20 hover:ring-indigo-500/30
                   transition-all
                 "
               >

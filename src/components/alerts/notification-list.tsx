@@ -24,7 +24,7 @@ export function NotificationList() {
 
   if (loading && notifications.length === 0) {
     return (
-      <div className="bg-slate-100 dark:bg-[#12121e] border border-slate-200 dark:border-white/[0.06] rounded-lg p-6">
+      <div className="bg-slate-100 dark:bg-[#14161c] border border-slate-200 dark:border-white/[0.06] rounded-lg p-6">
         <div className="animate-pulse space-y-3">
           {[...Array(5)].map((_, i) => (
             <div key={i} className="h-16 bg-slate-200 dark:bg-white/[0.06] rounded" />
@@ -36,7 +36,7 @@ export function NotificationList() {
 
   if (notifications.length === 0) {
     return (
-      <div className="bg-slate-100 dark:bg-[#12121e] border border-slate-200 dark:border-white/[0.06] rounded-lg p-8 text-center">
+      <div className="bg-slate-100 dark:bg-[#14161c] border border-slate-200 dark:border-white/[0.06] rounded-lg p-8 text-center">
         <p className="text-slate-500 dark:text-slate-400 text-sm">No notifications yet.</p>
         <p className="text-slate-400 dark:text-slate-500 text-xs mt-1">
           Notifications will appear here when filing events trigger your alerts.
@@ -46,7 +46,7 @@ export function NotificationList() {
   }
 
   return (
-    <div className="bg-slate-100 dark:bg-[#12121e] border border-slate-200 dark:border-white/[0.06] rounded-lg overflow-hidden">
+    <div className="bg-slate-100 dark:bg-[#14161c] border border-slate-200 dark:border-white/[0.06] rounded-lg overflow-hidden">
       <div className="divide-y divide-slate-200 dark:divide-white/[0.06]">
         {notifications.map((n) => {
           const sigKey = TIER_TO_SIGNIFICANCE[n.filing_event.max_tier] || "Low";

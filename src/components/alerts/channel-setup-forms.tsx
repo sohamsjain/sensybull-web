@@ -14,10 +14,10 @@ interface SetupFormProps {
 /* ------------------------------------------------------------------ */
 
 const inputClass =
-  "w-full px-3 py-2 text-sm rounded-lg bg-white border border-slate-200 text-slate-800 placeholder-slate-400 dark:bg-[#0a0a12] dark:border-white/[0.06] dark:text-slate-200 dark:placeholder-slate-500 focus:outline-none focus:border-violet-500/50";
+  "w-full px-3 py-2 text-sm rounded-lg bg-white border border-slate-200 text-slate-800 placeholder-slate-400 dark:bg-[#0b0d12] dark:border-white/[0.06] dark:text-slate-200 dark:placeholder-slate-500 focus:outline-none focus:border-indigo-500/50";
 
 const btnPrimaryClass =
-  "px-4 py-2 text-sm font-medium rounded-lg bg-violet-600 hover:bg-violet-700 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors";
+  "px-4 py-2 text-sm font-medium rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors";
 
 const btnDangerClass =
   "px-4 py-2 text-sm font-medium rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors";
@@ -142,13 +142,13 @@ export function ChannelSetupTelegram({ channelName, onConnected, onDisconnect }:
             href={`https://t.me/${linkData.bot_username}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-violet-600 hover:text-violet-700 dark:text-violet-400 dark:hover:text-violet-300 underline"
+            className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 underline"
           >
             @{linkData.bot_username}
           </a>{" "}
           on Telegram:
         </p>
-        <code className="block px-3 py-2 bg-slate-100 border border-slate-200 dark:bg-[#0a0a12] dark:border-white/[0.06] rounded-lg text-violet-700 dark:text-violet-300 text-sm font-mono tracking-widest">
+        <code className="block px-3 py-2 bg-slate-100 border border-slate-200 dark:bg-[#0b0d12] dark:border-white/[0.06] rounded-lg text-indigo-700 dark:text-indigo-300 text-sm font-mono tracking-widest">
           {linkData.code}
         </code>
         <p className={helperClass}>
