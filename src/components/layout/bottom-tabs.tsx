@@ -4,8 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
 import { useUnreadCount } from "@/hooks/use-unread-count";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { FontSizeToggle } from "./font-size-toggle";
 import { ProfileMenu } from "./profile-menu";
 
 function ChatsIcon() {
@@ -47,7 +45,7 @@ function BellIcon() {
   );
 }
 
-function RailLink({
+function Tab({
   href,
   label,
   active,
@@ -63,25 +61,28 @@ function RailLink({
   return (
     <Link
       href={href}
-      title={label}
-      aria-label={label}
-      className={`relative flex items-center justify-center w-10 h-10 rounded-xl transition-colors ${
+      className={`relative flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors ${
         active
-          ? "bg-slate-200 dark:bg-white/[0.08] text-slate-900 dark:text-white"
-          : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/[0.05]"
+          ? "text-indigo-600 dark:text-indigo-400"
+          : "text-slate-500 dark:text-slate-400"
       }`}
+      aria-current={active ? "page" : undefined}
     >
-      {children}
-      {badge != null && badge > 0 && (
-        <span className="absolute -top-0.5 -right-0.5 min-w-[17px] h-[17px] rounded-full bg-indigo-500 text-white text-[10px] font-bold flex items-center justify-center px-1 leading-none">
-          {badge > 99 ? "99+" : badge}
-        </span>
-      )}
+      <span className="relative">
+        {children}
+        {badge != null && badge > 0 && (
+          <span className="absolute -top-1 -right-2 min-w-[16px] h-[16px] rounded-full bg-indigo-500 text-white text-[9px] font-bold flex items-center justify-center px-1 leading-none">
+            {badge > 99 ? "99+" : badge}
+          </span>
+        )}
+      </span>
+      <span className="text-[10px] font-medium">{label}</span>
     </Link>
   );
 }
 
-export function NavRail() {
+/** Thumb-reachable primary navigation on mobile; the rail covers desktop. */
+export function BottomTabs() {
   const { user } = useAuth();
   const pathname = usePathname();
   const unread = useUnreadCount();
@@ -89,35 +90,35 @@ export function NavRail() {
   if (!user) return null;
 
   return (
-    <aside className="hidden md:flex w-14 shrink-0 flex-col items-center gap-1.5 py-3 border-r border-slate-200 dark:border-white/[0.04] bg-slate-100 dark:bg-[#07080c]">
-      <RailLink
+    <nav
+      className="md:hidden fixed bottom-0 inset-x-0 z-40 h-14 pb-[env(safe-area-inset-bottom)] flex items-stretch border-t border-slate-200 dark:border-white/[0.06] bg-white/95 dark:bg-[#0b0d12]/95 backdrop-blur"
+      aria-label="Primary"
+    >
+      <Tab
         href="/chats"
         label="Chats"
         active={pathname?.startsWith("/chats") ?? false}
         badge={unread}
       >
         <ChatsIcon />
-      </RailLink>
-      <RailLink
+      </Tab>
+      <Tab
         href="/feed"
         label="Feed"
         active={pathname?.startsWith("/feed") ?? false}
       >
         <FeedIcon />
-      </RailLink>
-
-      <div className="mt-auto flex flex-col items-center gap-1.5">
-        <RailLink
-          href="/alerts"
-          label="Alerts"
-          active={pathname?.startsWith("/alerts") ?? false}
-        >
-          <BellIcon />
-        </RailLink>
-        <FontSizeToggle className="w-10 h-10" />
-        <ThemeToggle className="w-10 h-10" />
-        <ProfileMenu />
+      </Tab>
+      <Tab
+        href="/alerts"
+        label="Alerts"
+        active={pathname?.startsWith("/alerts") ?? false}
+      >
+        <BellIcon />
+      </Tab>
+      <div className="flex-1 flex items-center justify-center">
+        <ProfileMenu side="top" />
       </div>
-    </aside>
+    </nav>
   );
 }

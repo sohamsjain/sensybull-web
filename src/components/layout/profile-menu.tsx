@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useTheme } from "next-themes";
 import { useAuth } from "@/hooks/use-auth";
+import { useFontScale } from "@/hooks/use-font-scale";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -10,9 +12,15 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
-/** Round profile avatar in the nav rail; opens account actions. */
-export function ProfileMenu() {
+/**
+ * Round profile avatar; opens account actions. Theme and font-size entries
+ * are included so the settings stay reachable on mobile, where the rail's
+ * dedicated toggles are hidden.
+ */
+export function ProfileMenu({ side = "right" }: { side?: "right" | "top" }) {
   const { user, logout } = useAuth();
+  const { resolvedTheme, setTheme } = useTheme();
+  const { scale, cycle } = useFontScale();
   const [imgFailed, setImgFailed] = useState(false);
 
   if (!user) return null;
@@ -49,7 +57,7 @@ export function ProfileMenu() {
       >
         {avatar}
       </DropdownMenuTrigger>
-      <DropdownMenuContent side="right" align="end" className="min-w-52">
+      <DropdownMenuContent side={side} align="end" className="min-w-52">
         <div className="px-1.5 py-1.5">
           <p className="text-sm font-medium text-slate-900 dark:text-slate-100 truncate">
             {user.name}
@@ -59,6 +67,18 @@ export function ProfileMenu() {
           </p>
         </div>
         <DropdownMenuSeparator />
+        <DropdownMenuItem
+          className="md:hidden"
+          onClick={() =>
+            setTheme(resolvedTheme === "dark" ? "light" : "dark")
+          }
+        >
+          {resolvedTheme === "dark" ? "Light theme" : "Dark theme"}
+        </DropdownMenuItem>
+        <DropdownMenuItem className="md:hidden" onClick={cycle}>
+          Font size: {scale.label}
+        </DropdownMenuItem>
+        <DropdownMenuSeparator className="md:hidden" />
         <DropdownMenuItem onClick={logout}>Log out</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

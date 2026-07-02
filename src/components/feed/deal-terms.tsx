@@ -46,7 +46,7 @@ export function DealTerms({ terms }: { terms: Record<string, string> }) {
       <div className="grid grid-cols-2 gap-x-4 gap-y-2.5">
         {entries.map(([key, value]) => (
           <div key={key} className="min-w-0">
-            <p className="text-[10px] text-slate-500 leading-none mb-0.5 truncate">
+            <p className="text-[10.5px] text-slate-500 leading-none mb-0.5 truncate">
               {labelFor(key)}
             </p>
             <p

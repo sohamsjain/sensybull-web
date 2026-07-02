@@ -201,6 +201,22 @@ export function FilingList({
             </span>
           </div>
 
+          {/* Guest nudge */}
+          {!isLoggedIn && displayed.length > 0 && (
+            <div className="mb-4 flex items-center justify-between gap-3 rounded-xl px-4 py-3 bg-indigo-500/[0.06] dark:bg-indigo-500/10 ring-1 ring-indigo-500/15 dark:ring-indigo-500/20">
+              <p className="text-[13px] text-slate-600 dark:text-slate-300 leading-snug">
+                Follow the companies you care about — sign in to build a
+                watchlist and get every filing as a chat message.
+              </p>
+              <a
+                href="/login"
+                className="shrink-0 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition-colors"
+              >
+                Sign in
+              </a>
+            </div>
+          )}
+
           {/* Event cards, grouped by day */}
           <div className="space-y-3">
             {displayed.map((event, i) => {
