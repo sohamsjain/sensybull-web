@@ -97,7 +97,7 @@ export function TopBar({
       )}
 
       <Link href="/" className="flex items-center gap-2 mr-2">
-        <span className="h-6 w-6 rounded-md bg-white flex items-center justify-center overflow-hidden">
+        <span className="h-6 w-6 rounded-md bg-white ring-1 ring-slate-200 dark:ring-0 flex items-center justify-center overflow-hidden">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/logo.png"
@@ -160,7 +160,7 @@ export function TopBar({
           onClick={() => setDropdownOpen((prev) => !prev)}
           className={`flex px-3 py-1.5 rounded text-xs font-medium transition-colors items-center gap-1.5 ${
             activeCount > 0
-              ? "bg-violet-500/20 text-violet-400 border border-violet-500/30"
+              ? "bg-violet-500/15 text-violet-700 dark:bg-violet-500/20 dark:text-violet-400 border border-violet-500/30"
               : "bg-slate-100 dark:bg-[#12121e] text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-white/[0.06] hover:border-slate-400 dark:hover:border-white/[0.12]"
           }`}
         >

@@ -187,7 +187,7 @@ function SetupChannelRow({
               {meta.label}
             </span>
             {isConnected && (
-              <span className="text-xs text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+              <span className="text-xs text-emerald-700 bg-emerald-500/10 dark:text-emerald-400 px-2 py-0.5 rounded-full">
                 Connected
               </span>
             )}
@@ -208,14 +208,14 @@ function SetupChannelRow({
           {isConnected ? (
             <button
               onClick={() => setExpanded(!expanded)}
-              className="text-xs text-slate-400 hover:text-slate-300 px-2 py-1 rounded transition-colors"
+              className="text-xs text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 px-2 py-1 rounded transition-colors"
             >
               {expanded ? "Hide" : "Manage"}
             </button>
           ) : (
             <button
               onClick={() => setExpanded(!expanded)}
-              className="text-xs text-violet-400 hover:text-violet-300 px-2 py-1 rounded border border-violet-500/20 hover:border-violet-500/40 transition-colors"
+              className="text-xs text-violet-600 hover:text-violet-700 dark:text-violet-400 dark:hover:text-violet-300 px-2 py-1 rounded border border-violet-500/20 hover:border-violet-500/40 transition-colors"
             >
               {expanded ? "Cancel" : "Set up"}
             </button>

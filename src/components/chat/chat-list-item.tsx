@@ -60,7 +60,7 @@ export function ChatListItem({
           <span
             className={`text-[11px] whitespace-nowrap shrink-0 tabular-nums ${
               hasUnread && !muted
-                ? "text-emerald-400 font-medium"
+                ? "text-emerald-600 dark:text-emerald-400 font-medium"
                 : "text-slate-400 dark:text-slate-500"
             }`}
             title={fullDateTime(last_activity_at)}
