@@ -4,13 +4,14 @@ import { useState } from "react";
 import type { FilingEvent } from "@/types/events";
 import type { Significance, Sentiment } from "@/config/constants";
 import { SIGNIFICANCE_CONFIG } from "@/config/constants";
-import { timeAgo } from "@/lib/utils";
+import { timeAgo, fullDateTime, marketSession } from "@/lib/utils";
 import { SignificanceBadge } from "./significance-badge";
 import { SentimentDot } from "./sentiment-dot";
 import { DealTerms } from "./deal-terms";
 import { CatalystsTable } from "./catalysts-table";
 import { EventTypeTag } from "./event-type-tag";
 import { CompanyLogo } from "./company-logo";
+import { InvestorTakeaway } from "./investor-takeaway";
 
 interface FilingCardProps {
   event: FilingEvent;
@@ -74,6 +75,9 @@ export function FilingCard({
   const hasExhibits = exhibits?.length > 0;
   const hasExpandedContent = items?.length > 0 || (isLow && briefing?.summary);
 
+  const eventTimestamp = received_at || filing_date;
+  const session = marketSession(eventTimestamp);
+
   return (
     <div
       className={`
@@ -132,8 +136,23 @@ export function FilingCard({
                     <span className="hidden sm:inline">Watch</span>
                   </button>
                 )}
-                <span className="text-slate-400 dark:text-slate-500 text-xs tabular-nums whitespace-nowrap">
-                  {timeAgo(received_at || filing_date)}
+                {session && (
+                  <span
+                    className="px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide bg-sky-500/10 text-sky-600 dark:text-sky-400"
+                    title={
+                      session === "pre-market"
+                        ? "Filed before market open (9:30 AM ET)"
+                        : "Filed after market close (4:00 PM ET)"
+                    }
+                  >
+                    {session === "pre-market" ? "Pre" : "AH"}
+                  </span>
+                )}
+                <span
+                  className="text-slate-400 dark:text-slate-500 text-xs tabular-nums whitespace-nowrap"
+                  title={fullDateTime(eventTimestamp)}
+                >
+                  {timeAgo(eventTimestamp)}
                 </span>
               </div>
             </div>
@@ -167,10 +186,11 @@ export function FilingCard({
 
             {/* Investor takeaway */}
             {briefing.investor_takeaway && (
-              <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-300 leading-relaxed flex gap-2">
-                <span className="text-amber-400/80 shrink-0 mt-0.5">&#9670;</span>
-                <span className="italic">{briefing.investor_takeaway}</span>
-              </p>
+              <InvestorTakeaway
+                text={briefing.investor_takeaway}
+                sentiment={sentiment}
+                className="mt-1.5 text-sm leading-relaxed"
+              />
             )}
 
             {/* Summary */}

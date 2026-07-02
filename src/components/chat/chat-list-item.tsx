@@ -1,7 +1,7 @@
 "use client";
 
 import type { Chat } from "@/types/api";
-import { chatTimestamp } from "@/lib/utils";
+import { chatTimestamp, fullDateTime } from "@/lib/utils";
 import { ChatAvatar } from "./chat-avatar";
 
 function MutedIcon() {
@@ -58,11 +58,12 @@ export function ChatListItem({
             {company.name}
           </span>
           <span
-            className={`text-[11px] whitespace-nowrap shrink-0 ${
+            className={`text-[11px] whitespace-nowrap shrink-0 tabular-nums ${
               hasUnread && !muted
                 ? "text-emerald-400 font-medium"
                 : "text-slate-400 dark:text-slate-500"
             }`}
+            title={fullDateTime(last_activity_at)}
           >
             {chatTimestamp(last_activity_at)}
           </span>
