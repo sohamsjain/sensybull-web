@@ -40,4 +40,4 @@
 - Files: kebab-case. Exports: PascalCase for components, camelCase for hooks/utils
 - All dashboard/auth components are client components (`"use client"`)
 - Filter state lives in `(dashboard)/layout.tsx` via React context
-- Dark theme only (slate-900 background)
+- Dual theme (class-based dark mode). Accent: indigo, reserved for interactive elements; red/amber = materiality, emerald/red = sentiment. Dark surfaces: #0b0d12 base, #12141b/#14161c cards, #1a1d25 hover

@@ -88,7 +88,7 @@ function ChannelRow({
   if (!needsSetup) {
     // Simple channel (email, push) -- just a toggle row
     return (
-      <div className="bg-white dark:bg-[#0a0a12] border border-slate-200 dark:border-white/[0.06] rounded-lg">
+      <div className="bg-white dark:bg-[#0b0d12] border border-slate-200 dark:border-white/[0.06] rounded-lg">
         <label className="flex items-center justify-between px-4 py-2.5 cursor-pointer hover:border-slate-400 dark:hover:border-white/[0.12]">
           <div>
             <span className="text-sm text-slate-600 dark:text-slate-300">
@@ -103,7 +103,7 @@ function ChannelRow({
             checked={enabled}
             onChange={() => onToggle(channel)}
             disabled={saving || (channel === "push" && pushBusy)}
-            className="rounded border-slate-300 dark:border-white/[0.1] bg-slate-100 dark:bg-[#12121e] text-violet-500 focus:ring-0 focus:ring-offset-0 w-4 h-4"
+            className="rounded border-slate-300 dark:border-white/[0.1] bg-slate-100 dark:bg-[#14161c] text-indigo-500 focus:ring-0 focus:ring-offset-0 w-4 h-4"
           />
         </label>
       </div>
@@ -179,7 +179,7 @@ function SetupChannelRow({
   }, [enabled, onToggle, channel, refetch, setExpanded]);
 
   return (
-    <div className="bg-white dark:bg-[#0a0a12] border border-slate-200 dark:border-white/[0.06] rounded-lg">
+    <div className="bg-white dark:bg-[#0b0d12] border border-slate-200 dark:border-white/[0.06] rounded-lg">
       <div className="flex items-center justify-between px-4 py-2.5">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
@@ -215,7 +215,7 @@ function SetupChannelRow({
           ) : (
             <button
               onClick={() => setExpanded(!expanded)}
-              className="text-xs text-violet-600 hover:text-violet-700 dark:text-violet-400 dark:hover:text-violet-300 px-2 py-1 rounded border border-violet-500/20 hover:border-violet-500/40 transition-colors"
+              className="text-xs text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 px-2 py-1 rounded border border-indigo-500/20 hover:border-indigo-500/40 transition-colors"
             >
               {expanded ? "Cancel" : "Set up"}
             </button>
@@ -225,7 +225,7 @@ function SetupChannelRow({
             checked={enabled}
             onChange={handleToggle}
             disabled={saving}
-            className="rounded border-slate-300 dark:border-white/[0.1] bg-slate-100 dark:bg-[#12121e] text-violet-500 focus:ring-0 focus:ring-offset-0 w-4 h-4"
+            className="rounded border-slate-300 dark:border-white/[0.1] bg-slate-100 dark:bg-[#14161c] text-indigo-500 focus:ring-0 focus:ring-offset-0 w-4 h-4"
           />
         </div>
       </div>
@@ -281,7 +281,7 @@ export function AlertPreferencesPanel() {
 
   if (loading) {
     return (
-      <div className="bg-slate-100 dark:bg-[#12121e] border border-slate-200 dark:border-white/[0.06] rounded-lg p-6">
+      <div className="bg-slate-100 dark:bg-[#14161c] border border-slate-200 dark:border-white/[0.06] rounded-lg p-6">
         <div className="animate-pulse space-y-4">
           <div className="h-4 bg-slate-200 dark:bg-white/[0.06] rounded w-1/3" />
           <div className="h-8 bg-slate-200 dark:bg-white/[0.06] rounded w-full" />
@@ -301,7 +301,7 @@ export function AlertPreferencesPanel() {
   ).filter((ch) => ch !== "push" || pushSupported());
 
   return (
-    <div className="bg-slate-100 dark:bg-[#12121e] border border-slate-200 dark:border-white/[0.06] rounded-lg p-6 space-y-6">
+    <div className="bg-slate-100 dark:bg-[#14161c] border border-slate-200 dark:border-white/[0.06] rounded-lg p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-slate-900 dark:text-white font-medium">
@@ -316,7 +316,7 @@ export function AlertPreferencesPanel() {
           disabled={saving}
           className={`relative w-11 h-6 rounded-full transition-colors ${
             preferences.enabled
-              ? "bg-violet-600"
+              ? "bg-indigo-600"
               : "bg-slate-300 dark:bg-white/[0.1]"
           }`}
         >
@@ -343,8 +343,8 @@ export function AlertPreferencesPanel() {
                   disabled={saving}
                   className={`w-full text-left px-4 py-2.5 rounded-lg text-sm transition-colors border ${
                     preferences.max_tier === tier
-                      ? "bg-violet-500/15 border-violet-500/40 text-violet-400"
-                      : "bg-white dark:bg-[#0a0a12] border-slate-200 dark:border-white/[0.06] text-slate-500 dark:text-slate-400 hover:border-slate-400 dark:hover:border-white/[0.12]"
+                      ? "bg-indigo-500/15 border-indigo-500/40 text-indigo-400"
+                      : "bg-white dark:bg-[#0b0d12] border-slate-200 dark:border-white/[0.06] text-slate-500 dark:text-slate-400 hover:border-slate-400 dark:hover:border-white/[0.12]"
                   }`}
                 >
                   <span className="font-medium">Tier {tier}</span>

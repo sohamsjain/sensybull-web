@@ -75,7 +75,7 @@ function RailLink({
     >
       {children}
       {badge != null && badge > 0 && (
-        <span className="absolute -top-0.5 -right-0.5 min-w-[17px] h-[17px] rounded-full bg-emerald-500 text-emerald-950 text-[10px] font-bold flex items-center justify-center px-1 leading-none">
+        <span className="absolute -top-0.5 -right-0.5 min-w-[17px] h-[17px] rounded-full bg-indigo-500 text-white text-[10px] font-bold flex items-center justify-center px-1 leading-none">
           {badge > 99 ? "99+" : badge}
         </span>
       )}
@@ -105,7 +105,7 @@ export function NavRail() {
   if (!user) return null;
 
   return (
-    <aside className="flex w-14 shrink-0 flex-col items-center gap-1.5 py-3 border-r border-slate-200 dark:border-white/[0.04] bg-slate-100 dark:bg-[#07070e]">
+    <aside className="flex w-14 shrink-0 flex-col items-center gap-1.5 py-3 border-r border-slate-200 dark:border-white/[0.04] bg-slate-100 dark:bg-[#07080c]">
       <RailLink
         href="/chats"
         label="Chats"

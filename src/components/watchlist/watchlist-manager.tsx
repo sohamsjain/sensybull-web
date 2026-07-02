@@ -57,7 +57,7 @@ export function WatchlistManager({
   };
 
   return (
-    <div className="mt-2 bg-slate-100 dark:bg-[#12121e] border border-slate-200 dark:border-white/[0.06] rounded p-3">
+    <div className="mt-2 bg-slate-100 dark:bg-[#14161c] border border-slate-200 dark:border-white/[0.06] rounded p-3">
       <div className="flex items-center justify-between mb-2">
         <span className="text-sm text-slate-900 dark:text-white font-medium">{watchlist.name}</span>
         <button
@@ -94,7 +94,7 @@ export function WatchlistManager({
         placeholder="Search ticker or company..."
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        className="w-full bg-white dark:bg-[#0a0a12] border border-slate-300 dark:border-white/[0.1] rounded px-2 py-1 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none focus:border-slate-500 dark:focus:border-violet-500/40"
+        className="w-full bg-white dark:bg-[#0b0d12] border border-slate-300 dark:border-white/[0.1] rounded px-2 py-1 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none focus:border-slate-500 dark:focus:border-indigo-500/40"
       />
       {results.length > 0 && (
         <div className="mt-1 max-h-32 overflow-y-auto space-y-0.5">

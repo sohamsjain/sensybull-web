@@ -8,7 +8,7 @@ const LOGO_DEV_TOKEN = process.env.NEXT_PUBLIC_LOGO_DEV_TOKEN;
 const LOGO_COLORS = [
   "bg-fuchsia-500/10 text-fuchsia-700 dark:bg-fuchsia-500/20 dark:text-fuchsia-300",
   "bg-emerald-500/10 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300",
-  "bg-violet-500/10 text-violet-700 dark:bg-violet-500/20 dark:text-violet-300",
+  "bg-indigo-500/10 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300",
   "bg-amber-500/10 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300",
   "bg-rose-500/10 text-rose-700 dark:bg-rose-500/20 dark:text-rose-300",
   "bg-cyan-500/10 text-cyan-700 dark:bg-cyan-500/20 dark:text-cyan-300",

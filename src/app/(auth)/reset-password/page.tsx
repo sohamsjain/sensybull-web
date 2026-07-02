@@ -37,7 +37,7 @@ function ResetPasswordContent() {
         <p className="text-red-400 text-sm">Invalid reset link.</p>
         <Link
           href="/forgot-password"
-          className="text-violet-400 hover:text-violet-300 text-sm mt-2 inline-block"
+          className="text-indigo-400 hover:text-indigo-300 text-sm mt-2 inline-block"
         >
           Request a new one
         </Link>
@@ -51,7 +51,7 @@ function ResetPasswordContent() {
         <p className="text-slate-700 dark:text-slate-200 text-sm">Password reset successfully.</p>
         <Link
           href="/login"
-          className="text-violet-400 hover:text-violet-300 text-sm"
+          className="text-indigo-400 hover:text-indigo-300 text-sm"
         >
           Sign in
         </Link>
@@ -70,13 +70,13 @@ function ResetPasswordContent() {
           onChange={(e) => setPassword(e.target.value)}
           required
           minLength={6}
-          className="bg-white dark:bg-[#0a0a12] border-slate-300 dark:border-white/[0.1] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus-visible:border-slate-500 dark:focus-visible:border-violet-500/40 focus-visible:ring-0"
+          className="bg-white dark:bg-[#0b0d12] border-slate-300 dark:border-white/[0.1] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus-visible:border-slate-500 dark:focus-visible:border-indigo-500/40 focus-visible:ring-0"
         />
         {error && <p className="text-red-400 text-xs">{error}</p>}
         <Button
           type="submit"
           disabled={loading}
-          className="w-full bg-violet-600 hover:bg-violet-500"
+          className="w-full bg-indigo-600 hover:bg-indigo-500"
         >
           {loading ? "..." : "Reset Password"}
         </Button>

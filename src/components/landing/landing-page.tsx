@@ -32,7 +32,7 @@ function Navbar() {
           </Link>
           <Link
             href="/register"
-            className="text-sm font-medium text-white bg-violet-600 hover:bg-violet-500 transition-colors px-4 py-1.5 rounded-md"
+            className="text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-500 transition-colors px-4 py-1.5 rounded-md"
           >
             Get Started
           </Link>
@@ -58,7 +58,7 @@ function HeroSection() {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <Link
             href="/register"
-            className="inline-flex items-center gap-2 px-7 py-3 rounded-md bg-violet-600 hover:bg-violet-500 text-white text-base font-semibold transition-colors"
+            className="inline-flex items-center gap-2 px-7 py-3 rounded-md bg-indigo-600 hover:bg-indigo-500 text-white text-base font-semibold transition-colors"
           >
             Start tracking
           </Link>
@@ -128,7 +128,7 @@ function ValueProps() {
             <p className="text-white/40 text-sm mb-4">Free without limits.</p>
             <Link
               href="/register"
-              className="text-violet-400 hover:text-violet-300 text-sm transition-colors"
+              className="text-indigo-400 hover:text-indigo-300 text-sm transition-colors"
             >
               Start tracking &rarr;
             </Link>

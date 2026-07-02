@@ -54,13 +54,13 @@ function MagicLinkVerifyContent() {
           <div className="space-y-2">
             <Link
               href="/magic-link"
-              className="block text-violet-400 hover:text-violet-300 text-sm"
+              className="block text-indigo-400 hover:text-indigo-300 text-sm"
             >
               Request a new link
             </Link>
             <Link
               href="/login"
-              className="block text-violet-400 hover:text-violet-300 text-sm"
+              className="block text-indigo-400 hover:text-indigo-300 text-sm"
             >
               Back to sign in
             </Link>
