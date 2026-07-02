@@ -12,6 +12,7 @@
 - Watchlists: CRUD at `/watchlists/`, company management at `/watchlists/:id/companies`
 - Companies: `GET /companies/?q=...` (search by ticker or name), `GET /companies/search?q=` (typeahead)
 - Alerts: `GET/PUT /alerts/preferences`, `GET /alerts/notifications`, `GET /alerts/channels`, Web Push at `/alerts/push/*` (see `src/lib/push.ts` + `public/sw.js`)
+- Events (single): `GET /events/all/:id` (public, permalinks)
 - Chats: `GET /chats/` (inbox: watchlist companies + unread counts), `POST /chats/:companyId/read`, `PUT /chats/:companyId/mute`
 - WebSocket: Socket.IO namespace `/feed`, auth via `{token}` dict, events: `filing_event`, `connected`
 
@@ -30,6 +31,8 @@
 - `src/app/(dashboard)/` — Dashboard pages (topbar + sidebar + main)
   - `/chats` — default landing for signed-in users; two-pane chat UI (list + conversation), self-contained layout (no watchlist sidebar/feed filters)
   - `/feed` — chronological all-events feed (public for guests)
+  - `/calendar` — upcoming-catalyst agenda across all tracked filings
+  - `/e/[id]` — public per-event permalink (backed by GET /events/all/:id)
 
 ## Related Projects
 - Backend API: ~/Projects/sensybull-api (Flask)

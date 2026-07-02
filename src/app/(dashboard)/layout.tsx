@@ -14,7 +14,11 @@ import { NavRail } from "@/components/layout/nav-rail";
 import { BottomTabs } from "@/components/layout/bottom-tabs";
 import { Sidebar } from "@/components/layout/sidebar";
 import { MobileNav } from "@/components/layout/mobile-nav";
+import { CompanySheet, type CompanyRef } from "@/components/company/company-sheet";
+import { CommandPalette } from "@/components/command-palette";
 import { useAuth } from "@/hooks/use-auth";
+
+export type { CompanyRef };
 
 interface DashboardContextValue {
   significanceFilter: Set<string>;
@@ -26,6 +30,7 @@ interface DashboardContextValue {
   clearEventTypes: () => void;
   setSearch: (value: string) => void;
   openMobileNav: () => void;
+  openCompany: (company: CompanyRef) => void;
 }
 
 const DashboardContext = createContext<DashboardContextValue>({
@@ -38,6 +43,7 @@ const DashboardContext = createContext<DashboardContextValue>({
   clearEventTypes: () => {},
   setSearch: () => {},
   openMobileNav: () => {},
+  openCompany: () => {},
 });
 
 export const useDashboard = () => useContext(DashboardContext);
@@ -73,6 +79,7 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
     null
   );
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [companySheet, setCompanySheet] = useState<CompanyRef | null>(null);
 
   // Mirror filter state back into the URL (shallow, no navigation)
   useEffect(() => {
@@ -112,6 +119,10 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
   }, []);
 
   const openMobileNav = useCallback(() => setMobileNavOpen(true), []);
+  const openCompany = useCallback(
+    (company: CompanyRef) => setCompanySheet(company),
+    []
+  );
 
   return (
     <DashboardContext.Provider
@@ -125,6 +136,7 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
         clearEventTypes,
         setSearch,
         openMobileNav,
+        openCompany,
       }}
     >
       {/* overflow-hidden pins the app shell to the viewport so the document
@@ -148,6 +160,11 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
           </main>
         </div>
         <BottomTabs />
+        <CompanySheet
+          company={companySheet}
+          onClose={() => setCompanySheet(null)}
+        />
+        <CommandPalette />
         {user && !isChats && (
           <MobileNav
             open={mobileNavOpen}

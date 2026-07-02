@@ -10,6 +10,7 @@ import { DealTerms } from "@/components/feed/deal-terms";
 import { CatalystsTable } from "@/components/feed/catalysts-table";
 import { EventTypeTag } from "@/components/feed/event-type-tag";
 import { InvestorTakeaway } from "@/components/feed/investor-takeaway";
+import { SignificanceExplainer } from "@/components/feed/significance-explainer";
 
 /**
  * One filing event rendered as an incoming chat message.
@@ -18,7 +19,18 @@ import { InvestorTakeaway } from "@/components/feed/investor-takeaway";
  */
 export function ChatMessage({ event }: { event: FilingEvent }) {
   const [expanded, setExpanded] = useState(false);
+  const [copied, setCopied] = useState(false);
   const { briefing, exhibits, edgar_url } = event;
+
+  const copyPermalink = () => {
+    navigator.clipboard
+      .writeText(`${window.location.origin}/e/${event.id}`)
+      .then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1500);
+      })
+      .catch(() => {});
+  };
 
   const significance = (briefing?.significance as Significance) || "Medium";
   const sentiment = (briefing?.sentiment as Sentiment) || "Neutral";
@@ -110,6 +122,16 @@ export function ChatMessage({ event }: { event: FilingEvent }) {
                 ))}
               </div>
             )}
+            <SignificanceExplainer level={significance} items={event.items} />
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                copyPermalink();
+              }}
+              className="mt-1.5 text-[11px] text-indigo-600 dark:text-indigo-400 hover:underline underline-offset-2"
+            >
+              {copied ? "Copied!" : "Copy link to this event"}
+            </button>
           </>
         )}
 

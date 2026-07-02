@@ -11,3 +11,7 @@ Now accepts either `{ "code": "..." }` (authorization code from OAuth popup flow
 ### User object (`/auth/*` responses, `GET /auth/me`)
 
 Now includes `picture_url` (string | null) — the Google account photo, captured on Google login and refreshed when it rotates. Null for email/password and Apple users.
+
+### GET /events/all/:eventId (new, public)
+
+Single event by id without auth — backs the frontend's shareable `/e/:id` permalink pages. Response: `{ "event": <FilingEvent payload> }`, 404 if unknown.
