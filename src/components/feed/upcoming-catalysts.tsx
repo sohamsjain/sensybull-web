@@ -57,6 +57,12 @@ export function UpcomingCatalysts() {
         <h2 className="text-[11px] font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
           Upcoming Catalysts
         </h2>
+        <a
+          href="/calendar"
+          className="ml-auto text-[11px] text-indigo-600 dark:text-indigo-400 hover:underline underline-offset-2"
+        >
+          View all →
+        </a>
       </div>
 
       {loading ? (

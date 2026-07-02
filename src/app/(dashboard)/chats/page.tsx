@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
 import { useChats } from "@/hooks/use-chats";
 import { useCompanyEvents } from "@/hooks/use-company-events";
@@ -20,11 +21,12 @@ function Key({ children }: { children: React.ReactNode }) {
 export default function ChatsPage() {
   const { user, loading: authLoading } = useAuth();
   const [activeCompanyId, setActiveCompanyId] = useState<string | null>(null);
-  // Deep link: /chats?c=<companyId> opens that conversation once chats load
-  const initialCompanyRef = useRef<string | null>(
-    typeof window === "undefined"
-      ? null
-      : new URLSearchParams(window.location.search).get("c")
+  // Deep link: /chats?c=<companyId> opens that conversation once chats load.
+  // Tracked via searchParams so in-app navigations (command palette, company
+  // sheet) work even when the page is already mounted.
+  const deepLinkId = useSearchParams().get("c");
+  const [consumedDeepLink, setConsumedDeepLink] = useState<string | null>(
+    null
   );
 
   const {
@@ -52,20 +54,24 @@ export default function ChatsPage() {
     };
   }, [totalUnread]);
 
-  const handleSelect = useCallback(
-    (companyId: string) => {
-      setActiveCompanyId(companyId);
-      markRead(companyId);
-    },
-    [markRead]
-  );
+  const handleSelect = useCallback((companyId: string) => {
+    setActiveCompanyId(companyId);
+  }, []);
 
+  // Consume the deep link during render once the chat list is available
+  if (
+    deepLinkId &&
+    deepLinkId !== consumedDeepLink &&
+    chats.some((c) => c.company.id === deepLinkId)
+  ) {
+    setConsumedDeepLink(deepLinkId);
+    setActiveCompanyId(deepLinkId);
+  }
+
+  // Opening a conversation marks it read, however it was opened
   useEffect(() => {
-    const id = initialCompanyRef.current;
-    if (!id || chats.length === 0) return;
-    initialCompanyRef.current = null;
-    if (chats.some((c) => c.company.id === id)) handleSelect(id);
-  }, [chats, handleSelect]);
+    if (activeCompanyId) markRead(activeCompanyId);
+  }, [activeCompanyId, markRead]);
 
   const handleRemove = useCallback(async () => {
     if (!activeCompanyId) return;

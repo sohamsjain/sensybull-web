@@ -34,6 +34,19 @@ function FeedIcon() {
   );
 }
 
+function CalendarIcon() {
+  return (
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={1.8}
+        d="M6.75 3v2.25M17.25 3v2.25M3.75 18.75V7.5a2.25 2.25 0 012.25-2.25h12a2.25 2.25 0 012.25 2.25v11.25m-16.5 0a2.25 2.25 0 002.25 2.25h12a2.25 2.25 0 002.25-2.25m-16.5 0v-7.5a2.25 2.25 0 012.25-2.25h12a2.25 2.25 0 012.25 2.25v7.5"
+      />
+    </svg>
+  );
+}
+
 function BellIcon() {
   return (
     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -104,6 +117,13 @@ export function NavRail() {
         active={pathname?.startsWith("/feed") ?? false}
       >
         <FeedIcon />
+      </RailLink>
+      <RailLink
+        href="/calendar"
+        label="Catalyst calendar"
+        active={pathname?.startsWith("/calendar") ?? false}
+      >
+        <CalendarIcon />
       </RailLink>
 
       <div className="mt-auto flex flex-col items-center gap-1.5">

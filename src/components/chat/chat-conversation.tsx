@@ -4,6 +4,7 @@ import { useState, useRef, useLayoutEffect, useMemo } from "react";
 import type { Chat } from "@/types/api";
 import type { FilingEvent } from "@/types/events";
 import { dayLabel, formatCatalystDate } from "@/lib/utils";
+import { useDashboard } from "@/app/(dashboard)/layout";
 import { usePinnedChats } from "@/hooks/use-pinned-chats";
 import { ChatAvatar } from "./chat-avatar";
 import { ChatMessage } from "./chat-message";
@@ -73,6 +74,7 @@ export function ChatConversation({
   onRemove,
 }: ChatConversationProps) {
   const { company, muted } = chat;
+  const { openCompany } = useDashboard();
   const { pinned, togglePin } = usePinnedChats();
   const isPinned = pinned.has(company.id);
   const [confirmRemove, setConfirmRemove] = useState(false);
@@ -155,9 +157,22 @@ export function ChatConversation({
           size="sm"
         />
         <div className="min-w-0 flex-1">
-          <p className="text-slate-900 dark:text-white/90 text-sm font-medium truncate leading-tight">
-            {company.name}
-          </p>
+          <button
+            onClick={() =>
+              openCompany({
+                id: company.id,
+                name: company.name,
+                ticker: company.ticker,
+                cik: company.cik,
+              })
+            }
+            className="block max-w-full text-left"
+            title={`View ${company.name}`}
+          >
+            <p className="text-slate-900 dark:text-white/90 text-sm font-medium truncate leading-tight hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+              {company.name}
+            </p>
+          </button>
           <p className="text-slate-400 dark:text-slate-500 text-xs truncate">
             {company.ticker && (
               <span className="font-mono">{company.ticker}</span>

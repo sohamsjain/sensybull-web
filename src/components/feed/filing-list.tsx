@@ -121,6 +121,10 @@ export function FilingList({
         toggleExpanded(current.id);
       } else if (e.key === "e" && current.edgar_url) {
         window.open(current.edgar_url, "_blank", "noopener,noreferrer");
+      } else if (e.key === "c") {
+        navigator.clipboard
+          .writeText(`${window.location.origin}/e/${current.id}`)
+          .catch(() => {});
       } else if (
         e.key === "w" &&
         current.company_id &&
@@ -330,6 +334,7 @@ export function FilingList({
               <kbd className="font-mono">j</kbd>/<kbd className="font-mono">k</kbd> navigate
               &nbsp;·&nbsp; <kbd className="font-mono">o</kbd> expand
               &nbsp;·&nbsp; <kbd className="font-mono">e</kbd> EDGAR
+              &nbsp;·&nbsp; <kbd className="font-mono">c</kbd> copy link
               {isLoggedIn && <>&nbsp;·&nbsp; <kbd className="font-mono">w</kbd> watch</>}
               &nbsp;·&nbsp; <kbd className="font-mono">/</kbd> search
             </p>

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { FilingEvent } from "@/types/events";
 import type { Significance, Sentiment } from "@/config/constants";
+import { useDashboard } from "@/app/(dashboard)/layout";
 import { timeAgo, fullDateTime, marketSession } from "@/lib/utils";
 import { SignificanceBadge } from "./significance-badge";
 import { SentimentDot } from "./sentiment-dot";
@@ -11,6 +12,7 @@ import { CatalystsTable } from "./catalysts-table";
 import { EventTypeTag } from "./event-type-tag";
 import { CompanyLogo } from "./company-logo";
 import { InvestorTakeaway } from "./investor-takeaway";
+import { SignificanceExplainer } from "./significance-explainer";
 
 interface FilingCardProps {
   event: FilingEvent;
@@ -65,10 +67,22 @@ export function FilingCard({
   const isLow = significance === "Low";
   const compact = density === "compact";
 
+  const { openCompany } = useDashboard();
   const [internalExpanded, setInternalExpanded] = useState(false);
+  const [copied, setCopied] = useState(false);
   const expanded = expandedProp ?? internalExpanded;
   const toggleExpanded =
     onToggleExpanded ?? (() => setInternalExpanded((e) => !e));
+
+  const copyPermalink = () => {
+    navigator.clipboard
+      .writeText(`${window.location.origin}/e/${event.id}`)
+      .then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1500);
+      })
+      .catch(() => {});
+  };
 
   const catalysts =
     eventCatalysts?.length > 0
@@ -100,7 +114,7 @@ export function FilingCard({
   const showTakeaway = !!briefing?.investor_takeaway && showDetails;
   const showSummary =
     !!briefing?.summary && (expanded || (!compact && !isLow));
-  const showActions = (hasExhibits || !!edgar_url) && showDetails;
+  const showActions = showDetails;
 
   const eventTimestamp = received_at || filing_date;
   const session = marketSession(eventTimestamp);
@@ -130,14 +144,41 @@ export function FilingCard({
             {/* Top line: ticker, company, time */}
             <div className="flex items-center justify-between gap-2 mb-1">
               <div className="flex items-center gap-2 min-w-0">
-                {ticker && (
-                  <span className="font-mono font-bold text-[15px] text-slate-900 dark:text-white tracking-tight">
-                    {ticker}
-                  </span>
+                {company_id ? (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openCompany({
+                        id: company_id,
+                        name: company_name,
+                        ticker,
+                        cik: event.cik || null,
+                      });
+                    }}
+                    className="flex items-center gap-2 min-w-0 group/company"
+                    title={`View ${company_name}`}
+                  >
+                    {ticker && (
+                      <span className="font-mono font-bold text-[15px] text-slate-900 dark:text-white tracking-tight group-hover/company:text-indigo-600 dark:group-hover/company:text-indigo-400 transition-colors">
+                        {ticker}
+                      </span>
+                    )}
+                    <span className="text-slate-400 dark:text-slate-500 text-sm truncate group-hover/company:text-slate-600 dark:group-hover/company:text-slate-300 transition-colors">
+                      {company_name}
+                    </span>
+                  </button>
+                ) : (
+                  <>
+                    {ticker && (
+                      <span className="font-mono font-bold text-[15px] text-slate-900 dark:text-white tracking-tight">
+                        {ticker}
+                      </span>
+                    )}
+                    <span className="text-slate-400 dark:text-slate-500 text-sm truncate">
+                      {company_name}
+                    </span>
+                  </>
                 )}
-                <span className="text-slate-400 dark:text-slate-500 text-sm truncate">
-                  {company_name}
-                </span>
               </div>
 
               <div className="flex items-center gap-2 shrink-0">
@@ -236,6 +277,11 @@ export function FilingCard({
             {showDetails && catalysts.length > 0 && (
               <CatalystsTable catalysts={catalysts} />
             )}
+
+            {/* Scoring transparency */}
+            {expanded && (
+              <SignificanceExplainer level={significance} items={items} />
+            )}
           </div>
         )}
 
@@ -306,6 +352,23 @@ export function FilingCard({
                 </svg>
               </a>
             )}
+
+            <button
+              onClick={copyPermalink}
+              className="
+                inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium
+                text-slate-500 dark:text-slate-400
+                hover:bg-slate-100 dark:hover:bg-white/[0.06]
+                ring-1 ring-slate-200 dark:ring-white/[0.06]
+                transition-all
+              "
+              title="Copy a shareable link to this event"
+            >
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="shrink-0 opacity-60">
+                <path d="M5 7a2.5 2.5 0 0 0 3.54 0l1.72-1.72a2.5 2.5 0 1 0-3.54-3.54l-.86.86M7 5a2.5 2.5 0 0 0-3.54 0L1.74 6.72a2.5 2.5 0 1 0 3.54 3.54l.86-.86" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" />
+              </svg>
+              {copied ? "Copied!" : "Copy link"}
+            </button>
           </div>
         )}
 
