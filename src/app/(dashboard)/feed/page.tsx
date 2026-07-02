@@ -6,6 +6,7 @@ import { useEvents } from "@/hooks/use-events";
 import { useWatchlists } from "@/hooks/use-watchlists";
 import { useAuth } from "@/hooks/use-auth";
 import { FilingList } from "@/components/feed/filing-list";
+import { FeedToolbar } from "@/components/feed/feed-toolbar";
 
 export default function FeedPage() {
   const { user } = useAuth();
@@ -51,17 +52,22 @@ export default function FeedPage() {
   );
 
   return (
-    <FilingList
-      events={events}
-      allCount={allEvents.length}
-      loading={loading}
-      hasMore={hasMore}
-      connected={connected}
-      onLoadMore={loadMore}
-      watchlistedCompanyIds={watchlistedCompanyIds}
-      onAddToWatchlist={handleAddToWatchlist}
-      addingCompanyId={addingCompanyId}
-      isLoggedIn={!!user}
-    />
+    <div className="h-full flex flex-col min-w-0">
+      <FeedToolbar />
+      <div className="flex-1 overflow-hidden">
+        <FilingList
+          events={events}
+          allCount={allEvents.length}
+          loading={loading}
+          hasMore={hasMore}
+          connected={connected}
+          onLoadMore={loadMore}
+          watchlistedCompanyIds={watchlistedCompanyIds}
+          onAddToWatchlist={handleAddToWatchlist}
+          addingCompanyId={addingCompanyId}
+          isLoggedIn={!!user}
+        />
+      </div>
+    </div>
   );
 }
