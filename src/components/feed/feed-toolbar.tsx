@@ -8,7 +8,11 @@ import { api } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { SIGNIFICANCE_LEVELS, SIGNIFICANCE_CONFIG } from "@/config/constants";
+import {
+  SIGNIFICANCE_LEVELS,
+  SIGNIFICANCE_CONFIG,
+  MARKET_CAP_BUCKETS,
+} from "@/config/constants";
 import { useDensity } from "@/hooks/use-density";
 import type { EventTypesResponse } from "@/types/api";
 
@@ -21,6 +25,9 @@ export function FeedToolbar() {
     eventTypeFilter,
     toggleEventType,
     clearEventTypes,
+    marketCapFilter,
+    toggleMarketCap,
+    clearMarketCaps,
     search,
     setSearch,
     openMobileNav,
@@ -29,6 +36,8 @@ export function FeedToolbar() {
   const [eventTypes, setEventTypes] = useState<string[]>([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [capDropdownOpen, setCapDropdownOpen] = useState(false);
+  const capDropdownRef = useRef<HTMLDivElement>(null);
   const [density, setDensity] = useDensity();
 
   useEffect(() => {
@@ -46,12 +55,20 @@ export function FeedToolbar() {
       ) {
         setDropdownOpen(false);
       }
+      if (
+        capDropdownOpen &&
+        capDropdownRef.current &&
+        !capDropdownRef.current.contains(e.target as Node)
+      ) {
+        setCapDropdownOpen(false);
+      }
     };
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
-  }, [dropdownOpen]);
+  }, [dropdownOpen, capDropdownOpen]);
 
   const activeCount = eventTypeFilter.size;
+  const activeCapCount = marketCapFilter.size;
 
   return (
     <div className="h-12 border-b border-slate-200 dark:border-white/[0.06] flex items-center px-4 gap-3 shrink-0 bg-white dark:bg-[#0b0d12]">
@@ -128,6 +145,61 @@ export function FeedToolbar() {
                     className="rounded border-slate-300 dark:border-white/[0.1] bg-white dark:bg-[#0b0d12] text-indigo-500 focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5"
                   />
                   <span className="text-xs text-slate-600 dark:text-slate-300">{type}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Market cap filter dropdown */}
+      <div className="relative hidden sm:block" ref={capDropdownRef}>
+        <button
+          onClick={() => setCapDropdownOpen((prev) => !prev)}
+          className={`flex px-3 py-1.5 rounded text-xs font-medium transition-colors items-center gap-1.5 ${
+            activeCapCount > 0
+              ? "bg-indigo-500/15 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-400 border border-indigo-500/30"
+              : "bg-slate-100 dark:bg-[#14161c] text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-white/[0.06] hover:border-slate-400 dark:hover:border-white/[0.12]"
+          }`}
+        >
+          Market Cap
+          {activeCapCount > 0 && (
+            <span className="bg-indigo-500 text-white rounded-full min-w-[18px] h-[18px] flex items-center justify-center text-[10px] leading-none px-1">
+              {activeCapCount}
+            </span>
+          )}
+        </button>
+
+        {capDropdownOpen && (
+          <div className="absolute top-full left-0 mt-1 w-56 bg-slate-100 dark:bg-[#14161c] border border-slate-200 dark:border-white/[0.06] rounded-lg shadow-xl z-50 overflow-hidden">
+            {activeCapCount > 0 && (
+              <div className="px-3 py-2 border-b border-slate-200 dark:border-white/[0.06]">
+                <button
+                  onClick={clearMarketCaps}
+                  className="text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                >
+                  Clear all ({activeCapCount})
+                </button>
+              </div>
+            )}
+            <div className="py-1">
+              {MARKET_CAP_BUCKETS.map((bucket) => (
+                <label
+                  key={bucket.key}
+                  className="flex items-center gap-2 px-3 py-1.5 hover:bg-slate-200/50 dark:hover:bg-white/[0.05] cursor-pointer"
+                >
+                  <input
+                    type="checkbox"
+                    checked={marketCapFilter.has(bucket.key)}
+                    onChange={() => toggleMarketCap(bucket.key)}
+                    className="rounded border-slate-300 dark:border-white/[0.1] bg-white dark:bg-[#0b0d12] text-indigo-500 focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5"
+                  />
+                  <span className="text-xs text-slate-600 dark:text-slate-300">
+                    {bucket.label}
+                  </span>
+                  <span className="text-[10px] text-slate-400 dark:text-slate-500 ml-auto tabular-nums">
+                    {bucket.hint}
+                  </span>
                 </label>
               ))}
             </div>

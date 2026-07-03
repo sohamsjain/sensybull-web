@@ -135,3 +135,11 @@ export function formatCatalystDate(dateStr: string | null): string {
     return dateStr;
   }
 }
+
+export function formatMarketCap(cap: number | null | undefined): string | null {
+  if (cap == null || cap <= 0) return null;
+  if (cap >= 1e12) return `$${(cap / 1e12).toFixed(2)}T`;
+  if (cap >= 1e9) return `$${(cap / 1e9).toFixed(1)}B`;
+  if (cap >= 1e6) return `$${(cap / 1e6).toFixed(0)}M`;
+  return `$${cap.toLocaleString()}`;
+}

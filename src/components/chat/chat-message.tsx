@@ -11,6 +11,8 @@ import { CatalystsTable } from "@/components/feed/catalysts-table";
 import { EventTypeTag } from "@/components/feed/event-type-tag";
 import { InvestorTakeaway } from "@/components/feed/investor-takeaway";
 import { SignificanceExplainer } from "@/components/feed/significance-explainer";
+import { PriceReactionStrip } from "@/components/feed/price-reaction-strip";
+import { ExplosiveBadge } from "@/components/feed/explosive-badge";
 
 /**
  * One filing event rendered as an incoming chat message.
@@ -60,6 +62,7 @@ export function ChatMessage({ event }: { event: FilingEvent }) {
         {/* Meta row: materiality + category */}
         <div className="flex items-center gap-1.5 mb-1.5">
           <SignificanceBadge level={significance} />
+          {event.explosive && <ExplosiveBadge />}
           {briefing?.primary_event_type &&
             briefing.primary_event_type !== "Other" && (
               <EventTypeTag type={briefing.primary_event_type} primary />
@@ -79,6 +82,14 @@ export function ChatMessage({ event }: { event: FilingEvent }) {
           <p className="text-slate-600 dark:text-slate-300 text-sm">
             {event.company_name} filed an {event.signal_type}.
           </p>
+        )}
+
+        {/* Price reaction since filing */}
+        {event.price_reactions && (
+          <PriceReactionStrip
+            reactions={event.price_reactions}
+            className="mt-1.5"
+          />
         )}
 
         {/* Details, on demand */}

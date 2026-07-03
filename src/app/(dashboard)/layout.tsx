@@ -23,11 +23,14 @@ export type { CompanyRef };
 interface DashboardContextValue {
   significanceFilter: Set<string>;
   eventTypeFilter: Set<string>;
+  marketCapFilter: Set<string>;
   search: string;
   selectedWatchlist: Watchlist | null;
   toggleSignificance: (level: string) => void;
   toggleEventType: (type: string) => void;
   clearEventTypes: () => void;
+  toggleMarketCap: (bucket: string) => void;
+  clearMarketCaps: () => void;
   setSearch: (value: string) => void;
   openMobileNav: () => void;
   openCompany: (company: CompanyRef) => void;
@@ -36,11 +39,14 @@ interface DashboardContextValue {
 const DashboardContext = createContext<DashboardContextValue>({
   significanceFilter: new Set(["High", "Medium", "Low"]),
   eventTypeFilter: new Set(),
+  marketCapFilter: new Set(),
   search: "",
   selectedWatchlist: null,
   toggleSignificance: () => {},
   toggleEventType: () => {},
   clearEventTypes: () => {},
+  toggleMarketCap: () => {},
+  clearMarketCaps: () => {},
   setSearch: () => {},
   openMobileNav: () => {},
   openCompany: () => {},
@@ -74,6 +80,10 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
       ? new Set(types.split(",").filter(Boolean))
       : new Set<string>();
   });
+  const [marketCapFilter, setMarketCapFilter] = useState<Set<string>>(() => {
+    const mcap = searchParams.get("mcap");
+    return mcap ? new Set(mcap.split(",").filter(Boolean)) : new Set<string>();
+  });
   const [search, setSearch] = useState(() => searchParams.get("q") ?? "");
   const [selectedWatchlist, setSelectedWatchlist] = useState<Watchlist | null>(
     null
@@ -91,10 +101,13 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
     if (eventTypeFilter.size > 0) {
       params.set("types", [...eventTypeFilter].join(","));
     }
+    if (marketCapFilter.size > 0) {
+      params.set("mcap", [...marketCapFilter].join(","));
+    }
     if (search) params.set("q", search);
     const qs = params.toString();
     window.history.replaceState(null, "", qs ? `${pathname}?${qs}` : pathname);
-  }, [significanceFilter, eventTypeFilter, search, pathname]);
+  }, [significanceFilter, eventTypeFilter, marketCapFilter, search, pathname]);
 
   const toggleSignificance = useCallback((level: string) => {
     setSignificanceFilter((prev) => {
@@ -118,6 +131,19 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
     setEventTypeFilter(new Set());
   }, []);
 
+  const toggleMarketCap = useCallback((bucket: string) => {
+    setMarketCapFilter((prev) => {
+      const next = new Set(prev);
+      if (next.has(bucket)) next.delete(bucket);
+      else next.add(bucket);
+      return next;
+    });
+  }, []);
+
+  const clearMarketCaps = useCallback(() => {
+    setMarketCapFilter(new Set());
+  }, []);
+
   const openMobileNav = useCallback(() => setMobileNavOpen(true), []);
   const openCompany = useCallback(
     (company: CompanyRef) => setCompanySheet(company),
@@ -129,11 +155,14 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
       value={{
         significanceFilter,
         eventTypeFilter,
+        marketCapFilter,
         search,
         selectedWatchlist,
         toggleSignificance,
         toggleEventType,
         clearEventTypes,
+        toggleMarketCap,
+        clearMarketCaps,
         setSearch,
         openMobileNav,
         openCompany,

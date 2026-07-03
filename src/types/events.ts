@@ -28,6 +28,21 @@ export interface Exhibit {
   url: string;
 }
 
+/** One measured price move after a filing (backend PriceReaction row). */
+export interface PriceReactionPoint {
+  /** % change vs the pre-filing baseline price */
+  pct: number | null;
+  price: number | null;
+  /** When the measurement actually printed — may lag the nominal interval
+   *  for after-hours filings (resolves to the next available trade) */
+  measured_at: string | null;
+  /** |move| >= 2× ATR(14) */
+  explosive: boolean;
+}
+
+/** Interval keys: "5m" | "15m" | "30m" | "1h" | "1d" | "1w" */
+export type PriceReactions = Record<string, PriceReactionPoint>;
+
 export interface FilingEvent {
   id: string;
   edgar_id: string;
@@ -46,4 +61,7 @@ export interface FilingEvent {
   event_types: string[];
   catalysts: Catalyst[];
   received_at: string;
+  market_cap?: number | null;
+  price_reactions?: PriceReactions;
+  explosive?: boolean;
 }

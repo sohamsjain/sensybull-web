@@ -3,14 +3,15 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import Link from "next/link";
 import type { FilingEvent } from "@/types/events";
-import type { PaginatedEvents } from "@/types/api";
+import type { Company, PaginatedEvents } from "@/types/api";
 import type { Significance } from "@/config/constants";
 import { api } from "@/lib/api-client";
 import { useAuth } from "@/hooks/use-auth";
 import { useWatchlists } from "@/hooks/use-watchlists";
-import { timeAgo, formatCatalystDate } from "@/lib/utils";
+import { timeAgo, formatCatalystDate, formatMarketCap } from "@/lib/utils";
 import { ChatAvatar } from "@/components/chat/chat-avatar";
 import { SignificanceBadge } from "@/components/feed/significance-badge";
+import { PriceChart } from "@/components/company/price-chart";
 import {
   Sheet,
   SheetContent,
@@ -41,6 +42,7 @@ export function CompanySheet({
     "loading" | "ready" | "gated"
   >("loading");
   const [adding, setAdding] = useState(false);
+  const [detail, setDetail] = useState<Company | null>(null);
 
   const isWatchlisted = useMemo(
     () =>
@@ -57,6 +59,7 @@ export function CompanySheet({
     setLoadedFor(company.id);
     setEvents([]);
     setHistoryState("loading");
+    setDetail(null);
   }
 
   useEffect(() => {
@@ -76,6 +79,20 @@ export function CompanySheet({
       cancelled = true;
     };
   }, [company, isWatchlisted]);
+
+  // Market cap / last price live on the company record (daily sync)
+  useEffect(() => {
+    if (!company || !user) return;
+    let cancelled = false;
+    api<{ company: Company }>(`/companies/${company.id}`)
+      .then((data) => {
+        if (!cancelled) setDetail(data.company);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [company, user]);
 
   const handleWatch = useCallback(async () => {
     if (!company) return;
@@ -134,6 +151,12 @@ export function CompanySheet({
                         {company.ticker && " · "}CIK {company.cik}
                       </span>
                     )}
+                    {formatMarketCap(detail?.market_cap) && (
+                      <span title="Market cap (EDGAR shares × last price)">
+                        {" · "}
+                        {formatMarketCap(detail?.market_cap)}
+                      </span>
+                    )}
                     {edgarUrl && (
                       <>
                         {" · "}
@@ -181,6 +204,17 @@ export function CompanySheet({
             </SheetHeader>
 
             <div className="px-5 py-4 space-y-5">
+              {/* Price chart with filing markers */}
+              {user && company.ticker && (
+                <section>
+                  <h3 className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-2">
+                    <span className="w-1 h-3.5 rounded-full bg-emerald-400/60" />
+                    Price
+                  </h3>
+                  <PriceChart companyId={company.id} events={events} />
+                </section>
+              )}
+
               {/* Upcoming catalysts */}
               {upcoming.length > 0 && (
                 <section>
