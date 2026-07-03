@@ -15,6 +15,7 @@ import { InvestorTakeaway } from "./investor-takeaway";
 import { SignificanceExplainer } from "./significance-explainer";
 import { PriceReactionStrip } from "./price-reaction-strip";
 import { ExplosiveBadge } from "./explosive-badge";
+import { formTag } from "@/lib/forms";
 
 interface FilingCardProps {
   event: FilingEvent;
@@ -231,6 +232,14 @@ export function FilingCard({
             <div className="flex items-center gap-2 flex-wrap">
               <SignificanceBadge level={significance} />
               {event.explosive && <ExplosiveBadge />}
+              {event.signal_type && event.signal_type !== "8-K" && (
+                <span
+                  className="px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide bg-slate-500/10 text-slate-500 dark:bg-slate-400/10 dark:text-slate-400"
+                  title={`SEC form ${event.signal_type}`}
+                >
+                  {formTag(event.signal_type)}
+                </span>
+              )}
               <SentimentDot sentiment={sentiment} label={expanded} />
               {briefing?.primary_event_type &&
                 briefing.primary_event_type !== "Other" && (

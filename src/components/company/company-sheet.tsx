@@ -122,7 +122,7 @@ export function CompanySheet({
   }, [events]);
 
   const edgarUrl = company?.cik
-    ? `https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=${company.cik}&type=8-K&dateb=&owner=include&count=40`
+    ? `https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=${company.cik}&type=&dateb=&owner=include&count=40`
     : null;
 
   return (

@@ -6,6 +6,7 @@ import type { Chat, ChatsResponse, ChatPreviewEvent, ReadStateResponse, Paginate
 import type { FilingEvent } from "@/types/events";
 import { api, getTokens } from "@/lib/api-client";
 import { connectSocket, disconnectSocket } from "@/lib/socket";
+import { formPhrase } from "@/lib/forms";
 import { useAuth } from "@/hooks/use-auth";
 
 /** Inbox order: unread chats first, then most recent activity. */
@@ -23,7 +24,7 @@ function toPreview(event: FilingEvent): ChatPreviewEvent {
     id: event.id,
     headline:
       event.briefing?.headline ||
-      `${event.company_name} filed an ${event.signal_type}`,
+      `${event.company_name} filed ${formPhrase(event.signal_type)}`,
     significance: event.briefing?.significance || null,
     sentiment: event.briefing?.sentiment || null,
     primary_event_type: event.briefing?.primary_event_type || null,

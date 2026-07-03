@@ -45,3 +45,17 @@ Event-driven top gainers/losers: companies with a filing event in the last 7 day
 ### GET /companies/:id/bars (new, auth)
 
 OHLCV bars for the company's ticker, proxying Alpaca with a 5-minute cache. Params: `timeframe` (`1D` | `1H` | `15Min`, default `1D`), `lookback` (`1M` | `3M` | `6M` | `1Y`, default `3M`). Response: `{ ticker, timeframe, lookback, bars: [{ t, o, h, l, c, v }] }`. 422 `{ "error": "no_ticker" }` for companies without a ticker.
+
+## 2026-07-03 (later)
+
+### Multi-form ingest — new `signal_type` values
+
+Events are no longer 8-K-only. `signal_type` on event payloads (and the `signal_type` query param on `GET /events/*`) now also takes: `SC 13D`, `SC 13D/A`, `SC 13G`, `SC TO-T`, `SC TO-I`, `SC 14D9`, `SC 13E3`, `S-4`, `PREM14A`, `DEFM14A`, `PREC14A`, `DEFC14A`, `DFAN14A`, `25`, `25-NSE`, `15-12B`, `15-12G`, `15F-12B`, `NT 10-K`, `NT 10-Q`, `CB`, `4` (Form 4 insider buys). Non-8-K events have `items: []` and a form-level `max_tier`; they get price reactions and market-cap data like any other event. Use `formPhrase`/`formTag` from `src/lib/forms.ts` for display.
+
+### GET /events/types
+
+Two new labels in the canonical list: `"Insider Buying"`, `"Late Filing"`.
+
+### Event payload
+
+New optional field `filed_by` (string, ingest-side) — the filer's name when it differs from the subject company (13D reporting person, tender bidder, proxy dissident). Not yet persisted/exposed by the API model; reserved for future use.

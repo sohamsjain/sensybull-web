@@ -13,6 +13,7 @@ import { InvestorTakeaway } from "@/components/feed/investor-takeaway";
 import { SignificanceExplainer } from "@/components/feed/significance-explainer";
 import { PriceReactionStrip } from "@/components/feed/price-reaction-strip";
 import { ExplosiveBadge } from "@/components/feed/explosive-badge";
+import { formPhrase, formTag } from "@/lib/forms";
 
 /**
  * One filing event rendered as an incoming chat message.
@@ -69,7 +70,7 @@ export function ChatMessage({ event }: { event: FilingEvent }) {
             )}
           <SentimentDot sentiment={sentiment} label={expanded} />
           <span className="text-slate-400 dark:text-slate-500 text-[10.5px] ml-auto whitespace-nowrap uppercase tracking-wide">
-            {event.signal_type}
+            {formTag(event.signal_type)}
           </span>
         </div>
 
@@ -80,7 +81,7 @@ export function ChatMessage({ event }: { event: FilingEvent }) {
           </p>
         ) : (
           <p className="text-slate-600 dark:text-slate-300 text-sm">
-            {event.company_name} filed an {event.signal_type}.
+            {event.company_name} filed {formPhrase(event.signal_type)}.
           </p>
         )}
 

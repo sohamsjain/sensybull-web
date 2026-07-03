@@ -315,7 +315,7 @@ export function FilingList({
                 No filing events yet.
               </p>
               <p className="text-slate-400 dark:text-slate-600 text-xs mt-1">
-                New 8-K filings will appear here in real time.
+                New SEC filings will appear here in real time.
               </p>
             </div>
           )}

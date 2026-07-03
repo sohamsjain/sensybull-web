@@ -51,8 +51,9 @@ function HeroSection() {
         </h1>
 
         <p className="text-xl text-white/50 max-w-lg mx-auto leading-relaxed mb-10">
-          Every 8-K filing turned into a plain-English briefing, seconds after
-          it hits EDGAR. Free to use.
+          8-Ks, activist stakes, tender offers, insider buys — every material
+          filing turned into a plain-English briefing, seconds after it hits
+          EDGAR. Free to use.
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
