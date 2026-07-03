@@ -8,16 +8,23 @@ import { useAuth } from "@/hooks/use-auth";
 import { FilingList } from "@/components/feed/filing-list";
 import { FeedToolbar } from "@/components/feed/feed-toolbar";
 import { UpcomingCatalysts } from "@/components/feed/upcoming-catalysts";
+import { MarketMovers } from "@/components/feed/market-movers";
 
 export default function FeedPage() {
   const { user } = useAuth();
-  const { significanceFilter, eventTypeFilter, search, selectedWatchlist } =
-    useDashboard();
+  const {
+    significanceFilter,
+    eventTypeFilter,
+    marketCapFilter,
+    search,
+    selectedWatchlist,
+  } = useDashboard();
 
   const { events, allEvents, loading, hasMore, loadMore, connected } =
     useEvents({
       significanceFilter,
       eventTypeFilter,
+      marketCapFilter,
       search,
       selectedWatchlist,
     });
@@ -70,8 +77,14 @@ export default function FeedPage() {
             isLoggedIn={!!user}
           />
         </div>
-        <aside className="hidden xl:block w-80 shrink-0 border-l border-slate-200 dark:border-white/[0.06]">
-          <UpcomingCatalysts />
+        <aside className="hidden xl:flex xl:flex-col w-80 shrink-0 border-l border-slate-200 dark:border-white/[0.06]">
+          <div className="shrink-0">
+            <MarketMovers />
+          </div>
+          {/* Catalysts keep their own scroll area below the pinned movers */}
+          <div className="flex-1 min-h-0">
+            <UpcomingCatalysts />
+          </div>
         </aside>
       </div>
     </div>

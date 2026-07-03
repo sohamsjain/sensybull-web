@@ -13,6 +13,8 @@ import { EventTypeTag } from "./event-type-tag";
 import { CompanyLogo } from "./company-logo";
 import { InvestorTakeaway } from "./investor-takeaway";
 import { SignificanceExplainer } from "./significance-explainer";
+import { PriceReactionStrip } from "./price-reaction-strip";
+import { ExplosiveBadge } from "./explosive-badge";
 
 interface FilingCardProps {
   event: FilingEvent;
@@ -228,6 +230,7 @@ export function FilingCard({
             {/* Meta line: significance + sentiment + event type */}
             <div className="flex items-center gap-2 flex-wrap">
               <SignificanceBadge level={significance} />
+              {event.explosive && <ExplosiveBadge />}
               <SentimentDot sentiment={sentiment} label={expanded} />
               {briefing?.primary_event_type &&
                 briefing.primary_event_type !== "Other" && (
@@ -241,6 +244,14 @@ export function FilingCard({
                 </div>
               )}
             </div>
+
+            {/* Price reaction since filing (populates live as measured) */}
+            {event.price_reactions && (
+              <PriceReactionStrip
+                reactions={event.price_reactions}
+                className="mt-1.5"
+              />
+            )}
           </div>
         </div>
 

@@ -1,24 +1,34 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import type { FilingEvent } from "@/types/events";
+import type { FilingEvent, PriceReactions } from "@/types/events";
 import type { PaginatedEvents } from "@/types/api";
 import type { Watchlist } from "@/types/api";
 import { api } from "@/lib/api-client";
 import { connectSocket, disconnectSocket } from "@/lib/socket";
 import { getTokens } from "@/lib/api-client";
 import { useAuth } from "@/hooks/use-auth";
+import { marketCapBucket } from "@/config/constants";
 
 interface UseEventsOptions {
   significanceFilter: Set<string>;
   eventTypeFilter: Set<string>;
+  marketCapFilter?: Set<string>;
   search: string;
   selectedWatchlist: Watchlist | null;
+}
+
+interface PriceReactionUpdate {
+  filing_event_id: string;
+  ticker: string | null;
+  price_reactions: PriceReactions;
+  explosive: boolean;
 }
 
 export function useEvents({
   significanceFilter,
   eventTypeFilter,
+  marketCapFilter,
   search,
   selectedWatchlist,
 }: UseEventsOptions) {
@@ -80,6 +90,22 @@ export function useEvents({
       });
     });
 
+    // Reactions are measured minutes-to-days after the filing arrives;
+    // merge them into already-rendered events as they complete
+    socket.on("price_reaction", (update: PriceReactionUpdate) => {
+      setEvents((prev) =>
+        prev.map((e) =>
+          e.id === update.filing_event_id
+            ? {
+                ...e,
+                price_reactions: update.price_reactions,
+                explosive: update.explosive,
+              }
+            : e
+        )
+      );
+    });
+
     return () => disconnectSocket();
   }, [user]);
 
@@ -90,6 +116,11 @@ export function useEvents({
 
     if (eventTypeFilter.size > 0) {
       if (!e.event_types?.some((t) => eventTypeFilter.has(t))) return false;
+    }
+
+    if (marketCapFilter && marketCapFilter.size > 0) {
+      const bucket = marketCapBucket(e.market_cap);
+      if (!bucket || !marketCapFilter.has(bucket)) return false;
     }
 
     if (search) {

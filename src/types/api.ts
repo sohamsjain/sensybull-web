@@ -32,6 +32,48 @@ export interface Company {
   sic: string | null;
   state_of_incorporation: string | null;
   created_at: string;
+  market_cap?: number | null;
+  last_price?: number | null;
+  shares_outstanding?: number | null;
+}
+
+export interface MoverEvent {
+  id: string;
+  headline: string | null;
+  significance: "High" | "Medium" | "Low" | null;
+  primary_event_type: string | null;
+  filing_date: string | null;
+}
+
+export interface Mover {
+  ticker: string;
+  company_name: string | null;
+  company_id: string | null;
+  price: number;
+  change_pct: number;
+  event: MoverEvent | null;
+}
+
+export interface MoversResponse {
+  as_of: string;
+  gainers: Mover[];
+  losers: Mover[];
+}
+
+export interface Bar {
+  t: string;
+  o: number;
+  h: number;
+  l: number;
+  c: number;
+  v: number;
+}
+
+export interface BarsResponse {
+  ticker: string;
+  timeframe: string;
+  lookback: string;
+  bars: Bar[];
 }
 
 export interface Watchlist {
