@@ -66,3 +66,16 @@ const FORM_TAGS: Record<string, string> = {
 export function formTag(signalType: string): string {
   return FORM_TAGS[signalType] ?? signalType;
 }
+
+/**
+ * True when the form's display tag would just repeat the LLM event-type tag
+ * (e.g. Form 15 → "Going Dark" badge next to a "Going Dark" event type).
+ * Callers suppress the form badge or fall back to the raw form name.
+ */
+export function formTagDuplicatesEventType(
+  signalType: string,
+  primaryEventType: string | null | undefined
+): boolean {
+  if (!primaryEventType) return false;
+  return formTag(signalType).toLowerCase() === primaryEventType.toLowerCase();
+}

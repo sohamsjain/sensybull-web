@@ -13,7 +13,7 @@ import { InvestorTakeaway } from "@/components/feed/investor-takeaway";
 import { SignificanceExplainer } from "@/components/feed/significance-explainer";
 import { PriceReactionStrip } from "@/components/feed/price-reaction-strip";
 import { ExplosiveBadge } from "@/components/feed/explosive-badge";
-import { formPhrase, formTag } from "@/lib/forms";
+import { formPhrase, formTag, formTagDuplicatesEventType } from "@/lib/forms";
 
 /**
  * One filing event rendered as an incoming chat message.
@@ -70,7 +70,14 @@ export function ChatMessage({ event }: { event: FilingEvent }) {
             )}
           <SentimentDot sentiment={sentiment} label={expanded} />
           <span className="text-slate-400 dark:text-slate-500 text-[10.5px] ml-auto whitespace-nowrap uppercase tracking-wide">
-            {formTag(event.signal_type)}
+            {/* Corner slot is form identity: fall back to the raw form name
+                when the friendly tag would repeat the event-type badge */}
+            {formTagDuplicatesEventType(
+              event.signal_type,
+              briefing?.primary_event_type
+            )
+              ? event.signal_type
+              : formTag(event.signal_type)}
           </span>
         </div>
 
