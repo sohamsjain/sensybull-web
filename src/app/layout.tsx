@@ -7,11 +7,11 @@ const siteUrl = "https://www.sensybull.com";
 
 export const metadata: Metadata = {
   title: {
-    default: "Sensybull — SEC 8-K Filings, Decoded",
+    default: "Sensybull — SEC Filings, Decoded",
     template: "%s | Sensybull",
   },
   description:
-    "Every SEC 8-K filing decoded into a plain-English briefing, seconds after it hits EDGAR. Track your companies, get alerts, stay ahead. Free to use.",
+    "Every material SEC filing — 8-Ks, activist stakes, tenders, insider buys — decoded into a plain-English briefing, seconds after it hits EDGAR. Track your companies, get alerts, stay ahead. Free to use.",
   keywords: [
     "SEC filings",
     "8-K filings",
@@ -32,9 +32,9 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: siteUrl,
     siteName: "Sensybull",
-    title: "Sensybull — SEC 8-K Filings, Decoded",
+    title: "Sensybull — SEC Filings, Decoded",
     description:
-      "Every SEC 8-K filing decoded into a plain-English briefing, seconds after it hits EDGAR. Free to use.",
+      "Every material SEC filing decoded into a plain-English briefing, seconds after it hits EDGAR. Free to use.",
     images: [
       {
         url: "/logo.png",
@@ -46,9 +46,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary",
-    title: "Sensybull — SEC 8-K Filings, Decoded",
+    title: "Sensybull — SEC Filings, Decoded",
     description:
-      "Every SEC 8-K filing decoded into a plain-English briefing, seconds after it hits EDGAR. Free to use.",
+      "Every material SEC filing decoded into a plain-English briefing, seconds after it hits EDGAR. Free to use.",
     images: ["/logo.png"],
   },
   robots: {
@@ -85,7 +85,7 @@ export default function RootLayout({
               name: "Sensybull",
               url: siteUrl,
               description:
-                "Every SEC 8-K filing decoded into a plain-English briefing, seconds after it hits EDGAR.",
+                "Every material SEC filing decoded into a plain-English briefing, seconds after it hits EDGAR.",
               applicationCategory: "FinanceApplication",
               operatingSystem: "Web",
               offers: {
