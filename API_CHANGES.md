@@ -104,3 +104,20 @@ Now ordered by `created_at` (when the event was received) instead of `filing_dat
 ### Briefing headlines
 
 The ingest prompt no longer asks for semicolon-separated facts; new headlines are single plain-English sentences. Stored headlines are unchanged and age out naturally.
+
+### Positions — holdings + investment thesis (new)
+
+New `Position` resource: a user's stake in a company plus the *thesis* for
+holding it. This is the primitive that lets the platform reason for an
+investor (thesis-break detection, personalized materiality) rather than only
+inform. One position per (user, company).
+
+- `GET  /positions/` — list the user's positions; optional `?thesis_status=intact|watch|broken` filter. Returns `{ positions: [...] }`, each with a nested `company` and thesis fields.
+- `POST /positions/` — open a position. Body: `company_id` (required), plus optional `direction` (`long`|`short`, default `long`), `shares`, `cost_basis`, `thesis`, `opened_at`, `notes`. Idempotent per company: re-posting the same `company_id` updates the existing position (200) instead of creating a duplicate (201).
+- `GET  /positions/:id` — single position (owner only).
+- `PUT  /positions/:id` — update `direction`/`shares`/`cost_basis`/`thesis`/`thesis_status`/`opened_at`/`notes`. Setting `thesis_status` stamps `thesis_reviewed_at`.
+- `DELETE /positions/:id` — close (delete) a position.
+
+Position fields: `id`, `company_id`, `direction`, `shares` (string decimal), `cost_basis` (string decimal), `thesis`, `thesis_status` (`intact`|`watch`|`broken`, server-managed), `thesis_reviewed_at`, `opened_at`, `notes`, `created_at`, `updated_at`, nested `company`.
+
+`thesis_status` is the anchor for the forthcoming thesis-break engine: incoming filings for a held company will be evaluated against the thesis and can flip the status to `watch`/`broken`, firing a distinct alert.
