@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
 import { useWatchlistInbox } from "@/hooks/use-watchlist-inbox";
 import { useCompanyEvents } from "@/hooks/use-company-events";
+import { usePaneWidth } from "@/hooks/use-pane-width";
 import { WatchlistPanel } from "@/components/watchlist/watchlist-panel";
 import { Conversation } from "@/components/watchlist/conversation";
 import { Button } from "@/components/ui/button";
@@ -44,6 +45,7 @@ export default function WatchlistPage() {
   const activeEntry = entries.find((c) => c.company.id === activeCompanyId) || null;
   const { events, loading: eventsLoading, hasMore, loadEarlier } =
     useCompanyEvents(activeCompanyId, socket);
+  const pane = usePaneWidth();
 
   // Unread count in the tab title
   useEffect(() => {
@@ -140,11 +142,12 @@ export default function WatchlistPage() {
 
   return (
     <div className="h-full flex min-w-0">
-      {/* Watchlist pane: full width on mobile, fixed column on desktop */}
+      {/* Watchlist pane: full width on mobile, resizable column on desktop */}
       <div
         className={`${
           activeCompanyId ? "hidden md:flex" : "flex"
-        } w-full md:w-80 lg:w-96 md:border-r md:border-slate-200 dark:md:border-white/[0.06] bg-white dark:bg-transparent flex-col shrink-0`}
+        } ${pane.collapsed ? "md:!hidden" : ""} w-full md:w-[var(--pane-w)] bg-white dark:bg-transparent flex-col shrink-0`}
+        style={{ "--pane-w": `${pane.width}px` } as React.CSSProperties}
       >
         <WatchlistPanel
           entries={entries}
@@ -153,8 +156,36 @@ export default function WatchlistPage() {
           activeCompanyId={activeCompanyId}
           onSelect={handleSelect}
           onAddCompany={addCompany}
+          onCollapse={pane.collapse}
         />
       </div>
+
+      {/* Drag handle: resize, double-click to reset, drag closed to collapse */}
+      {!pane.collapsed && (
+        <div
+          role="separator"
+          aria-orientation="vertical"
+          title="Drag to resize · double-click to reset"
+          className="hidden md:flex w-1.5 shrink-0 cursor-col-resize items-stretch justify-center group touch-none"
+          {...pane.handleProps}
+        >
+          <div className="w-px bg-slate-200 dark:bg-white/[0.06] group-hover:bg-slate-400 dark:group-hover:bg-white/[0.2] transition-colors" />
+        </div>
+      )}
+
+      {/* Reopen chevron when the pane is hidden */}
+      {pane.collapsed && (
+        <button
+          onClick={pane.expand}
+          className="hidden md:flex items-center justify-center w-6 shrink-0 border-r border-slate-200 dark:border-white/[0.06] text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/[0.04] transition-colors"
+          title="Show the watchlist"
+          aria-label="Show the watchlist"
+        >
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M4.5 2.5 8 6l-3.5 3.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+      )}
 
       {/* Company history pane */}
       <div
