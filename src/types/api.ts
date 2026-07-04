@@ -183,7 +183,7 @@ export interface TelegramLinkResponse {
   bot_username: string;
 }
 
-export interface ChatCompany {
+export interface WatchlistCompany {
   id: string;
   ticker: string | null;
   name: string;
@@ -191,7 +191,7 @@ export interface ChatCompany {
   logo_url?: string | null;
 }
 
-export interface ChatPreviewEvent {
+export interface EventPreview {
   id: string;
   headline: string;
   significance: "High" | "Medium" | "Low" | null;
@@ -203,21 +203,21 @@ export interface ChatPreviewEvent {
   received_at: string | null;
 }
 
-export interface Chat {
-  company: ChatCompany;
-  last_event: ChatPreviewEvent | null;
+export interface WatchlistEntry {
+  company: WatchlistCompany;
+  last_event: EventPreview | null;
   last_activity_at: string | null;
   unread_count: number;
   muted: boolean;
   last_read_at: string | null;
 }
 
-export interface ChatsResponse {
-  chats: Chat[];
+export interface WatchlistInboxResponse {
+  items: WatchlistEntry[];
   total_unread: number;
 }
 
-export interface ChatReadState {
+export interface CompanyReadState {
   company_id: string;
   last_read_at: string | null;
   muted: boolean;
@@ -225,7 +225,7 @@ export interface ChatReadState {
 
 export interface ReadStateResponse {
   message: string;
-  read_state: ChatReadState;
+  read_state: CompanyReadState;
 }
 
 export interface ApiError {

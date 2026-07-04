@@ -5,26 +5,12 @@ import { useTheme } from "next-themes";
 
 const LOGO_DEV_TOKEN = process.env.NEXT_PUBLIC_LOGO_DEV_TOKEN;
 
-const AVATAR_COLORS = [
-  "bg-fuchsia-500/15 text-fuchsia-700 dark:bg-fuchsia-500/30 dark:text-fuchsia-300",
-  "bg-emerald-500/15 text-emerald-700 dark:bg-emerald-500/30 dark:text-emerald-300",
-  "bg-indigo-500/15 text-indigo-700 dark:bg-indigo-500/30 dark:text-indigo-300",
-  "bg-amber-500/15 text-amber-700 dark:bg-amber-500/30 dark:text-amber-300",
-  "bg-rose-500/15 text-rose-700 dark:bg-rose-500/30 dark:text-rose-300",
-  "bg-cyan-500/15 text-cyan-700 dark:bg-cyan-500/30 dark:text-cyan-300",
-  "bg-indigo-500/15 text-indigo-700 dark:bg-indigo-500/30 dark:text-indigo-300",
-  "bg-teal-500/15 text-teal-700 dark:bg-teal-500/30 dark:text-teal-300",
-];
+// One quiet style for every fallback avatar — company logos carry the
+// visual identity; initials just need to be readable.
+const AVATAR_STYLE =
+  "bg-slate-200/70 text-slate-600 dark:bg-white/[0.08] dark:text-slate-300";
 
-function colorFor(key: string): string {
-  let hash = 0;
-  for (let i = 0; i < key.length; i++) {
-    hash = (hash * 31 + key.charCodeAt(i)) | 0;
-  }
-  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
-}
-
-export function ChatAvatar({
+export function CompanyAvatar({
   ticker,
   name,
   size = "md",
@@ -66,7 +52,7 @@ export function ChatAvatar({
 
   return (
     <div
-      className={`${sizeClass} ${radius} ${colorFor(label)} flex items-center justify-center font-mono font-semibold shrink-0 select-none`}
+      className={`${sizeClass} ${radius} ${AVATAR_STYLE} flex items-center justify-center font-mono font-semibold shrink-0 select-none`}
       aria-hidden="true"
     >
       {label.slice(0, 4)}

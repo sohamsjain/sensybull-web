@@ -62,7 +62,7 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams();
   // The chats page brings its own list pane; the watchlist sidebar and feed
   // filters only apply to the feed.
-  const isChats = pathname?.startsWith("/chats") ?? false;
+  const isWatchlist = pathname?.startsWith("/watchlist") ?? false;
 
   // Filters initialize from the URL so filtered views are shareable
   const [significanceFilter, setSignificanceFilter] = useState<Set<string>>(
@@ -173,7 +173,7 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
       <div className="h-dvh overflow-hidden flex bg-slate-50 dark:bg-[#0b0d12] text-slate-800 dark:text-slate-100">
         <NavRail />
         <div className="flex-1 flex min-w-0 overflow-hidden">
-          {user && !isChats && (
+          {user && !isWatchlist && (
             <div className="hidden md:block">
               <Sidebar
                 selectedWatchlist={selectedWatchlist}
@@ -194,7 +194,7 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
           onClose={() => setCompanySheet(null)}
         />
         <CommandPalette />
-        {user && !isChats && (
+        {user && !isWatchlist && (
           <MobileNav
             open={mobileNavOpen}
             onOpenChange={setMobileNavOpen}

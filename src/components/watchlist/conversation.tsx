@@ -1,13 +1,13 @@
 "use client";
 
 import { useState, useRef, useLayoutEffect, useMemo } from "react";
-import type { Chat } from "@/types/api";
+import type { WatchlistEntry } from "@/types/api";
 import type { FilingEvent } from "@/types/events";
 import { dayLabel, formatCatalystDate } from "@/lib/utils";
 import { useDashboard } from "@/app/(dashboard)/layout";
-import { usePinnedChats } from "@/hooks/use-pinned-chats";
-import { ChatAvatar } from "./chat-avatar";
-import { ChatMessage } from "./chat-message";
+import { usePinnedCompanies } from "@/hooks/use-pinned-companies";
+import { CompanyAvatar } from "./company-avatar";
+import { FilingMessage } from "./filing-message";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -15,8 +15,8 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 
-interface ChatConversationProps {
-  chat: Chat;
+interface ConversationProps {
+  entry: WatchlistEntry;
   events: FilingEvent[]; // newest first
   loading: boolean;
   hasMore: boolean;
@@ -63,8 +63,8 @@ function MoreIcon() {
   );
 }
 
-export function ChatConversation({
-  chat,
+export function Conversation({
+  entry,
   events,
   loading,
   hasMore,
@@ -72,10 +72,10 @@ export function ChatConversation({
   onBack,
   onToggleMute,
   onRemove,
-}: ChatConversationProps) {
-  const { company, muted } = chat;
+}: ConversationProps) {
+  const { company, muted } = entry;
   const { openCompany } = useDashboard();
-  const { pinned, togglePin } = usePinnedChats();
+  const { pinned, togglePin } = usePinnedCompanies();
   const isPinned = pinned.has(company.id);
   const [confirmRemove, setConfirmRemove] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -147,11 +147,11 @@ export function ChatConversation({
         <button
           onClick={onBack}
           className="md:hidden text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white shrink-0"
-          aria-label="Back to chats"
+          aria-label="Back to watchlist"
         >
           <BackIcon />
         </button>
-        <ChatAvatar
+        <CompanyAvatar
           ticker={company.ticker}
           name={company.name}
           size="sm"
@@ -218,13 +218,14 @@ export function ChatConversation({
           <DropdownMenu>
             <DropdownMenuTrigger
               className="p-1.5 rounded transition-colors text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-              aria-label="Conversation options"
+              aria-label="Company options"
+              title="Company options"
             >
               <MoreIcon />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="min-w-48">
               <DropdownMenuItem onClick={() => togglePin(company.id)}>
-                {isPinned ? "Unpin chat" : "Pin chat"}
+                {isPinned ? "Unpin company" : "Pin company"}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={onToggleMute}>
                 {muted ? "Unmute alerts" : "Mute alerts"}
@@ -308,7 +309,7 @@ export function ChatConversation({
                     </span>
                   </div>
                 )}
-                <ChatMessage event={event} />
+                <FilingMessage event={event} />
               </div>
             );
           })

@@ -26,7 +26,7 @@ function MagicLinkVerifyContent() {
       .then(() => {
         setStatus("success");
         setMessage("Signed in successfully! Redirecting...");
-        setTimeout(() => router.push("/chats"), 1000);
+        setTimeout(() => router.push("/watchlist"), 1000);
       })
       .catch((err) => {
         setStatus("error");

@@ -78,8 +78,8 @@ export function formatDealValue(value: string): string {
   );
 }
 
-/** Short chat-list timestamp: time today, weekday this week, date otherwise. */
-export function chatTimestamp(dateStr: string | null | undefined): string {
+/** Short list timestamp: time today, weekday this week, date otherwise. */
+export function listTimestamp(dateStr: string | null | undefined): string {
   if (!dateStr) return "";
   const d = new Date(dateStr);
   const now = new Date();

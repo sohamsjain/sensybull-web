@@ -6,14 +6,14 @@ import { useAuth } from "@/hooks/use-auth";
 import { useUnreadCount } from "@/hooks/use-unread-count";
 import { ProfileMenu } from "./profile-menu";
 
-function ChatsIcon() {
+function WatchlistIcon() {
   return (
     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
         strokeWidth={1.8}
-        d="M8 10h8m-8 4h5m7-2c0 4.418-4.03 8-9 8a9.86 9.86 0 01-3.534-.65L3 21l1.35-3.6A7.6 7.6 0 013 12c0-4.418 4.03-8 9-8s8 3.582 8 8z"
+        d="M11.48 3.5c.2-.4.84-.4 1.04 0l2.12 4.3c.08.16.23.27.4.29l4.75.69c.45.07.63.62.3.94l-3.43 3.35c-.13.12-.19.3-.16.48l.81 4.73c.08.44-.39.78-.79.57l-4.25-2.23a.55.55 0 00-.51 0l-4.25 2.23c-.4.21-.87-.13-.79-.57l.81-4.73a.55.55 0 00-.16-.48L3.94 9.72a.55.55 0 01.3-.94l4.75-.69a.55.55 0 00.4-.29l2.09-4.3z"
       />
     </svg>
   );
@@ -108,12 +108,12 @@ export function BottomTabs() {
       aria-label="Primary"
     >
       <Tab
-        href="/chats"
-        label="Chats"
-        active={pathname?.startsWith("/chats") ?? false}
+        href="/watchlist"
+        label="Watchlist"
+        active={pathname?.startsWith("/watchlist") ?? false}
         badge={unread}
       >
-        <ChatsIcon />
+        <WatchlistIcon />
       </Tab>
       <Tab
         href="/feed"

@@ -9,6 +9,12 @@ const nextConfig: NextConfig = {
         destination: "https://sensybull.com/:path*",
         permanent: true,
       },
+      // Old alert deep links and bookmarks from the "Chats" era
+      {
+        source: "/chats",
+        destination: "/watchlist",
+        permanent: false,
+      },
     ];
   },
 };

@@ -16,11 +16,11 @@ import { ExplosiveBadge } from "@/components/feed/explosive-badge";
 import { formPhrase, formTag, formTagDuplicatesEventType } from "@/lib/forms";
 
 /**
- * One filing event rendered as an incoming chat message.
- * Collapsed, it shows only the materiality indicator, category label, and
- * headline; the briefing details live behind the Details toggle.
+ * One filing event rendered as an incoming message bubble.
+ * Collapsed, it shows only the category label and headline; the briefing
+ * details live behind the "Read more" toggle.
  */
-export function ChatMessage({ event }: { event: FilingEvent }) {
+export function FilingMessage({ event }: { event: FilingEvent }) {
   const [expanded, setExpanded] = useState(false);
   const [copied, setCopied] = useState(false);
   const { briefing, exhibits, edgar_url } = event;
