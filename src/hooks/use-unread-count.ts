@@ -4,9 +4,9 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
 import { api } from "@/lib/api-client";
-import type { ChatsResponse } from "@/types/api";
+import type { WatchlistInboxResponse } from "@/types/api";
 
-/** Total unread chat count for nav badges; refreshes on navigation. */
+/** Total unread filing count for nav badges; refreshes on navigation. */
 export function useUnreadCount(): number {
   const { user } = useAuth();
   const pathname = usePathname();
@@ -15,7 +15,7 @@ export function useUnreadCount(): number {
   useEffect(() => {
     if (!user) return;
     let cancelled = false;
-    api<ChatsResponse>("/chats/")
+    api<WatchlistInboxResponse>("/watchlist/")
       .then((data) => {
         if (!cancelled) setUnread(data.total_unread || 0);
       })

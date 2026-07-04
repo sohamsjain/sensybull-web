@@ -3,10 +3,11 @@
 import { useMemo, useSyncExternalStore } from "react";
 import { createLocalPref } from "@/lib/local-pref";
 
+// Key kept as "pinned-chats" so existing users' pins survive the rename
 const store = createLocalPref("pinned-chats", "[]");
 
-/** Company ids pinned to the top of the chat list, persisted locally. */
-export function usePinnedChats(): {
+/** Company ids pinned to the top of the watchlist, persisted locally. */
+export function usePinnedCompanies(): {
   pinned: Set<string>;
   togglePin: (companyId: string) => void;
 } {

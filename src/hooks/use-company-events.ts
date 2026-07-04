@@ -12,13 +12,13 @@ interface CompanyEventsState {
   hasMore: boolean;
 }
 
-// Session-lifetime cache so revisiting a chat paints instantly from the last
+// Session-lifetime cache so revisiting a company paints instantly from the last
 // known history while a fresh fetch revalidates in the background.
 const historyCache = new Map<string, CompanyEventsState>();
 
 /**
  * One company's filing history for the conversation view, newest first.
- * Pass the live socket from useChats so listeners follow reconnections
+ * Pass the live socket from useWatchlistInbox so listeners follow reconnections
  * instead of clinging to a stale instance.
  */
 export function useCompanyEvents(companyId: string | null, socket: Socket | null) {
@@ -100,7 +100,7 @@ export function useCompanyEvents(companyId: string | null, socket: Socket | null
 
   // While switching companies, paint from cache immediately if we've been
   // here before; otherwise show the loading state — never the previous
-  // chat's messages.
+  // company's messages.
   const current =
     state.companyId === companyId
       ? state

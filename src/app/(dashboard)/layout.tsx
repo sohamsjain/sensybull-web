@@ -9,11 +9,8 @@ import {
   Suspense,
 } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
-import type { Watchlist } from "@/types/api";
 import { NavRail } from "@/components/layout/nav-rail";
 import { BottomTabs } from "@/components/layout/bottom-tabs";
-import { Sidebar } from "@/components/layout/sidebar";
-import { MobileNav } from "@/components/layout/mobile-nav";
 import { CompanySheet, type CompanyRef } from "@/components/company/company-sheet";
 import { CommandPalette } from "@/components/command-palette";
 import { useAuth } from "@/hooks/use-auth";
@@ -25,14 +22,12 @@ interface DashboardContextValue {
   eventTypeFilter: Set<string>;
   marketCapFilter: Set<string>;
   search: string;
-  selectedWatchlist: Watchlist | null;
   toggleSignificance: (level: string) => void;
   toggleEventType: (type: string) => void;
   clearEventTypes: () => void;
   toggleMarketCap: (bucket: string) => void;
   clearMarketCaps: () => void;
   setSearch: (value: string) => void;
-  openMobileNav: () => void;
   openCompany: (company: CompanyRef) => void;
 }
 
@@ -41,14 +36,12 @@ const DashboardContext = createContext<DashboardContextValue>({
   eventTypeFilter: new Set(),
   marketCapFilter: new Set(),
   search: "",
-  selectedWatchlist: null,
   toggleSignificance: () => {},
   toggleEventType: () => {},
   clearEventTypes: () => {},
   toggleMarketCap: () => {},
   clearMarketCaps: () => {},
   setSearch: () => {},
-  openMobileNav: () => {},
   openCompany: () => {},
 });
 
@@ -60,9 +53,6 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  // The chats page brings its own list pane; the watchlist sidebar and feed
-  // filters only apply to the feed.
-  const isChats = pathname?.startsWith("/chats") ?? false;
 
   // Filters initialize from the URL so filtered views are shareable
   const [significanceFilter, setSignificanceFilter] = useState<Set<string>>(
@@ -85,10 +75,6 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
     return mcap ? new Set(mcap.split(",").filter(Boolean)) : new Set<string>();
   });
   const [search, setSearch] = useState(() => searchParams.get("q") ?? "");
-  const [selectedWatchlist, setSelectedWatchlist] = useState<Watchlist | null>(
-    null
-  );
-  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [companySheet, setCompanySheet] = useState<CompanyRef | null>(null);
 
   // Mirror filter state back into the URL (shallow, no navigation)
@@ -144,7 +130,6 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
     setMarketCapFilter(new Set());
   }, []);
 
-  const openMobileNav = useCallback(() => setMobileNavOpen(true), []);
   const openCompany = useCallback(
     (company: CompanyRef) => setCompanySheet(company),
     []
@@ -157,14 +142,12 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
         eventTypeFilter,
         marketCapFilter,
         search,
-        selectedWatchlist,
         toggleSignificance,
         toggleEventType,
         clearEventTypes,
         toggleMarketCap,
         clearMarketCaps,
         setSearch,
-        openMobileNav,
         openCompany,
       }}
     >
@@ -173,14 +156,6 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
       <div className="h-dvh overflow-hidden flex bg-slate-50 dark:bg-[#0b0d12] text-slate-800 dark:text-slate-100">
         <NavRail />
         <div className="flex-1 flex min-w-0 overflow-hidden">
-          {user && !isChats && (
-            <div className="hidden md:block">
-              <Sidebar
-                selectedWatchlist={selectedWatchlist}
-                onSelectWatchlist={setSelectedWatchlist}
-              />
-            </div>
-          )}
           {/* pb clears the mobile bottom tab bar */}
           <main
             className={`flex-1 overflow-hidden ${user ? "pb-14 md:pb-0" : ""}`}
@@ -194,14 +169,6 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
           onClose={() => setCompanySheet(null)}
         />
         <CommandPalette />
-        {user && !isChats && (
-          <MobileNav
-            open={mobileNavOpen}
-            onOpenChange={setMobileNavOpen}
-            selectedWatchlist={selectedWatchlist}
-            onSelectWatchlist={setSelectedWatchlist}
-          />
-        )}
       </div>
     </DashboardContext.Provider>
   );

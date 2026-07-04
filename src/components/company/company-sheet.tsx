@@ -9,7 +9,7 @@ import { api } from "@/lib/api-client";
 import { useAuth } from "@/hooks/use-auth";
 import { useWatchlists } from "@/hooks/use-watchlists";
 import { timeAgo, formatCatalystDate, formatMarketCap } from "@/lib/utils";
-import { ChatAvatar } from "@/components/chat/chat-avatar";
+import { CompanyAvatar } from "@/components/watchlist/company-avatar";
 import { SignificanceBadge } from "@/components/feed/significance-badge";
 import { PriceChart } from "@/components/company/price-chart";
 import {
@@ -135,7 +135,7 @@ export function CompanySheet({
           <>
             <SheetHeader className="px-5 pt-5 pb-4 border-b border-slate-200 dark:border-white/[0.06]">
               <div className="flex items-center gap-3">
-                <ChatAvatar ticker={company.ticker} name={company.name} />
+                <CompanyAvatar ticker={company.ticker} name={company.name} />
                 <div className="min-w-0">
                   <SheetTitle className="text-slate-900 dark:text-white text-base font-semibold leading-tight truncate">
                     {company.name}
@@ -176,12 +176,12 @@ export function CompanySheet({
 
               {user && (
                 <div className="flex items-center gap-2 mt-3">
-                  <Link href={`/chats?c=${company.id}`} onClick={onClose}>
+                  <Link href={`/watchlist?c=${company.id}`} onClick={onClose}>
                     <Button
                       size="sm"
                       className="bg-indigo-600 hover:bg-indigo-500 text-white"
                     >
-                      Open chat
+                      View filings
                     </Button>
                   </Link>
                   {isWatchlisted ? (
@@ -208,7 +208,7 @@ export function CompanySheet({
               {user && company.ticker && (
                 <section>
                   <h3 className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-2">
-                    <span className="w-1 h-3.5 rounded-full bg-emerald-400/60" />
+                    <span className="w-1 h-3.5 rounded-full bg-slate-300 dark:bg-white/[0.15]" />
                     Price
                   </h3>
                   <PriceChart companyId={company.id} events={events} />
@@ -219,13 +219,13 @@ export function CompanySheet({
               {upcoming.length > 0 && (
                 <section>
                   <h3 className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-2">
-                    <span className="w-1 h-3.5 rounded-full bg-amber-400/60" />
+                    <span className="w-1 h-3.5 rounded-full bg-slate-300 dark:bg-white/[0.15]" />
                     Upcoming catalysts
                   </h3>
                   <ul className="space-y-1.5">
                     {upcoming.map((c, i) => (
                       <li key={i} className="text-[13px] leading-snug">
-                        <span className="font-mono tabular-nums text-[11px] text-amber-600 dark:text-amber-400 mr-2">
+                        <span className="font-mono tabular-nums text-[11px] text-slate-900 dark:text-slate-100 mr-2">
                           {formatCatalystDate(c.date)}
                         </span>
                         <span className="text-slate-700 dark:text-slate-200">

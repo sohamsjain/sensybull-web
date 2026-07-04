@@ -65,7 +65,7 @@ export function AppleAuthButton() {
           }
         : undefined;
       await appleAuth(idToken, user);
-      router.push("/chats");
+      router.push("/watchlist");
     } catch (err) {
       if (err && typeof err === "object" && "error" in err) {
         const appleErr = err as { error: string };

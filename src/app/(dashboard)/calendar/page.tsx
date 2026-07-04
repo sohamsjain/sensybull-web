@@ -67,7 +67,7 @@ export default function CalendarPage() {
     <div className="h-full overflow-y-auto">
       <div className="max-w-2xl mx-auto px-4 py-6">
         <div className="flex items-center gap-1.5 mb-1">
-          <span className="w-1 h-4 rounded-full bg-amber-400/60" />
+          <span className="w-1 h-4 rounded-full bg-slate-300 dark:bg-white/[0.15]" />
           <h1 className="text-slate-900 dark:text-white/90 text-base font-semibold">
             Catalyst Calendar
           </h1>
@@ -122,7 +122,7 @@ export default function CalendarPage() {
                           <span
                             className={`text-[11px] tabular-nums ${
                               near
-                                ? "text-amber-600 dark:text-amber-400 font-semibold"
+                                ? "text-slate-900 dark:text-white font-semibold"
                                 : "text-slate-400 dark:text-slate-500"
                             }`}
                           >

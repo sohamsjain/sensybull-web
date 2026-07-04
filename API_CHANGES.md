@@ -88,3 +88,19 @@ Two new labels in the canonical list: `"Insider Buying"`, `"Late Filing"`.
 ### Event payload
 
 New optional field `filed_by` (string, ingest-side) — the filer's name when it differs from the subject company (13D reporting person, tender bidder, proxy dissident). Not yet persisted/exposed by the API model; reserved for future use.
+
+## 2026-07-04
+
+### Chats renamed to Watchlist inbox
+
+- `GET /watchlist/`, `POST /watchlist/:companyId/read`, `PUT /watchlist/:companyId/mute` replace the `/chats` endpoints. The inbox list moved from the `chats` response key to `items` (same entry shape).
+- The old `/api/v1/chats/*` prefix and the `chats` response key still work as a temporary compat alias; they will be removed after this frontend deploys.
+- Alert channel deep links now point at `/watchlist`.
+
+### GET /events/all — ordering change
+
+Now ordered by `created_at` (when the event was received) instead of `filing_date`, so REST pages line up with the live socket stream. `/events/` and `/events/company/:id` keep `filing_date` ordering.
+
+### Briefing headlines
+
+The ingest prompt no longer asks for semicolon-separated facts; new headlines are single plain-English sentences. Stored headlines are unchanged and age out naturally.

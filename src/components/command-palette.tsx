@@ -86,13 +86,14 @@ export function CommandPalette() {
       ...(user
         ? [
             {
-              id: "chats",
-              label: "Go to Chats",
-              run: () => router.push("/chats"),
+              id: "watchlist",
+              label: "Go to Watchlist",
+              run: () => router.push("/watchlist"),
             },
           ]
         : []),
       { id: "feed", label: "Go to Feed", run: () => router.push("/feed") },
+      { id: "movers", label: "Go to Movers", run: () => router.push("/movers") },
       ...(user
         ? [
             {
@@ -140,7 +141,7 @@ export function CommandPalette() {
     (row: (typeof rows)[number]) => {
       close();
       if ("company" in row && row.company) {
-        router.push(`/chats?c=${row.company.id}`);
+        router.push(`/watchlist?c=${row.company.id}`);
       } else if ("action" in row && row.action) {
         row.action.run();
       }

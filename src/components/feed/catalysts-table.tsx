@@ -7,7 +7,7 @@ export function CatalystsTable({ catalysts }: { catalysts: Catalyst[] }) {
   return (
     <div className="mt-3 rounded-lg bg-slate-100/60 dark:bg-slate-900/40 ring-1 ring-slate-300/40 dark:ring-slate-700/40 p-3">
       <div className="flex items-center gap-1.5 mb-2.5">
-        <span className="w-1 h-3.5 rounded-full bg-amber-400/60" />
+        <span className="w-1 h-3.5 rounded-full bg-slate-300 dark:bg-white/[0.15]" />
         <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400 tracking-wide">
           Catalysts
         </span>
@@ -19,7 +19,7 @@ export function CatalystsTable({ catalysts }: { catalysts: Catalyst[] }) {
           return (
             <div key={i} className="flex gap-3">
               <div className="flex flex-col items-center w-3 shrink-0">
-                <div className="w-1.5 h-1.5 rounded-full bg-amber-400/80 mt-1 shrink-0" />
+                <div className="w-1.5 h-1.5 rounded-full bg-slate-400 dark:bg-slate-500 mt-1 shrink-0" />
                 {!isLast && (
                   <div className="w-px flex-1 bg-slate-300 dark:bg-slate-700/60" />
                 )}

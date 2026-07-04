@@ -5,24 +5,9 @@ import { useTheme } from "next-themes";
 
 const LOGO_DEV_TOKEN = process.env.NEXT_PUBLIC_LOGO_DEV_TOKEN;
 
-const LOGO_COLORS = [
-  "bg-fuchsia-500/10 text-fuchsia-700 dark:bg-fuchsia-500/20 dark:text-fuchsia-300",
-  "bg-emerald-500/10 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300",
-  "bg-indigo-500/10 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300",
-  "bg-amber-500/10 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300",
-  "bg-rose-500/10 text-rose-700 dark:bg-rose-500/20 dark:text-rose-300",
-  "bg-cyan-500/10 text-cyan-700 dark:bg-cyan-500/20 dark:text-cyan-300",
-  "bg-indigo-500/10 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300",
-  "bg-teal-500/10 text-teal-700 dark:bg-teal-500/20 dark:text-teal-300",
-];
-
-function colorFor(key: string): string {
-  let hash = 0;
-  for (let i = 0; i < key.length; i++) {
-    hash = (hash * 31 + key.charCodeAt(i)) | 0;
-  }
-  return LOGO_COLORS[Math.abs(hash) % LOGO_COLORS.length];
-}
+// One quiet style for every fallback logo — real logos carry the identity
+const LOGO_STYLE =
+  "bg-slate-200/70 text-slate-600 dark:bg-white/[0.08] dark:text-slate-300";
 
 export function CompanyLogo({
   ticker,
@@ -61,7 +46,7 @@ export function CompanyLogo({
 
   return (
     <div
-      className={`w-10 h-10 rounded-full ${colorFor(label)} flex items-center justify-center font-mono font-bold text-xs shrink-0 select-none ring-1 ring-slate-200/60 dark:ring-white/[0.06]`}
+      className={`w-10 h-10 rounded-full ${LOGO_STYLE} flex items-center justify-center font-mono font-bold text-xs shrink-0 select-none ring-1 ring-slate-200/60 dark:ring-white/[0.06]`}
       aria-hidden="true"
     >
       {label.slice(0, 4)}

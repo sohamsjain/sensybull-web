@@ -30,7 +30,6 @@ export function FeedToolbar() {
     clearMarketCaps,
     search,
     setSearch,
-    openMobileNav,
   } = useDashboard();
 
   const [eventTypes, setEventTypes] = useState<string[]>([]);
@@ -72,19 +71,6 @@ export function FeedToolbar() {
 
   return (
     <div className="h-12 border-b border-slate-200 dark:border-white/[0.06] flex items-center px-4 gap-3 shrink-0 bg-white dark:bg-[#0b0d12]">
-      {/* Watchlist drawer on mobile */}
-      {user && (
-        <button
-          onClick={openMobileNav}
-          className="md:hidden text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-          aria-label="Open watchlists"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-        </button>
-      )}
-
       {/* Significance filter toggles */}
       <div className="flex gap-1">
         {SIGNIFICANCE_LEVELS.map((level) => (

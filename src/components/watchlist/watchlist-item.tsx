@@ -1,8 +1,8 @@
 "use client";
 
-import type { Chat } from "@/types/api";
-import { chatTimestamp, fullDateTime } from "@/lib/utils";
-import { ChatAvatar } from "./chat-avatar";
+import type { WatchlistEntry } from "@/types/api";
+import { listTimestamp, fullDateTime } from "@/lib/utils";
+import { CompanyAvatar } from "./company-avatar";
 
 function MutedIcon() {
   return (
@@ -23,10 +23,9 @@ function MutedIcon() {
   );
 }
 
+// Only genuinely material events get an accent; everything else stays quiet
 const SIG_ACCENT: Record<string, string> = {
-  High: "border-l-red-500/70",
-  Medium: "border-l-amber-500/60",
-  Low: "border-l-transparent",
+  High: "border-l-red-400/60 dark:border-l-red-400/40",
 };
 
 function PinIcon() {
@@ -42,18 +41,18 @@ function PinIcon() {
   );
 }
 
-export function ChatListItem({
-  chat,
+export function WatchlistItem({
+  entry,
   active,
   pinned = false,
   onSelect,
 }: {
-  chat: Chat;
+  entry: WatchlistEntry;
   active: boolean;
   pinned?: boolean;
   onSelect: () => void;
 }) {
-  const { company, last_event, last_activity_at, unread_count, muted } = chat;
+  const { company, last_event, last_activity_at, unread_count, muted } = entry;
   const hasUnread = unread_count > 0;
   const accent = SIG_ACCENT[last_event?.significance ?? ""] ?? "border-l-transparent";
 
@@ -65,7 +64,7 @@ export function ChatListItem({
         active ? "bg-slate-100 dark:bg-[#14161c]" : "hover:bg-slate-100/60 dark:hover:bg-white/[0.04]"
       }`}
     >
-      <ChatAvatar
+      <CompanyAvatar
         ticker={company.ticker}
         name={company.name}
       />
@@ -87,7 +86,7 @@ export function ChatListItem({
             }`}
             title={fullDateTime(last_activity_at)}
           >
-            {chatTimestamp(last_activity_at)}
+            {listTimestamp(last_activity_at)}
           </span>
         </div>
 

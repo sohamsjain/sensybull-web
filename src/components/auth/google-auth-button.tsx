@@ -34,7 +34,7 @@ export function GoogleAuthButton() {
       setError("");
       try {
         await googleAuth(response.code);
-        router.push("/chats");
+        router.push("/watchlist");
       } catch (err) {
         setError(
           err instanceof Error ? err.message : "Google sign-in failed"

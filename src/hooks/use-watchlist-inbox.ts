@@ -2,15 +2,16 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import type { Socket } from "socket.io-client";
-import type { Chat, ChatsResponse, ChatPreviewEvent, ReadStateResponse, PaginatedWatchlists, Watchlist } from "@/types/api";
+import type { WatchlistEntry, WatchlistInboxResponse, EventPreview, ReadStateResponse, PaginatedWatchlists } from "@/types/api";
 import type { FilingEvent } from "@/types/events";
 import { api, getTokens } from "@/lib/api-client";
 import { connectSocket, disconnectSocket } from "@/lib/socket";
 import { formPhrase } from "@/lib/forms";
+import { addToDefaultWatchlist } from "@/lib/default-watchlist";
 import { useAuth } from "@/hooks/use-auth";
 
-/** Inbox order: unread chats first, then most recent activity. */
-function sortChats(list: Chat[]): Chat[] {
+/** Inbox order: unread companies first, then most recent activity. */
+function sortEntries(list: WatchlistEntry[]): WatchlistEntry[] {
   return [...list].sort((a, b) => {
     const aUnread = a.unread_count > 0 ? 0 : 1;
     const bUnread = b.unread_count > 0 ? 0 : 1;
@@ -19,7 +20,7 @@ function sortChats(list: Chat[]): Chat[] {
   });
 }
 
-function toPreview(event: FilingEvent): ChatPreviewEvent {
+function toPreview(event: FilingEvent): EventPreview {
   return {
     id: event.id,
     headline:
@@ -36,13 +37,13 @@ function toPreview(event: FilingEvent): ChatPreviewEvent {
 }
 
 /**
- * Chat list state: watchlist companies as conversations, with live unread
- * counts. New socket events bump the matching chat to the top; events for
- * the currently open chat are auto-marked as read instead.
+ * Watchlist inbox state: every watchlist company with live unread counts.
+ * New socket events bump the matching company to the top; events for the
+ * currently open company are auto-marked as read instead.
  */
-export function useChats(activeCompanyId: string | null) {
+export function useWatchlistInbox(activeCompanyId: string | null) {
   const { user } = useAuth();
-  const [chats, setChats] = useState<Chat[]>([]);
+  const [entries, setEntries] = useState<WatchlistEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [connected, setConnected] = useState(false);
   // The live socket instance, exposed so dependent hooks (useCompanyEvents)
@@ -56,21 +57,21 @@ export function useChats(activeCompanyId: string | null) {
 
   const refetch = useCallback(async () => {
     try {
-      const data = await api<ChatsResponse>("/chats/");
-      setChats(sortChats(data.chats || []));
+      const data = await api<WatchlistInboxResponse>("/watchlist/");
+      setEntries(sortEntries(data.items || []));
       setLoading(false);
     } catch {}
   }, []);
 
-  // Only fetch once signed in; the chats page gates rendering on auth, so
-  // stale state from a previous session is never shown.
+  // Only fetch once signed in; the watchlist page gates rendering on auth,
+  // so stale state from a previous session is never shown.
   useEffect(() => {
     if (!user) return;
     let cancelled = false;
-    api<ChatsResponse>("/chats/")
+    api<WatchlistInboxResponse>("/watchlist/")
       .then((data) => {
         if (cancelled) return;
-        setChats(sortChats(data.chats || []));
+        setEntries(sortEntries(data.items || []));
         setLoading(false);
       })
       .catch(() => {});
@@ -80,30 +81,30 @@ export function useChats(activeCompanyId: string | null) {
   }, [user]);
 
   const markRead = useCallback((companyId: string) => {
-    setChats((prev) =>
+    setEntries((prev) =>
       prev.map((c) =>
         c.company.id === companyId
           ? { ...c, unread_count: 0, last_read_at: new Date().toISOString() }
           : c
       )
     );
-    api<ReadStateResponse>(`/chats/${companyId}/read`, { method: "POST" }).catch(
+    api<ReadStateResponse>(`/watchlist/${companyId}/read`, { method: "POST" }).catch(
       () => {}
     );
   }, []);
 
   const setMuted = useCallback(async (companyId: string, muted: boolean) => {
-    setChats((prev) =>
+    setEntries((prev) =>
       prev.map((c) => (c.company.id === companyId ? { ...c, muted } : c))
     );
     try {
-      await api<ReadStateResponse>(`/chats/${companyId}/mute`, {
+      await api<ReadStateResponse>(`/watchlist/${companyId}/mute`, {
         method: "PUT",
         body: JSON.stringify({ muted }),
       });
     } catch {
       // Roll back the optimistic update on failure
-      setChats((prev) =>
+      setEntries((prev) =>
         prev.map((c) =>
           c.company.id === companyId ? { ...c, muted: !muted } : c
         )
@@ -111,23 +112,10 @@ export function useChats(activeCompanyId: string | null) {
     }
   }, []);
 
-  /** Add a company to the user's first watchlist (created if none exists). */
+  /** Add a company to the user's watchlist. */
   const addCompany = useCallback(
     async (companyId: string) => {
-      const data = await api<PaginatedWatchlists>("/watchlists/");
-      let wl = data.watchlists?.[0];
-      if (!wl) {
-        wl = (
-          await api<{ watchlist: Watchlist }>("/watchlists/", {
-            method: "POST",
-            body: JSON.stringify({ name: "My Watchlist" }),
-          })
-        ).watchlist;
-      }
-      await api(`/watchlists/${wl.id}/companies`, {
-        method: "POST",
-        body: JSON.stringify({ company_id: companyId }),
-      });
+      await addToDefaultWatchlist(companyId);
       await refetch();
     },
     [refetch]
@@ -167,28 +155,28 @@ export function useChats(activeCompanyId: string | null) {
     socket.on("filing_event", (event: FilingEvent) => {
       if (!event.company_id) return;
       const isActive = activeRef.current === event.company_id;
-      setChats((prev) => {
+      setEntries((prev) => {
         const idx = prev.findIndex((c) => c.company.id === event.company_id);
-        if (idx === -1) return prev; // not one of the user's chats
-        const chat = prev[idx];
+        if (idx === -1) return prev; // not one of the user's companies
+        const entry = prev[idx];
         // The server replays recent historical events on every (re)connect.
-        // Only events strictly newer than the chat's last known activity are
+        // Only events strictly newer than the entry's last known activity are
         // genuinely new — REST already accounted for everything else, so
         // counting replays would resurrect cleared unread badges.
         const ts = event.received_at || "";
-        if (chat.last_activity_at && ts <= chat.last_activity_at) return prev;
-        const updated: Chat = {
-          ...chat,
+        if (entry.last_activity_at && ts <= entry.last_activity_at) return prev;
+        const updated: WatchlistEntry = {
+          ...entry,
           last_event: toPreview(event),
           last_activity_at: event.received_at,
-          unread_count: isActive ? 0 : chat.unread_count + 1,
+          unread_count: isActive ? 0 : entry.unread_count + 1,
         };
         const next = [...prev];
         next[idx] = updated;
-        return sortChats(next);
+        return sortEntries(next);
       });
       if (isActive) {
-        api(`/chats/${event.company_id}/read`, { method: "POST" }).catch(
+        api(`/watchlist/${event.company_id}/read`, { method: "POST" }).catch(
           () => {}
         );
       }
@@ -197,10 +185,10 @@ export function useChats(activeCompanyId: string | null) {
     return () => disconnectSocket();
   }, [user]);
 
-  const totalUnread = chats.reduce((sum, c) => sum + c.unread_count, 0);
+  const totalUnread = entries.reduce((sum, c) => sum + c.unread_count, 0);
 
   return {
-    chats,
+    entries,
     totalUnread,
     // Signed-out users have nothing to load; don't report a perpetual
     // loading state for them.

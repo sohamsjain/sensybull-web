@@ -17,7 +17,7 @@ const GLYPH: Record<Sentiment, string> = {
 
 /**
  * The briefing's one-line verdict, with a sentiment-colored directional
- * glyph. Shared by the feed card and chat message so the takeaway reads
+ * glyph. Shared by the feed card and filing message so the takeaway reads
  * the same everywhere.
  */
 export function InvestorTakeaway({

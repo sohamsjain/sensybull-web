@@ -13,24 +13,25 @@
 - Companies: `GET /companies/?q=...` (search by ticker or name), `GET /companies/search?q=` (typeahead)
 - Alerts: `GET/PUT /alerts/preferences`, `GET /alerts/notifications`, `GET /alerts/channels`, Web Push at `/alerts/push/*` (see `src/lib/push.ts` + `public/sw.js`)
 - Events (single): `GET /events/all/:id` (public, permalinks)
-- Chats: `GET /chats/` (inbox: watchlist companies + unread counts), `POST /chats/:companyId/read`, `PUT /chats/:companyId/mute`
+- Watchlist inbox: `GET /watchlist/` (companies + unread counts under `items`), `POST /watchlist/:companyId/read`, `PUT /watchlist/:companyId/mute`
 - WebSocket: Socket.IO namespace `/feed`, auth via `{token}` dict, events: `filing_event`, `connected`
 
 ## Project Structure
 - `src/types/` — API and event type definitions
 - `src/lib/` — API client (auto-refresh on 401), Socket.IO wrapper, utilities
-- `src/hooks/` — useAuth, useSocket, useEvents (REST+Socket merge), useWatchlists, useChats (inbox + live unread), useCompanyEvents (per-company history)
+- `src/hooks/` — useAuth, useSocket, useEvents (REST+Socket merge), useWatchlists, useWatchlistInbox (inbox + live unread), useCompanyEvents (per-company history), usePaneWidth (resizable pane)
 - `src/context/` — AuthProvider (login/register/google/logout)
 - `src/components/ui/` — shadcn/ui primitives
 - `src/components/feed/` — FilingCard, FilingList, badges
-- `src/components/chat/` — WhatsApp-style chats: ChatList, ChatConversation, ChatMessage, ChatAvatar
-- `src/components/layout/` — TopBar, Sidebar, MobileNav
-- `src/components/watchlist/` — Watchlist CRUD components
+- `src/components/watchlist/` — WatchlistPanel, WatchlistItem, Conversation, FilingMessage, CompanyAvatar
+- `src/components/movers/` — MoverList/MoverRow (shared by /movers page)
+- `src/components/layout/` — NavRail, BottomTabs
 - `src/components/auth/` — Login/register/forgot-password forms
 - `src/app/(auth)/` — Auth pages (centered layout, no sidebar)
-- `src/app/(dashboard)/` — Dashboard pages (topbar + sidebar + main)
-  - `/chats` — default landing for signed-in users; two-pane chat UI (list + conversation), self-contained layout (no watchlist sidebar/feed filters)
-  - `/feed` — chronological all-events feed (public for guests)
+- `src/app/(dashboard)/` — Dashboard pages (nav rail + main)
+  - `/watchlist` — default landing for signed-in users; two-pane UI (resizable/collapsible company list + filing history), chart toggle swaps the right pane for a full-size price chart (`/chats` redirects here)
+  - `/feed` — public live stream of all events in received order (no watchlist filtering)
+  - `/movers` — today's gainers/losers among recent filers
   - `/calendar` — upcoming-catalyst agenda across all tracked filings
   - `/e/[id]` — public per-event permalink (backed by GET /events/all/:id)
 
@@ -43,4 +44,5 @@
 - Files: kebab-case. Exports: PascalCase for components, camelCase for hooks/utils
 - All dashboard/auth components are client components (`"use client"`)
 - Filter state lives in `(dashboard)/layout.tsx` via React context
-- Dual theme (class-based dark mode). Accent: indigo, reserved for interactive elements; red/amber = materiality, emerald/red = sentiment. Dark surfaces: #0b0d12 base, #12141b/#14161c cards, #1a1d25 hover
+- Dual theme (class-based dark mode). Accent: indigo, reserved for interactive elements. Decorative color is avoided: category/form tags are plain muted text, only High materiality gets a restrained red, emerald/red appear only on price/sentiment data. Dark surfaces: #0b0d12 base, #12141b/#14161c cards, #1a1d25 hover
+- The UI presents a single watchlist (adds go to the user's first list via `src/lib/default-watchlist.ts`); the API still supports multiple lists

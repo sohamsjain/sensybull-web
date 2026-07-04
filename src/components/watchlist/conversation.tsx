@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, useRef, useLayoutEffect, useMemo } from "react";
-import type { Chat } from "@/types/api";
+import type { WatchlistEntry } from "@/types/api";
 import type { FilingEvent } from "@/types/events";
 import { dayLabel, formatCatalystDate } from "@/lib/utils";
 import { useDashboard } from "@/app/(dashboard)/layout";
-import { usePinnedChats } from "@/hooks/use-pinned-chats";
-import { ChatAvatar } from "./chat-avatar";
-import { ChatMessage } from "./chat-message";
+import { usePinnedCompanies } from "@/hooks/use-pinned-companies";
+import { CompanyAvatar } from "./company-avatar";
+import { FilingMessage } from "./filing-message";
+import { PriceChart } from "@/components/company/price-chart";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -15,8 +16,8 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 
-interface ChatConversationProps {
-  chat: Chat;
+interface ConversationProps {
+  entry: WatchlistEntry;
   events: FilingEvent[]; // newest first
   loading: boolean;
   hasMore: boolean;
@@ -37,7 +38,7 @@ function BackIcon() {
 function MutedBellIcon() {
   return (
     <svg
-      className="w-4 h-4 text-amber-400/80 shrink-0"
+      className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0"
       fill="none"
       stroke="currentColor"
       viewBox="0 0 24 24"
@@ -63,8 +64,34 @@ function MoreIcon() {
   );
 }
 
-export function ChatConversation({
-  chat,
+function ChartIcon() {
+  return (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={1.8}
+        d="M3 4v14a2 2 0 002 2h16M8 15V9m4 6V6m4 9v-4"
+      />
+    </svg>
+  );
+}
+
+function MessagesIcon() {
+  return (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={1.8}
+        d="M4 6h16M4 10h16M4 14h10M4 18h7"
+      />
+    </svg>
+  );
+}
+
+export function Conversation({
+  entry,
   events,
   loading,
   hasMore,
@@ -72,12 +99,19 @@ export function ChatConversation({
   onBack,
   onToggleMute,
   onRemove,
-}: ChatConversationProps) {
-  const { company, muted } = chat;
+}: ConversationProps) {
+  const { company, muted } = entry;
   const { openCompany } = useDashboard();
-  const { pinned, togglePin } = usePinnedChats();
+  const { pinned, togglePin } = usePinnedCompanies();
   const isPinned = pinned.has(company.id);
   const [confirmRemove, setConfirmRemove] = useState(false);
+  const [view, setView] = useState<"messages" | "chart">("messages");
+  // Switching companies always lands back on messages (adjust during render)
+  const [viewCompanyId, setViewCompanyId] = useState(company.id);
+  if (viewCompanyId !== company.id) {
+    setViewCompanyId(company.id);
+    setView("messages");
+  }
   const scrollRef = useRef<HTMLDivElement>(null);
   const loadingEarlierRef = useRef(false);
   const prevHeightRef = useRef(0);
@@ -147,11 +181,11 @@ export function ChatConversation({
         <button
           onClick={onBack}
           className="md:hidden text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white shrink-0"
-          aria-label="Back to chats"
+          aria-label="Back to watchlist"
         >
           <BackIcon />
         </button>
-        <ChatAvatar
+        <CompanyAvatar
           ticker={company.ticker}
           name={company.name}
           size="sm"
@@ -193,6 +227,20 @@ export function ChatConversation({
           </p>
         </div>
         {muted && <MutedBellIcon />}
+        {company.ticker && (
+          <button
+            onClick={() => setView((v) => (v === "chart" ? "messages" : "chart"))}
+            className={`p-1.5 rounded transition-colors ${
+              view === "chart"
+                ? "bg-slate-200 dark:bg-white/[0.08] text-slate-900 dark:text-white"
+                : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+            }`}
+            aria-label={view === "chart" ? "Back to messages" : "Show price chart"}
+            title={view === "chart" ? "Back to messages" : "Show price chart"}
+          >
+            {view === "chart" ? <MessagesIcon /> : <ChartIcon />}
+          </button>
+        )}
         {confirmRemove ? (
           <span className="flex items-center gap-1.5 text-xs shrink-0">
             <span className="text-slate-500 dark:text-slate-400 hidden sm:inline">
@@ -218,13 +266,14 @@ export function ChatConversation({
           <DropdownMenu>
             <DropdownMenuTrigger
               className="p-1.5 rounded transition-colors text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-              aria-label="Conversation options"
+              aria-label="Company options"
+              title="Company options"
             >
               <MoreIcon />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="min-w-48">
               <DropdownMenuItem onClick={() => togglePin(company.id)}>
-                {isPinned ? "Unpin chat" : "Pin chat"}
+                {isPinned ? "Unpin company" : "Pin company"}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={onToggleMute}>
                 {muted ? "Unmute alerts" : "Mute alerts"}
@@ -245,8 +294,7 @@ export function ChatConversation({
         <div className="px-3 py-1.5 bg-slate-100/80 dark:bg-[#14161c]/80 border-b border-slate-200 dark:border-white/[0.06] shrink-0">
           {pinnedCatalysts.map((c, i) => (
             <p key={i} className="text-xs text-slate-600 dark:text-slate-300 truncate">
-              <span className="mr-1.5" aria-hidden="true">📌</span>
-              <span className="text-indigo-600 dark:text-indigo-300 font-medium">
+              <span className="text-slate-900 dark:text-slate-100 font-medium">
                 {formatCatalystDate(c.date)}
               </span>
               {" — "}
@@ -256,10 +304,19 @@ export function ChatConversation({
         </div>
       )}
 
+      {/* Full-pane price chart, toggled from the header */}
+      {view === "chart" && (
+        <div className="flex-1 min-h-0 px-4 py-3 bg-white dark:bg-transparent">
+          <PriceChart companyId={company.id} events={events} fill />
+        </div>
+      )}
+
       {/* Messages */}
       <div
         ref={scrollRef}
-        className="chat-wallpaper flex-1 overflow-y-auto px-4 py-3 space-y-2"
+        className={`chat-wallpaper flex-1 overflow-y-auto px-4 py-3 space-y-2 ${
+          view === "chart" ? "hidden" : ""
+        }`}
       >
         {hasMore && (
           <div className="text-center">
@@ -308,7 +365,7 @@ export function ChatConversation({
                     </span>
                   </div>
                 )}
-                <ChatMessage event={event} />
+                <FilingMessage event={event} />
               </div>
             );
           })

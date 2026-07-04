@@ -53,7 +53,7 @@ export function UpcomingCatalysts() {
   return (
     <div className="h-full overflow-y-auto px-4 py-5">
       <div className="flex items-center gap-1.5 mb-4">
-        <span className="w-1 h-3.5 rounded-full bg-amber-400/60" />
+        <span className="w-1 h-3.5 rounded-full bg-slate-300 dark:bg-white/[0.15]" />
         <h2 className="text-[11px] font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
           Upcoming Catalysts
         </h2>
@@ -93,7 +93,7 @@ export function UpcomingCatalysts() {
                     <span
                       className={`ml-1.5 ${
                         near
-                          ? "text-amber-600 dark:text-amber-400 font-semibold"
+                          ? "text-slate-900 dark:text-white font-semibold"
                           : "text-slate-400 dark:text-slate-500"
                       }`}
                     >

@@ -14,7 +14,7 @@ export default function Home() {
     if (loading) return;
 
     if (user) {
-      router.replace("/chats");
+      router.replace("/watchlist");
       return;
     }
 
