@@ -149,3 +149,26 @@ Payload: `position_id`, `company_id`, `ticker`, `company_name`, `impact`,
 Server-side dependency: the engine self-disables (records nothing, never
 errors) when Groq keys (`GROQ_API_KEYS`/`GROQ_API_KEY`) are unset, so no
 client change is required to deploy the API safely.
+
+### Thesis alerts now go over all channels (correction)
+
+The thesis-break engine previously only emitted the `thesis_alert` socket
+event. Thesis verdicts now also drive the user's regular notification
+channels (email, push, SMS, Slack, Discord, Telegram, WhatsApp, webhook):
+
+- **One enriched alert, not two.** When a filing is judged against a held
+  thesis, that user's filing alert is *upgraded* to lead with the verdict +
+  rationale instead of sending a separate notification. No thesis on the
+  company → the regular alert, unchanged.
+- **Enriched on `supports` / `threatens` / `breaks`;** a `neutral` verdict
+  falls back to the regular tier-gated alert.
+- **Thesis-break bypasses the tier gate** — a low-tier filing that breaks a
+  thesis still notifies. Per-company mute and the user's enabled/channel
+  choices are still respected.
+- Held-with-thesis users are deferred from the bulk dispatch and delivered
+  by the engine once the verdict lands; if the LLM is unavailable they still
+  receive their regular alert (nothing is dropped).
+- The `webhook` channel payload gains an optional `thesis` object
+  (`{impact, rationale, thesis_status}`) when the filing was thesis-assessed.
+
+No frontend change required; this is server-side delivery behavior.
