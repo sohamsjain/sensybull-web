@@ -210,7 +210,7 @@ export function FilingList({
             <div className="mb-4 flex items-center justify-between gap-3 rounded-xl px-4 py-3 bg-indigo-500/[0.06] dark:bg-indigo-500/10 ring-1 ring-indigo-500/15 dark:ring-indigo-500/20">
               <p className="text-[13px] text-slate-600 dark:text-slate-300 leading-snug">
                 Follow the companies you care about — sign in to build a
-                watchlist and get every filing as a chat message.
+                watchlist and get every filing explained in plain English.
               </p>
               <a
                 href="/login"
@@ -220,6 +220,24 @@ export function FilingList({
               </a>
             </div>
           )}
+
+          {/* First-run nudge: signed in but following nobody yet */}
+          {isLoggedIn &&
+            watchlistedCompanyIds?.size === 0 &&
+            displayed.length > 0 && (
+              <p className="mb-4 text-[13px] text-slate-500 dark:text-slate-400 leading-snug">
+                This is everything, from every company. Filings from companies
+                you follow live in your{" "}
+                <a
+                  href="/watchlist"
+                  className="text-indigo-600 dark:text-indigo-400 hover:underline underline-offset-2"
+                >
+                  Watchlist
+                </a>
+                {" "}— hit the <span className="font-medium">+ Watch</span>{" "}
+                button on any event to start.
+              </p>
+            )}
 
           {/* Event cards, grouped by day */}
           <div className="space-y-3">

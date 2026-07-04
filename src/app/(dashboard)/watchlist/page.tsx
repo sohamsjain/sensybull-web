@@ -217,7 +217,8 @@ export default function WatchlistPage() {
               <p className="text-slate-500 text-[13px] leading-relaxed">
                 Pick a company on the left to see its filing history in plain
                 English. Every briefing links back to the original document on
-                SEC EDGAR.
+                SEC EDGAR, and the chart button up top shows how the stock
+                moved around each filing.
               </p>
               <p className="text-slate-500 dark:text-slate-600 text-xs mt-5 flex items-center justify-center gap-2">
                 <Key>↑</Key>
