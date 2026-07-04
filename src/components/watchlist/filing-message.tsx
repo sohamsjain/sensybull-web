@@ -4,15 +4,11 @@ import { useState } from "react";
 import type { FilingEvent } from "@/types/events";
 import type { Significance, Sentiment } from "@/config/constants";
 import { messageTime, fullDateTime } from "@/lib/utils";
-import { SignificanceBadge } from "@/components/feed/significance-badge";
-import { SentimentDot } from "@/components/feed/sentiment-dot";
 import { DealTerms } from "@/components/feed/deal-terms";
 import { CatalystsTable } from "@/components/feed/catalysts-table";
-import { EventTypeTag } from "@/components/feed/event-type-tag";
 import { InvestorTakeaway } from "@/components/feed/investor-takeaway";
 import { SignificanceExplainer } from "@/components/feed/significance-explainer";
 import { PriceReactionStrip } from "@/components/feed/price-reaction-strip";
-import { ExplosiveBadge } from "@/components/feed/explosive-badge";
 import { formPhrase, formTag, formTagDuplicatesEventType } from "@/lib/forms";
 
 /**
@@ -60,30 +56,47 @@ export function FilingMessage({ event }: { event: FilingEvent }) {
         className="max-w-[92%] md:max-w-[70%] bg-white ring-1 ring-slate-200/80 dark:ring-0 dark:bg-[#14161c] rounded-xl rounded-tl-sm px-3.5 py-2.5 shadow-sm shadow-slate-300/40 dark:shadow-md dark:shadow-black/20 cursor-pointer transition-colors hover:bg-slate-50 dark:hover:bg-[#171a21]"
         onClick={toggleExpanded}
       >
-        {/* Meta row: materiality + category */}
+        {/* Meta row: category name + form type (links to the filing on EDGAR) */}
         <div className="flex items-center gap-1.5 mb-1.5">
-          <SignificanceBadge level={significance} />
-          {event.explosive && <ExplosiveBadge />}
           {briefing?.primary_event_type &&
             briefing.primary_event_type !== "Other" && (
-              <EventTypeTag type={briefing.primary_event_type} primary />
+              <span className="text-slate-700 dark:text-slate-200 text-[11px] font-semibold uppercase tracking-wide">
+                {briefing.primary_event_type}
+              </span>
             )}
-          <SentimentDot sentiment={sentiment} label={expanded} />
-          <span className="text-slate-400 dark:text-slate-500 text-[10.5px] ml-auto whitespace-nowrap uppercase tracking-wide">
-            {/* Corner slot is form identity: fall back to the raw form name
-                when the friendly tag would repeat the event-type badge */}
-            {formTagDuplicatesEventType(
-              event.signal_type,
-              briefing?.primary_event_type
-            )
-              ? event.signal_type
-              : formTag(event.signal_type)}
-          </span>
+          {edgar_url ? (
+            <a
+              href={edgar_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              title="View this filing on SEC EDGAR"
+              className="text-slate-400 dark:text-slate-500 text-[10.5px] ml-auto whitespace-nowrap uppercase tracking-wide hover:underline underline-offset-2 hover:text-slate-600 dark:hover:text-slate-300"
+            >
+              {/* Corner slot is form identity: fall back to the raw form name
+                  when the friendly tag would repeat the category label */}
+              {formTagDuplicatesEventType(
+                event.signal_type,
+                briefing?.primary_event_type
+              )
+                ? event.signal_type
+                : formTag(event.signal_type)}
+            </a>
+          ) : (
+            <span className="text-slate-400 dark:text-slate-500 text-[10.5px] ml-auto whitespace-nowrap uppercase tracking-wide">
+              {formTagDuplicatesEventType(
+                event.signal_type,
+                briefing?.primary_event_type
+              )
+                ? event.signal_type
+                : formTag(event.signal_type)}
+            </span>
+          )}
         </div>
 
         {/* Headline */}
         {briefing ? (
-          <p className="text-slate-900 dark:text-slate-100/90 text-[14px] font-medium leading-snug">
+          <p className="text-slate-900 dark:text-slate-100/90 text-[14px] font-normal leading-snug">
             {briefing.headline}
           </p>
         ) : (
@@ -166,30 +179,12 @@ export function FilingMessage({ event }: { event: FilingEvent }) {
             >
               <path d="M2 3.5 5 6.5 8 3.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-            {expanded ? "Less" : "Details"}
+            {expanded ? "Show less" : "Read more"}
           </div>
         )}
 
-        {/* Footer: provenance + timestamp */}
-        <div
-          className="flex items-center justify-between gap-3 mt-1.5"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <span className="text-slate-400 dark:text-slate-500 text-[11px]">
-            AI briefing &middot;{" "}
-            {edgar_url ? (
-              <a
-                href={edgar_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-indigo-600/90 hover:text-indigo-700 dark:text-indigo-400/80 dark:hover:text-indigo-300 underline underline-offset-2"
-              >
-                verify on SEC EDGAR
-              </a>
-            ) : (
-              "sourced from SEC EDGAR"
-            )}
-          </span>
+        {/* Timestamp */}
+        <div className="flex justify-end mt-1.5">
           <span
             className="text-slate-400/80 dark:text-slate-500/80 text-[11px] whitespace-nowrap tabular-nums"
             title={fullDateTime(event.received_at || event.filing_date)}
