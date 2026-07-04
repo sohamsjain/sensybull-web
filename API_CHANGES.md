@@ -121,3 +121,31 @@ inform. One position per (user, company).
 Position fields: `id`, `company_id`, `direction`, `shares` (string decimal), `cost_basis` (string decimal), `thesis`, `thesis_status` (`intact`|`watch`|`broken`, server-managed), `thesis_reviewed_at`, `opened_at`, `notes`, `created_at`, `updated_at`, nested `company`.
 
 `thesis_status` is the anchor for the forthcoming thesis-break engine: incoming filings for a held company will be evaluated against the thesis and can flip the status to `watch`/`broken`, firing a distinct alert.
+
+### Thesis-break engine — filings judged against your thesis (new)
+
+When a filing event is stored for a company a user holds (has a `Position`
+with a non-empty `thesis`), the API now evaluates the filing against that
+thesis via Groq and records a `ThesisAssessment`. Runs independently of
+watchlist membership — a held position is watched by definition — and off
+the real-time path, so it never delays event delivery.
+
+**Impact verdicts:** `supports` | `neutral` | `threatens` | `breaks`.
+The engine only ever *escalates* `thesis_status` (never auto-heals):
+`threatens` → `watch`, `breaks` → `broken`; `supports`/`neutral` record an
+assessment but leave status unchanged.
+
+New read endpoints (on the positions blueprint):
+- `GET /positions/assessments` — recent thesis assessments across all your positions. Optional `?impact=` filter and `?limit=` (default 50, max 200). Returns `{ assessments: [...] }`.
+- `GET /positions/:id/assessments` — assessment history for one position, newest first.
+
+Assessment shape: `id`, `position_id`, `filing_event_id`, `impact`, `rationale` (one sentence citing the filing), `prior_status`, `new_status`, `created_at`.
+
+**New socket event** (namespace `/feed`): `thesis_alert`, emitted to the
+owner's `user:<id>` room when a filing `threatens` or `breaks` a thesis.
+Payload: `position_id`, `company_id`, `ticker`, `company_name`, `impact`,
+`rationale`, `thesis_status`, `filing_event_id`, `headline`.
+
+Server-side dependency: the engine self-disables (records nothing, never
+errors) when Groq keys (`GROQ_API_KEYS`/`GROQ_API_KEY`) are unset, so no
+client change is required to deploy the API safely.
