@@ -232,3 +232,60 @@ export interface ApiError {
   error: string;
   details?: Record<string, string>;
 }
+
+// ── Positions & thesis ────────────────────────────────────────────────
+export type ThesisStatus = "intact" | "watch" | "broken";
+export type ThesisImpact = "supports" | "neutral" | "threatens" | "breaks";
+
+export interface Position {
+  id: string;
+  company_id: string;
+  direction: "long" | "short";
+  shares: string | null;
+  cost_basis: string | null;
+  thesis: string | null;
+  thesis_status: ThesisStatus;
+  thesis_reviewed_at: string | null;
+  opened_at: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string | null;
+  company: Company;
+}
+
+export interface PositionsResponse {
+  positions: Position[];
+}
+
+export interface PositionResponse {
+  position: Position;
+  message?: string;
+}
+
+export interface ThesisAssessment {
+  id: string;
+  position_id: string;
+  filing_event_id: string;
+  impact: ThesisImpact;
+  rationale: string | null;
+  prior_status: ThesisStatus | null;
+  new_status: ThesisStatus | null;
+  created_at: string;
+}
+
+export interface AssessmentsResponse {
+  assessments: ThesisAssessment[];
+}
+
+/** Payload of the `/feed` socket `thesis_alert` event. */
+export interface ThesisAlert {
+  position_id: string;
+  company_id: string;
+  ticker: string | null;
+  company_name: string;
+  impact: ThesisImpact;
+  rationale: string | null;
+  thesis_status: ThesisStatus;
+  filing_event_id: string;
+  headline: string | null;
+}
