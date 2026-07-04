@@ -5,20 +5,15 @@ import { useDashboard } from "../layout";
 import { useEvents } from "@/hooks/use-events";
 import { useWatchlists } from "@/hooks/use-watchlists";
 import { useAuth } from "@/hooks/use-auth";
+import { addToDefaultWatchlist } from "@/lib/default-watchlist";
 import { FilingList } from "@/components/feed/filing-list";
 import { FeedToolbar } from "@/components/feed/feed-toolbar";
 import { UpcomingCatalysts } from "@/components/feed/upcoming-catalysts";
-import { MarketMovers } from "@/components/feed/market-movers";
 
 export default function FeedPage() {
   const { user } = useAuth();
-  const {
-    significanceFilter,
-    eventTypeFilter,
-    marketCapFilter,
-    search,
-    selectedWatchlist,
-  } = useDashboard();
+  const { significanceFilter, eventTypeFilter, marketCapFilter, search } =
+    useDashboard();
 
   const { events, allEvents, loading, hasMore, loadMore, connected } =
     useEvents({
@@ -26,10 +21,9 @@ export default function FeedPage() {
       eventTypeFilter,
       marketCapFilter,
       search,
-      selectedWatchlist,
     });
 
-  const { watchlists, create, addCompany } = useWatchlists();
+  const { watchlists, refetch } = useWatchlists();
   const [addingCompanyId, setAddingCompanyId] = useState<string | null>(null);
 
   const watchlistedCompanyIds = useMemo(() => {
@@ -46,17 +40,12 @@ export default function FeedPage() {
     async (companyId: string) => {
       setAddingCompanyId(companyId);
       try {
-        let targetWatchlist = watchlists[0];
-        if (!targetWatchlist) {
-          targetWatchlist = await create("My Watchlist");
-        }
-        if (targetWatchlist?.id) {
-          await addCompany(targetWatchlist.id, companyId);
-        }
+        await addToDefaultWatchlist(companyId);
+        await refetch();
       } catch {}
       setAddingCompanyId(null);
     },
-    [watchlists, create, addCompany]
+    [refetch]
   );
 
   return (
@@ -78,13 +67,7 @@ export default function FeedPage() {
           />
         </div>
         <aside className="hidden xl:flex xl:flex-col w-80 shrink-0 border-l border-slate-200 dark:border-white/[0.06]">
-          <div className="shrink-0">
-            <MarketMovers />
-          </div>
-          {/* Catalysts keep their own scroll area below the pinned movers */}
-          <div className="flex-1 min-h-0">
-            <UpcomingCatalysts />
-          </div>
+          <UpcomingCatalysts />
         </aside>
       </div>
     </div>

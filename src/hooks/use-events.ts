@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import type { FilingEvent, PriceReactions } from "@/types/events";
 import type { PaginatedEvents } from "@/types/api";
-import type { Watchlist } from "@/types/api";
 import { api } from "@/lib/api-client";
 import { connectSocket, disconnectSocket } from "@/lib/socket";
 import { getTokens } from "@/lib/api-client";
@@ -15,7 +14,6 @@ interface UseEventsOptions {
   eventTypeFilter: Set<string>;
   marketCapFilter?: Set<string>;
   search: string;
-  selectedWatchlist: Watchlist | null;
 }
 
 interface PriceReactionUpdate {
@@ -30,7 +28,6 @@ export function useEvents({
   eventTypeFilter,
   marketCapFilter,
   search,
-  selectedWatchlist,
 }: UseEventsOptions) {
   const { user } = useAuth();
   const [events, setEvents] = useState<FilingEvent[]>([]);
@@ -39,33 +36,29 @@ export function useEvents({
   const [connected, setConnected] = useState(false);
   const pageRef = useRef(1);
 
-  // Fetch history from REST API
+  // Fetch history from REST API — always the public stream, in the order
+  // events were received, so pages line up with the live socket feed
   useEffect(() => {
     setLoading(true);
     setEvents([]);
     pageRef.current = 1;
 
-    const endpoint =
-      user && selectedWatchlist ? "/events/" : "/events/all";
-
-    api<PaginatedEvents>(`${endpoint}?page=1&per_page=50`)
+    api<PaginatedEvents>(`/events/all?page=1&per_page=50`)
       .then((data) => {
         setEvents(data.events || []);
         setHasMore((data.events?.length || 0) < data.total);
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [user, selectedWatchlist]);
+  }, [user]);
 
   const loadMore = useCallback(async () => {
     if (loading) return;
     setLoading(true);
     pageRef.current += 1;
-    const endpoint =
-      user && selectedWatchlist ? "/events/" : "/events/all";
     try {
       const data = await api<PaginatedEvents>(
-        `${endpoint}?page=${pageRef.current}&per_page=50`
+        `/events/all?page=${pageRef.current}&per_page=50`
       );
       setEvents((prev) => [...prev, ...(data.events || [])]);
       setHasMore(
@@ -73,7 +66,7 @@ export function useEvents({
       );
     } catch {}
     setLoading(false);
-  }, [loading, user, selectedWatchlist, events.length]);
+  }, [loading, events.length]);
 
   // WebSocket for live events
   useEffect(() => {
@@ -131,13 +124,6 @@ export function useEvents({
       ) {
         return false;
       }
-    }
-
-    if (selectedWatchlist) {
-      const tickers = new Set(
-        selectedWatchlist.companies?.map((c) => c.ticker?.toUpperCase())
-      );
-      if (!tickers.has(e.ticker?.toUpperCase() ?? "")) return false;
     }
 
     return true;
