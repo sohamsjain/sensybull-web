@@ -32,9 +32,12 @@ function markerColor(event: FilingEvent): string {
 export function PriceChart({
   companyId,
   events,
+  fill = false,
 }: {
   companyId: string;
   events: FilingEvent[];
+  /** Size to the parent container (pannable/zoomable) instead of a fixed 220px strip. */
+  fill?: boolean;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
@@ -48,7 +51,7 @@ export function PriceChart({
     const dark = document.documentElement.classList.contains("dark");
     const chart = createChart(container, {
       width: container.clientWidth,
-      height: 220,
+      height: fill ? container.clientHeight : 220,
       layout: {
         background: { type: ColorType.Solid, color: "transparent" },
         textColor: dark ? "#64748b" : "#94a3b8",
@@ -61,8 +64,9 @@ export function PriceChart({
       },
       rightPriceScale: { borderVisible: false },
       timeScale: { borderVisible: false, timeVisible: false },
-      handleScroll: false,
-      handleScale: false,
+      // A full-pane chart is worth exploring; the compact strip stays static
+      handleScroll: fill,
+      handleScale: fill,
     });
     chartRef.current = chart;
 
@@ -113,7 +117,11 @@ export function PriceChart({
     chart.timeScale().fitContent();
 
     const resize = new ResizeObserver(() => {
-      chart.applyOptions({ width: container.clientWidth });
+      chart.applyOptions(
+        fill
+          ? { width: container.clientWidth, height: container.clientHeight }
+          : { width: container.clientWidth }
+      );
     });
     resize.observe(container);
 
@@ -122,11 +130,11 @@ export function PriceChart({
       chart.remove();
       chartRef.current = null;
     };
-  }, [bars, events, state]);
+  }, [bars, events, state, fill]);
 
   return (
-    <div>
-      <div className="flex items-center gap-1 mb-2">
+    <div className={fill ? "flex flex-col h-full min-h-0" : undefined}>
+      <div className="flex items-center gap-1 mb-2 shrink-0">
         {LOOKBACKS.map((lb) => (
           <button
             key={lb}
@@ -143,14 +151,21 @@ export function PriceChart({
       </div>
 
       {state === "loading" ? (
-        <div className="h-[220px] rounded-lg bg-slate-100 dark:bg-white/[0.04] animate-pulse" />
+        <div
+          className={`rounded-lg bg-slate-100 dark:bg-white/[0.04] animate-pulse ${
+            fill ? "flex-1 min-h-0" : "h-[220px]"
+          }`}
+        />
       ) : state === "unavailable" ? (
         <p className="text-xs text-slate-400 dark:text-slate-500 leading-relaxed py-4">
           No price data available for this company — it may trade OTC or
           outside US exchanges.
         </p>
       ) : (
-        <div ref={containerRef} className="w-full" />
+        <div
+          ref={containerRef}
+          className={fill ? "flex-1 min-h-0 w-full" : "w-full"}
+        />
       )}
     </div>
   );
