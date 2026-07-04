@@ -38,7 +38,7 @@ function BackIcon() {
 function MutedBellIcon() {
   return (
     <svg
-      className="w-4 h-4 text-amber-400/80 shrink-0"
+      className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0"
       fill="none"
       stroke="currentColor"
       viewBox="0 0 24 24"
@@ -294,8 +294,7 @@ export function Conversation({
         <div className="px-3 py-1.5 bg-slate-100/80 dark:bg-[#14161c]/80 border-b border-slate-200 dark:border-white/[0.06] shrink-0">
           {pinnedCatalysts.map((c, i) => (
             <p key={i} className="text-xs text-slate-600 dark:text-slate-300 truncate">
-              <span className="mr-1.5" aria-hidden="true">📌</span>
-              <span className="text-indigo-600 dark:text-indigo-300 font-medium">
+              <span className="text-slate-900 dark:text-slate-100 font-medium">
                 {formatCatalystDate(c.date)}
               </span>
               {" — "}

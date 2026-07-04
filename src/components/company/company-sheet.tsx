@@ -208,7 +208,7 @@ export function CompanySheet({
               {user && company.ticker && (
                 <section>
                   <h3 className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-2">
-                    <span className="w-1 h-3.5 rounded-full bg-emerald-400/60" />
+                    <span className="w-1 h-3.5 rounded-full bg-slate-300 dark:bg-white/[0.15]" />
                     Price
                   </h3>
                   <PriceChart companyId={company.id} events={events} />
@@ -219,13 +219,13 @@ export function CompanySheet({
               {upcoming.length > 0 && (
                 <section>
                   <h3 className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-2">
-                    <span className="w-1 h-3.5 rounded-full bg-amber-400/60" />
+                    <span className="w-1 h-3.5 rounded-full bg-slate-300 dark:bg-white/[0.15]" />
                     Upcoming catalysts
                   </h3>
                   <ul className="space-y-1.5">
                     {upcoming.map((c, i) => (
                       <li key={i} className="text-[13px] leading-snug">
-                        <span className="font-mono tabular-nums text-[11px] text-amber-600 dark:text-amber-400 mr-2">
+                        <span className="font-mono tabular-nums text-[11px] text-slate-900 dark:text-slate-100 mr-2">
                           {formatCatalystDate(c.date)}
                         </span>
                         <span className="text-slate-700 dark:text-slate-200">

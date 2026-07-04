@@ -1,9 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-
-const WIDTH_KEY = "sb.watchlist.paneWidth";
-const COLLAPSED_KEY = "sb.watchlist.paneCollapsed";
+import { useCallback, useRef, useState, useSyncExternalStore } from "react";
+import { createLocalPref } from "@/lib/local-pref";
 
 const DEFAULT_WIDTH = 320;
 const MIN_WIDTH = 240;
@@ -11,46 +9,35 @@ const MAX_WIDTH = 480;
 // Dragging narrower than this snaps the pane closed
 const COLLAPSE_AT = 180;
 
+const widthStore = createLocalPref("sb.watchlist.paneWidth", String(DEFAULT_WIDTH));
+const collapsedStore = createLocalPref("sb.watchlist.paneCollapsed", "0");
+
+function clamp(w: number): number {
+  if (!Number.isFinite(w) || w === 0) return DEFAULT_WIDTH;
+  return Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, w));
+}
+
 /**
  * Width + collapsed state for the watchlist pane, persisted locally.
  * Returns pointer handlers to spread onto the drag handle between panes.
  */
 export function usePaneWidth() {
-  const [width, setWidth] = useState(DEFAULT_WIDTH);
-  const [collapsed, setCollapsed] = useState(false);
+  const storedWidth = clamp(
+    Number(useSyncExternalStore(widthStore.subscribe, widthStore.get, widthStore.getServer))
+  );
+  const collapsed =
+    useSyncExternalStore(collapsedStore.subscribe, collapsedStore.get, collapsedStore.getServer) === "1";
+  // Live width while dragging; the store only sees the final value
+  const [dragWidth, setDragWidth] = useState<number | null>(null);
   const dragState = useRef<{ startX: number; startWidth: number } | null>(null);
 
-  // Restore persisted state after mount (avoids SSR hydration mismatch)
-  useEffect(() => {
-    const stored = Number(window.localStorage.getItem(WIDTH_KEY));
-    if (Number.isFinite(stored) && stored > 0) {
-      setWidth(Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, stored)));
-    }
-    if (window.localStorage.getItem(COLLAPSED_KEY) === "1") {
-      setCollapsed(true);
-    }
-  }, []);
+  const width = dragWidth ?? storedWidth;
 
-  const persistWidth = (w: number) => {
-    try {
-      window.localStorage.setItem(WIDTH_KEY, String(w));
-    } catch {}
-  };
-
-  const persistCollapsed = (c: boolean) => {
-    try {
-      window.localStorage.setItem(COLLAPSED_KEY, c ? "1" : "0");
-    } catch {}
-  };
-
-  const collapse = useCallback(() => {
-    setCollapsed(true);
-    persistCollapsed(true);
-  }, []);
-
-  const expand = useCallback(() => {
-    setCollapsed(false);
-    persistCollapsed(false);
+  const collapse = useCallback(() => collapsedStore.set("1"), []);
+  const expand = useCallback(() => collapsedStore.set("0"), []);
+  const reset = useCallback(() => {
+    setDragWidth(null);
+    widthStore.set(String(DEFAULT_WIDTH));
   }, []);
 
   const onPointerDown = useCallback(
@@ -67,8 +54,7 @@ export function usePaneWidth() {
   const onPointerMove = useCallback((e: React.PointerEvent<HTMLElement>) => {
     const drag = dragState.current;
     if (!drag) return;
-    const raw = drag.startWidth + (e.clientX - drag.startX);
-    setWidth(Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, raw)));
+    setDragWidth(clamp(drag.startWidth + (e.clientX - drag.startX)));
   }, []);
 
   const onPointerUp = useCallback(
@@ -78,23 +64,18 @@ export function usePaneWidth() {
       dragState.current = null;
       document.body.style.userSelect = "";
       document.body.style.cursor = "";
+      setDragWidth(null);
       const raw = drag.startWidth + (e.clientX - drag.startX);
       if (raw < COLLAPSE_AT) {
-        setWidth(drag.startWidth); // reopen at the pre-drag width
+        // Reopen later at the pre-drag width
+        widthStore.set(String(drag.startWidth));
         collapse();
         return;
       }
-      const clamped = Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, raw));
-      setWidth(clamped);
-      persistWidth(clamped);
+      widthStore.set(String(clamp(raw)));
     },
     [collapse]
   );
-
-  const reset = useCallback(() => {
-    setWidth(DEFAULT_WIDTH);
-    persistWidth(DEFAULT_WIDTH);
-  }, []);
 
   return {
     width,

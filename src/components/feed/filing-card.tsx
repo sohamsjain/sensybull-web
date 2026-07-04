@@ -6,7 +6,6 @@ import type { Significance, Sentiment } from "@/config/constants";
 import { useDashboard } from "@/app/(dashboard)/layout";
 import { timeAgo, fullDateTime, marketSession } from "@/lib/utils";
 import { SignificanceBadge } from "./significance-badge";
-import { SentimentDot } from "./sentiment-dot";
 import { DealTerms } from "./deal-terms";
 import { CatalystsTable } from "./catalysts-table";
 import { EventTypeTag } from "./event-type-tag";
@@ -14,7 +13,6 @@ import { CompanyLogo } from "./company-logo";
 import { InvestorTakeaway } from "./investor-takeaway";
 import { SignificanceExplainer } from "./significance-explainer";
 import { PriceReactionStrip } from "./price-reaction-strip";
-import { ExplosiveBadge } from "./explosive-badge";
 import { formTag, formTagDuplicatesEventType } from "@/lib/forms";
 
 interface FilingCardProps {
@@ -32,10 +30,11 @@ interface FilingCardProps {
   selected?: boolean;
 }
 
+// Only genuinely material events get an accent; everything else stays quiet
 const SIG_ACCENT: Record<string, string> = {
-  High: "border-l-red-500/80 dark:border-l-red-400/70",
-  Medium: "border-l-amber-500/70 dark:border-l-amber-400/60",
-  Low: "border-l-slate-300 dark:border-l-slate-600",
+  High: "border-l-red-400/60 dark:border-l-red-400/40",
+  Medium: "border-l-slate-200/80 dark:border-l-white/[0.06]",
+  Low: "border-l-slate-200/80 dark:border-l-white/[0.06]",
 };
 
 export function FilingCard({
@@ -209,7 +208,7 @@ export function FilingCard({
                 )}
                 {session && (
                   <span
-                    className="px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide bg-sky-500/10 text-sky-600 dark:text-sky-400"
+                    className="text-[10px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500"
                     title={
                       session === "pre-market"
                         ? "Filed before market open (9:30 AM ET)"
@@ -228,10 +227,12 @@ export function FilingCard({
               </div>
             </div>
 
-            {/* Meta line: significance + sentiment + event type */}
+            {/* Meta line: category + form type + significance */}
             <div className="flex items-center gap-2 flex-wrap">
-              <SignificanceBadge level={significance} />
-              {event.explosive && <ExplosiveBadge />}
+              {briefing?.primary_event_type &&
+                briefing.primary_event_type !== "Other" && (
+                  <EventTypeTag type={briefing.primary_event_type} primary />
+                )}
               {event.signal_type &&
                 event.signal_type !== "8-K" &&
                 !formTagDuplicatesEventType(
@@ -239,17 +240,15 @@ export function FilingCard({
                   briefing?.primary_event_type
                 ) && (
                   <span
-                    className="px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide bg-slate-500/10 text-slate-500 dark:bg-slate-400/10 dark:text-slate-400"
+                    className="text-[10px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500"
                     title={`SEC form ${event.signal_type}`}
                   >
                     {formTag(event.signal_type)}
                   </span>
                 )}
-              <SentimentDot sentiment={sentiment} label={expanded} />
-              {briefing?.primary_event_type &&
-                briefing.primary_event_type !== "Other" && (
-                  <EventTypeTag type={briefing.primary_event_type} primary />
-                )}
+              {significance === "High" && (
+                <SignificanceBadge level={significance} />
+              )}
               {showDetails && secondaryTypes.length > 0 && (
                 <div className="flex items-center gap-1 flex-wrap">
                   {secondaryTypes.map((type, i) => (
@@ -273,7 +272,7 @@ export function FilingCard({
         {briefing && (
           <div className="mt-3.5 pl-[3.375rem]">
             {/* Headline */}
-            <h3 className="text-[15px] sm:text-base font-semibold text-slate-800 dark:text-slate-100 leading-snug">
+            <h3 className="text-[15px] sm:text-base font-normal text-slate-800 dark:text-slate-100 leading-snug">
               {briefing.headline}
             </h3>
 
@@ -409,7 +408,7 @@ export function FilingCard({
             >
               <path d="M2 3.5 5 6.5 8 3.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-            {expanded ? "Less" : "Details"}
+            {expanded ? "Show less" : "Read more"}
           </div>
         )}
       </div>
