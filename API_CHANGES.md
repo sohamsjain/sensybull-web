@@ -1,5 +1,34 @@
 # API Changes
 
+## 2026-07-04
+
+### Refresh token moved to an httpOnly cookie (breaking — coordinated web deploy required)
+
+The refresh token is **no longer returned in the JSON body** of `POST /auth/login`,
+`/auth/register`, `/auth/google`, `/auth/apple`. It is now set as an httpOnly,
+CSRF-protected cookie (`refresh_token_cookie`, scoped to `/api/v1/auth`). The access
+token is still returned in the body for the `Authorization: Bearer` header.
+
+- `POST /auth/refresh` reads the refresh token from the cookie. Browser calls must use
+  `credentials: 'include'` and send the CSRF header `X-CSRF-TOKEN` = value of the
+  non-httpOnly `csrf_refresh_token` cookie. (A bearer `Authorization` refresh token is
+  still accepted and bypasses CSRF, e.g. for non-browser clients.)
+- **`POST /auth/logout` (new)** — revokes the current refresh token server-side
+  (blocklisted by `jti`) and clears the auth cookies. Send with the refresh cookie +
+  CSRF header (or bearer refresh token). Idempotent-ish: returns `{ "message": "Logged out" }`.
+- Refresh-token lifetime shortened from 999 days to 60 (configurable via `JWT_REFRESH_DAYS`).
+- CORS now sends `Access-Control-Allow-Credentials: true`; the frontend must include
+  credentials on authed requests for the cookie to flow.
+
+### Auth endpoints now rate-limited
+
+`POST /auth/login`, `/auth/register`, `/auth/google`, `/auth/apple` return `429` past
+`10/minute` (or `50/hour`) per IP.
+
+### GET /users/ now admin-only
+
+Returns `403` for non-admin authenticated users (was any authenticated user).
+
 ## 2026-06-24
 
 ### POST /auth/google

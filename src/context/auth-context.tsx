@@ -13,8 +13,9 @@ import {
   setTokens,
   clearTokens,
   getTokens,
+  logout as apiLogout,
 } from "@/lib/api-client";
-import type { User, AuthResponse, RefreshResponse } from "@/types/api";
+import type { User, AuthResponse } from "@/types/api";
 
 interface AuthContextValue {
   user: User | null;
@@ -58,7 +59,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       method: "POST",
       body: JSON.stringify({ email, password }),
     });
-    setTokens(data.access_token, data.refresh_token);
+    setTokens(data.access_token);
     setUser(data.user);
   };
 
@@ -67,7 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       method: "POST",
       body: JSON.stringify({ name, email, password }),
     });
-    setTokens(data.access_token, data.refresh_token);
+    setTokens(data.access_token);
     setUser(data.user);
   };
 
@@ -76,7 +77,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       method: "POST",
       body: JSON.stringify({ code }),
     });
-    setTokens(data.access_token, data.refresh_token);
+    setTokens(data.access_token);
     setUser(data.user);
   };
 
@@ -85,7 +86,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       method: "POST",
       body: JSON.stringify({ id_token: idToken, user }),
     });
-    setTokens(data.access_token, data.refresh_token);
+    setTokens(data.access_token);
     setUser(data.user);
   };
 
@@ -101,12 +102,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       method: "POST",
       body: JSON.stringify({ token }),
     });
-    setTokens(data.access_token, data.refresh_token);
+    setTokens(data.access_token);
     setUser(data.user);
   };
 
   const logout = () => {
-    clearTokens();
+    // Revoke the refresh token server-side (best-effort) and clear local state.
+    void apiLogout();
     setUser(null);
   };
 
