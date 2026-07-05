@@ -1,14 +1,13 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import type { Socket } from "socket.io-client";
 import type { WatchlistEntry, WatchlistInboxResponse, EventPreview, ReadStateResponse, PaginatedWatchlists } from "@/types/api";
 import type { FilingEvent } from "@/types/events";
-import { api, getTokens } from "@/lib/api-client";
-import { connectSocket, disconnectSocket } from "@/lib/socket";
+import { api } from "@/lib/api-client";
 import { formPhrase } from "@/lib/forms";
 import { addToDefaultWatchlist } from "@/lib/default-watchlist";
 import { useAuth } from "@/hooks/use-auth";
+import { useSocket } from "@/context/socket-provider";
 
 /** Inbox order: unread companies first, then most recent activity. */
 function sortEntries(list: WatchlistEntry[]): WatchlistEntry[] {
@@ -43,12 +42,11 @@ function toPreview(event: FilingEvent): EventPreview {
  */
 export function useWatchlistInbox(activeCompanyId: string | null) {
   const { user } = useAuth();
+  // The shared session socket (owned by SocketProvider) is exposed here so
+  // dependent hooks (useCompanyEvents) attach to the same instance.
+  const { socket, connected } = useSocket();
   const [entries, setEntries] = useState<WatchlistEntry[]>([]);
   const [loading, setLoading] = useState(true);
-  const [connected, setConnected] = useState(false);
-  // The live socket instance, exposed so dependent hooks (useCompanyEvents)
-  // re-attach their listeners whenever the connection is re-established.
-  const [socket, setSocket] = useState<Socket | null>(null);
   const activeRef = useRef(activeCompanyId);
 
   useEffect(() => {
@@ -140,19 +138,12 @@ export function useWatchlistInbox(activeCompanyId: string | null) {
     [refetch]
   );
 
-  // Live updates: new filing events reorder the inbox in real time
+  // Live updates: new filing events reorder the inbox in real time. Attaches
+  // to the shared session socket rather than owning a connection.
   useEffect(() => {
-    if (!user) return;
-    const { access } = getTokens();
-    const socket = connectSocket(access);
+    if (!user || !socket) return;
 
-    socket.on("connect", () => {
-      setConnected(true);
-      setSocket(socket);
-    });
-    socket.on("disconnect", () => setConnected(false));
-
-    socket.on("filing_event", (event: FilingEvent) => {
+    const onFiling = (event: FilingEvent) => {
       if (!event.company_id) return;
       const isActive = activeRef.current === event.company_id;
       setEntries((prev) => {
@@ -180,10 +171,13 @@ export function useWatchlistInbox(activeCompanyId: string | null) {
           () => {}
         );
       }
-    });
+    };
 
-    return () => disconnectSocket();
-  }, [user]);
+    socket.on("filing_event", onFiling);
+    return () => {
+      socket.off("filing_event", onFiling);
+    };
+  }, [user, socket]);
 
   const totalUnread = entries.reduce((sum, c) => sum + c.unread_count, 0);
 

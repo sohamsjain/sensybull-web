@@ -4,9 +4,8 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import type { FilingEvent, PriceReactions } from "@/types/events";
 import type { PaginatedEvents } from "@/types/api";
 import { api } from "@/lib/api-client";
-import { connectSocket, disconnectSocket } from "@/lib/socket";
-import { getTokens } from "@/lib/api-client";
 import { useAuth } from "@/hooks/use-auth";
+import { useSocket } from "@/context/socket-provider";
 import { marketCapBucket } from "@/config/constants";
 
 interface UseEventsOptions {
@@ -30,10 +29,10 @@ export function useEvents({
   search,
 }: UseEventsOptions) {
   const { user } = useAuth();
+  const { socket, connected } = useSocket();
   const [events, setEvents] = useState<FilingEvent[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(false);
-  const [connected, setConnected] = useState(false);
   const pageRef = useRef(1);
 
   // Fetch history from REST API — always the public stream, in the order
@@ -68,24 +67,20 @@ export function useEvents({
     setLoading(false);
   }, [loading, events.length]);
 
-  // WebSocket for live events
+  // Live events from the shared session socket (owned by SocketProvider).
   useEffect(() => {
-    const { access } = getTokens();
-    const socket = connectSocket(access);
+    if (!socket) return;
 
-    socket.on("connect", () => setConnected(true));
-    socket.on("disconnect", () => setConnected(false));
-
-    socket.on("filing_event", (event: FilingEvent) => {
+    const onFiling = (event: FilingEvent) => {
       setEvents((prev) => {
         if (prev.some((e) => e.edgar_id === event.edgar_id)) return prev;
         return [event, ...prev];
       });
-    });
+    };
 
     // Reactions are measured minutes-to-days after the filing arrives;
     // merge them into already-rendered events as they complete
-    socket.on("price_reaction", (update: PriceReactionUpdate) => {
+    const onReaction = (update: PriceReactionUpdate) => {
       setEvents((prev) =>
         prev.map((e) =>
           e.id === update.filing_event_id
@@ -97,10 +92,15 @@ export function useEvents({
             : e
         )
       );
-    });
+    };
 
-    return () => disconnectSocket();
-  }, [user]);
+    socket.on("filing_event", onFiling);
+    socket.on("price_reaction", onReaction);
+    return () => {
+      socket.off("filing_event", onFiling);
+      socket.off("price_reaction", onReaction);
+    };
+  }, [socket]);
 
   // Client-side filtering
   const filtered = events.filter((e) => {

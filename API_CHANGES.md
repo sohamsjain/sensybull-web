@@ -104,3 +104,71 @@ Now ordered by `created_at` (when the event was received) instead of `filing_dat
 ### Briefing headlines
 
 The ingest prompt no longer asks for semicolon-separated facts; new headlines are single plain-English sentences. Stored headlines are unchanged and age out naturally.
+
+### Positions — holdings + investment thesis (new)
+
+New `Position` resource: a user's stake in a company plus the *thesis* for
+holding it. This is the primitive that lets the platform reason for an
+investor (thesis-break detection, personalized materiality) rather than only
+inform. One position per (user, company).
+
+- `GET  /positions/` — list the user's positions; optional `?thesis_status=intact|watch|broken` filter. Returns `{ positions: [...] }`, each with a nested `company` and thesis fields.
+- `POST /positions/` — open a position. Body: `company_id` (required), plus optional `direction` (`long`|`short`, default `long`), `shares`, `cost_basis`, `thesis`, `opened_at`, `notes`. Idempotent per company: re-posting the same `company_id` updates the existing position (200) instead of creating a duplicate (201).
+- `GET  /positions/:id` — single position (owner only).
+- `PUT  /positions/:id` — update `direction`/`shares`/`cost_basis`/`thesis`/`thesis_status`/`opened_at`/`notes`. Setting `thesis_status` stamps `thesis_reviewed_at`.
+- `DELETE /positions/:id` — close (delete) a position.
+
+Position fields: `id`, `company_id`, `direction`, `shares` (string decimal), `cost_basis` (string decimal), `thesis`, `thesis_status` (`intact`|`watch`|`broken`, server-managed), `thesis_reviewed_at`, `opened_at`, `notes`, `created_at`, `updated_at`, nested `company`.
+
+`thesis_status` is the anchor for the forthcoming thesis-break engine: incoming filings for a held company will be evaluated against the thesis and can flip the status to `watch`/`broken`, firing a distinct alert.
+
+### Thesis-break engine — filings judged against your thesis (new)
+
+When a filing event is stored for a company a user holds (has a `Position`
+with a non-empty `thesis`), the API now evaluates the filing against that
+thesis via Groq and records a `ThesisAssessment`. Runs independently of
+watchlist membership — a held position is watched by definition — and off
+the real-time path, so it never delays event delivery.
+
+**Impact verdicts:** `supports` | `neutral` | `threatens` | `breaks`.
+The engine only ever *escalates* `thesis_status` (never auto-heals):
+`threatens` → `watch`, `breaks` → `broken`; `supports`/`neutral` record an
+assessment but leave status unchanged.
+
+New read endpoints (on the positions blueprint):
+- `GET /positions/assessments` — recent thesis assessments across all your positions. Optional `?impact=` filter and `?limit=` (default 50, max 200). Returns `{ assessments: [...] }`.
+- `GET /positions/:id/assessments` — assessment history for one position, newest first.
+
+Assessment shape: `id`, `position_id`, `filing_event_id`, `impact`, `rationale` (one sentence citing the filing), `prior_status`, `new_status`, `created_at`.
+
+**New socket event** (namespace `/feed`): `thesis_alert`, emitted to the
+owner's `user:<id>` room when a filing `threatens` or `breaks` a thesis.
+Payload: `position_id`, `company_id`, `ticker`, `company_name`, `impact`,
+`rationale`, `thesis_status`, `filing_event_id`, `headline`.
+
+Server-side dependency: the engine self-disables (records nothing, never
+errors) when Groq keys (`GROQ_API_KEYS`/`GROQ_API_KEY`) are unset, so no
+client change is required to deploy the API safely.
+
+### Thesis alerts now go over all channels (correction)
+
+The thesis-break engine previously only emitted the `thesis_alert` socket
+event. Thesis verdicts now also drive the user's regular notification
+channels (email, push, SMS, Slack, Discord, Telegram, WhatsApp, webhook):
+
+- **One enriched alert, not two.** When a filing is judged against a held
+  thesis, that user's filing alert is *upgraded* to lead with the verdict +
+  rationale instead of sending a separate notification. No thesis on the
+  company → the regular alert, unchanged.
+- **Enriched on `supports` / `threatens` / `breaks`;** a `neutral` verdict
+  falls back to the regular tier-gated alert.
+- **Thesis-break bypasses the tier gate** — a low-tier filing that breaks a
+  thesis still notifies. Per-company mute and the user's enabled/channel
+  choices are still respected.
+- Held-with-thesis users are deferred from the bulk dispatch and delivered
+  by the engine once the verdict lands; if the LLM is unavailable they still
+  receive their regular alert (nothing is dropped).
+- The `webhook` channel payload gains an optional `thesis` object
+  (`{impact, rationale, thesis_status}`) when the filing was thesis-assessed.
+
+No frontend change required; this is server-side delivery behavior.

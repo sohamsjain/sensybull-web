@@ -34,6 +34,19 @@ function FeedIcon() {
   );
 }
 
+function PositionsIcon() {
+  return (
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={1.8}
+        d="M8 7V5.5A1.5 1.5 0 019.5 4h5A1.5 1.5 0 0116 5.5V7m4 0H4a1 1 0 00-1 1v10a1 1 0 001 1h16a1 1 0 001-1V8a1 1 0 00-1-1zM3 12h18"
+      />
+    </svg>
+  );
+}
+
 function MoversIcon() {
   return (
     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -123,6 +136,13 @@ export function NavRail() {
         badge={unread}
       >
         <WatchlistIcon />
+      </RailLink>
+      <RailLink
+        href="/positions"
+        label="Positions"
+        active={pathname?.startsWith("/positions") ?? false}
+      >
+        <PositionsIcon />
       </RailLink>
       <RailLink
         href="/feed"
