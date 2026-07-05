@@ -172,3 +172,60 @@ channels (email, push, SMS, Slack, Discord, Telegram, WhatsApp, webhook):
   (`{impact, rationale, thesis_status}`) when the filing was thesis-assessed.
 
 No frontend change required; this is server-side delivery behavior.
+
+## 2026-07-05 — The thesis engine: structured theses, two-stage judgment, analyst, scorecard
+
+### Structured, versioned theses
+
+`Position` gains:
+- `thesis_structured` (nullable): `{ core_claim, assumptions: string[] (≤5), kill_criteria: string[] (≤3), horizon: string|null }` — the falsifiable form the deep judge reasons over.
+- `thesis_version` (int): bumped on every thesis change; each value has a snapshot row.
+
+`POST /positions/` and `PUT /positions/:id` accept `thesis_structured` and
+`thesis_source` (`"user"` | `"assist"`). When only the structure is sent, the
+free-text `thesis` is derived from it server-side, so both stay in sync.
+**Any thesis change** (text or structure) bumps `thesis_version`, snapshots a
+revision, resets `thesis_status` to `intact` (old verdicts judged the old
+thesis; sending an explicit `thesis_status` in the same request overrides
+the reset), purges stale backtest rows, and queues a retroactive backtest
+(below).
+
+- `GET /positions/:id/versions` — revision history, newest first. Returns `{ versions: [{ id, position_id, version, thesis, thesis_structured, source, created_at }] }`.
+- `POST /positions/draft-thesis` — AI drafting assistant. Body `{ raw_text (required, ≤5000), company_id?, direction? }` → `{ draft: { core_claim, assumptions, kill_criteria, horizon } }`. `503` when the LLM is unconfigured/unavailable.
+
+### Two-stage judgment (deep assessments)
+
+Non-neutral triage verdicts now escalate to a deep pass over the **full
+filing text**, the measured price reaction, position direction/size, and the
+structured thesis. Assessment payloads gain:
+- `stage`: `"triage"` | `"deep"`
+- `triage_impact`: what the cheap pass said, when a deep pass ran
+- `confidence`: 0–1 (deep only)
+- `assumption_verdicts`: `[{ index (1-based into thesis_structured.assumptions), impact, rationale }]`
+- `citations`: verbatim quotes from the filing grounding the verdict
+- `retroactive`: true for backtest rows
+- `thesis_version`: the revision the verdict judged
+
+`GET /positions/assessments` now **excludes retroactive rows by default**
+(`?include_retroactive=1` to include). `GET /positions/:id/assessments`
+includes them (flagged) — for one position they are the backtest view.
+
+Retroactive backtests: on thesis create/edit the engine judges the thesis
+against the company's ~10 most recent stored filings. Rows are informational
+only (status never moves, no alerts/sockets).
+
+The `thesis_alert` socket payload gains `confidence` and `stage`.
+Server env: `THESIS_DEEP_MODEL` overrides the deep model (default
+`llama-3.3-70b-versatile`).
+
+### Per-position analyst
+
+- `POST /positions/:id/analyst` — chat with a tool-using analyst grounded in this company's filings, price reactions, and past assessments. Body `{ messages: [{ role: "user"|"assistant", content }] (≤24, last must be user) }` → `{ reply, tools_used }`. Stateless: send the whole history each turn. `503` when the LLM is unavailable.
+
+### Track record
+
+- `GET /positions/scorecard` — `{ scorecard: { assessed_filings, verdict_counts: {impact: n}, avg_move_after_verdict: {impact: {"1d": pct, "1w": pct}}, position_status_counts: {status: n} } }`. Live assessments joined to the measured 1d/1w price reactions of the filings they judged.
+
+### Misc
+
+- `GET /events/catalysts` accepts `?company_id=` to narrow to one company (backs the per-position "next test of your thesis" view).

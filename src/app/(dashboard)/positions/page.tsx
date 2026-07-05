@@ -1,9 +1,10 @@
 "use client";
 
 import { useMemo } from "react";
-import { usePositions } from "@/hooks/use-positions";
+import { usePositions, useScorecard } from "@/hooks/use-positions";
 import { AddPosition } from "@/components/positions/add-position";
 import { PositionCard } from "@/components/positions/position-card";
+import { ScorecardStrip } from "@/components/positions/scorecard";
 
 /**
  * Positions — the holdings a user tracks and the thesis behind each. Filings
@@ -12,6 +13,7 @@ import { PositionCard } from "@/components/positions/position-card";
  */
 export default function PositionsPage() {
   const { positions, loading, open, update, remove } = usePositions();
+  const scorecard = useScorecard();
 
   const heldCompanyIds = useMemo(
     () => new Set(positions.map((p) => p.company_id)),
@@ -50,6 +52,8 @@ export default function PositionsPage() {
         <div className="mb-5">
           <AddPosition onOpen={open} heldCompanyIds={heldCompanyIds} />
         </div>
+
+        <ScorecardStrip scorecard={scorecard} />
 
         {loading ? (
           <div className="space-y-2 animate-pulse">

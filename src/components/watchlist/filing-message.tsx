@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { FilingEvent } from "@/types/events";
+import type { ThesisAssessment } from "@/types/api";
 import type { Significance, Sentiment } from "@/config/constants";
 import { messageTime, fullDateTime } from "@/lib/utils";
 import { DealTerms } from "@/components/feed/deal-terms";
@@ -9,14 +10,22 @@ import { CatalystsTable } from "@/components/feed/catalysts-table";
 import { InvestorTakeaway } from "@/components/feed/investor-takeaway";
 import { SignificanceExplainer } from "@/components/feed/significance-explainer";
 import { PriceReactionStrip } from "@/components/feed/price-reaction-strip";
+import { ImpactLabel } from "@/components/positions/thesis-badge";
 import { formPhrase, formTag, formTagDuplicatesEventType } from "@/lib/forms";
 
 /**
  * One filing event rendered as an incoming message bubble.
  * Collapsed, it shows only the category label and headline; the briefing
- * details live behind the "Read more" toggle.
+ * details live behind the "Read more" toggle. When the company is held and
+ * the thesis engine judged this filing, the verdict leads the message.
  */
-export function FilingMessage({ event }: { event: FilingEvent }) {
+export function FilingMessage({
+  event,
+  assessment = null,
+}: {
+  event: FilingEvent;
+  assessment?: ThesisAssessment | null;
+}) {
   const [expanded, setExpanded] = useState(false);
   const [copied, setCopied] = useState(false);
   const { briefing, exhibits, edgar_url } = event;
@@ -93,6 +102,17 @@ export function FilingMessage({ event }: { event: FilingEvent }) {
             </span>
           )}
         </div>
+
+        {/* Thesis verdict, when this filing was judged against a held thesis */}
+        {assessment && assessment.impact !== "neutral" && (
+          <p className="mb-1 text-[12px] leading-snug">
+            <ImpactLabel impact={assessment.impact} />{" "}
+            <span className="text-slate-500 dark:text-slate-400">
+              your thesis
+              {assessment.rationale ? ` — ${assessment.rationale}` : ""}
+            </span>
+          </p>
+        )}
 
         {/* Headline */}
         {briefing ? (

@@ -2,12 +2,21 @@
 
 import { useState, useEffect, useCallback } from "react";
 import type {
+  AnalystMessage,
+  AnalystResponse,
   Position,
   PositionsResponse,
   PositionResponse,
+  Scorecard,
+  ScorecardResponse,
   ThesisAssessment,
   AssessmentsResponse,
+  ThesisDraft,
+  ThesisDraftResponse,
   ThesisStatus,
+  ThesisStructured,
+  ThesisVersionEntry,
+  ThesisVersionsResponse,
 } from "@/types/api";
 import { api } from "@/lib/api-client";
 import { useAuth } from "@/hooks/use-auth";
@@ -19,7 +28,38 @@ export interface OpenPositionInput {
   shares?: string | null;
   cost_basis?: string | null;
   thesis?: string | null;
+  thesis_structured?: ThesisStructured | null;
+  /** Who produced this thesis revision: typed vs accepted from the assistant. */
+  thesis_source?: "user" | "assist";
   notes?: string | null;
+}
+
+/** AI drafting assistant: raw investor notes → structured falsifiable thesis. */
+export async function draftThesis(
+  rawText: string,
+  companyId?: string | null,
+  direction: "long" | "short" = "long"
+): Promise<ThesisDraft> {
+  const data = await api<ThesisDraftResponse>("/positions/draft-thesis", {
+    method: "POST",
+    body: JSON.stringify({
+      raw_text: rawText,
+      company_id: companyId ?? null,
+      direction,
+    }),
+  });
+  return data.draft;
+}
+
+/** One turn of the per-position analyst chat; the caller owns the history. */
+export async function askAnalyst(
+  positionId: string,
+  messages: AnalystMessage[]
+): Promise<AnalystResponse> {
+  return api<AnalystResponse>(`/positions/${positionId}/analyst`, {
+    method: "POST",
+    body: JSON.stringify({ messages }),
+  });
 }
 
 // Recent assessments are polled (no per-page socket owner yet), mirroring
@@ -166,4 +206,50 @@ export function usePositionAssessments(positionId: string | null) {
   }, [positionId]);
 
   return { assessments, loading };
+}
+
+/** Thesis revision history for a single position, loaded on demand. */
+export function usePositionVersions(positionId: string | null) {
+  const [versions, setVersions] = useState<ThesisVersionEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!positionId) return;
+    let cancelled = false;
+    api<ThesisVersionsResponse>(`/positions/${positionId}/versions`)
+      .then((data) => {
+        if (!cancelled) setVersions(data.versions || []);
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [positionId]);
+
+  return { versions, loading };
+}
+
+/** Track record: the user's verdicts vs the tape (refreshed with alerts). */
+export function useScorecard() {
+  const { user } = useAuth();
+  const { lastThesisAlert } = useSocket();
+  const [scorecard, setScorecard] = useState<Scorecard | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    api<ScorecardResponse>("/positions/scorecard")
+      .then((d) => {
+        if (!cancelled) setScorecard(d.scorecard);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [user, lastThesisAlert]);
+
+  return scorecard;
 }
