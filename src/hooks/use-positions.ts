@@ -11,6 +11,7 @@ import type {
 } from "@/types/api";
 import { api } from "@/lib/api-client";
 import { useAuth } from "@/hooks/use-auth";
+import { useSocket } from "@/context/socket-provider";
 
 export interface OpenPositionInput {
   company_id: string;
@@ -27,6 +28,7 @@ const ASSESSMENTS_REFRESH_MS = 120_000;
 
 export function usePositions() {
   const { user } = useAuth();
+  const { lastThesisAlert } = useSocket();
   const [positions, setPositions] = useState<Position[]>([]);
   const [assessments, setAssessments] = useState<ThesisAssessment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -77,6 +79,26 @@ export function usePositions() {
       clearInterval(timer);
     };
   }, [user]);
+
+  // A live thesis_alert means a held thesis just moved — refresh immediately
+  // instead of waiting for the poll (state set only in promise callbacks).
+  useEffect(() => {
+    if (!lastThesisAlert || !user) return;
+    let cancelled = false;
+    api<PositionsResponse>("/positions/")
+      .then((d) => {
+        if (!cancelled) setPositions(d.positions || []);
+      })
+      .catch(() => {});
+    api<AssessmentsResponse>("/positions/assessments?limit=50")
+      .then((d) => {
+        if (!cancelled) setAssessments(d.assessments || []);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [lastThesisAlert, user]);
 
   const open = useCallback(
     async (input: OpenPositionInput) => {

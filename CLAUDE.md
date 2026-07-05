@@ -15,13 +15,13 @@
 - Events (single): `GET /events/all/:id` (public, permalinks)
 - Watchlist inbox: `GET /watchlist/` (companies + unread counts under `items`), `POST /watchlist/:companyId/read`, `PUT /watchlist/:companyId/mute`
 - Positions: CRUD at `/positions/` (holdings + thesis), `GET /positions/assessments` (recent thesis-break assessments), `GET /positions/:id/assessments` (per-position history)
-- WebSocket: Socket.IO namespace `/feed`, auth via `{token}` dict, events: `filing_event`, `connected`, `thesis_alert` (fired when a filing threatens/breaks a held thesis; no frontend live-handler yet — the /positions page polls assessments)
+- WebSocket: Socket.IO namespace `/feed`, auth via `{token}` dict, events: `filing_event`, `connected`, `thesis_alert` (a filing moved a held thesis). The `/feed` socket is owned once at the dashboard layout by `SocketProvider` (`useSocket`) and shared by all pages — it persists across client-side navigation. `thesis_alert` surfaces a global toast anywhere in the app and live-refreshes the Positions page.
 
 ## Project Structure
 - `src/types/` — API and event type definitions
 - `src/lib/` — API client (auto-refresh on 401), Socket.IO wrapper, utilities
 - `src/hooks/` — useAuth, useSocket, useEvents (REST+Socket merge), useWatchlists, useWatchlistInbox (inbox + live unread), useCompanyEvents (per-company history), usePositions (holdings + thesis + thesis-break assessments), usePaneWidth (resizable pane)
-- `src/context/` — AuthProvider (login/register/google/logout)
+- `src/context/` — AuthProvider (login/register/google/logout), SocketProvider (session-wide `/feed` socket + `useSocket` + global thesis-alert toaster)
 - `src/components/ui/` — shadcn/ui primitives
 - `src/components/feed/` — FilingCard, FilingList, badges
 - `src/components/watchlist/` — WatchlistPanel, WatchlistItem, Conversation, FilingMessage, CompanyAvatar

@@ -13,6 +13,7 @@ import { NavRail } from "@/components/layout/nav-rail";
 import { BottomTabs } from "@/components/layout/bottom-tabs";
 import { CompanySheet, type CompanyRef } from "@/components/company/company-sheet";
 import { CommandPalette } from "@/components/command-palette";
+import { SocketProvider } from "@/context/socket-provider";
 import { useAuth } from "@/hooks/use-auth";
 
 export type { CompanyRef };
@@ -151,25 +152,29 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
         openCompany,
       }}
     >
-      {/* overflow-hidden pins the app shell to the viewport so the document
-          itself never grows a second scrollbar */}
-      <div className="h-dvh overflow-hidden flex bg-slate-50 dark:bg-[#0b0d12] text-slate-800 dark:text-slate-100">
-        <NavRail />
-        <div className="flex-1 flex min-w-0 overflow-hidden">
-          {/* pb clears the mobile bottom tab bar */}
-          <main
-            className={`flex-1 overflow-hidden ${user ? "pb-14 md:pb-0" : ""}`}
-          >
-            {children}
-          </main>
+      {/* One socket for the whole session, owned above the pages so it
+          survives navigation and can surface thesis alerts anywhere. */}
+      <SocketProvider>
+        {/* overflow-hidden pins the app shell to the viewport so the document
+            itself never grows a second scrollbar */}
+        <div className="h-dvh overflow-hidden flex bg-slate-50 dark:bg-[#0b0d12] text-slate-800 dark:text-slate-100">
+          <NavRail />
+          <div className="flex-1 flex min-w-0 overflow-hidden">
+            {/* pb clears the mobile bottom tab bar */}
+            <main
+              className={`flex-1 overflow-hidden ${user ? "pb-14 md:pb-0" : ""}`}
+            >
+              {children}
+            </main>
+          </div>
+          <BottomTabs />
+          <CompanySheet
+            company={companySheet}
+            onClose={() => setCompanySheet(null)}
+          />
+          <CommandPalette />
         </div>
-        <BottomTabs />
-        <CompanySheet
-          company={companySheet}
-          onClose={() => setCompanySheet(null)}
-        />
-        <CommandPalette />
-      </div>
+      </SocketProvider>
     </DashboardContext.Provider>
   );
 }
