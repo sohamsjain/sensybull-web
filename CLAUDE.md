@@ -14,7 +14,7 @@
 - Alerts: `GET/PUT /alerts/preferences`, `GET /alerts/notifications`, `GET /alerts/channels`, Web Push at `/alerts/push/*` (see `src/lib/push.ts` + `public/sw.js`)
 - Events (single): `GET /events/all/:id` (public, permalinks)
 - Watchlist inbox: `GET /watchlist/` (companies + unread counts under `items`), `POST /watchlist/:companyId/read`, `PUT /watchlist/:companyId/mute`
-- Positions: CRUD at `/positions/` (holdings + thesis), `GET /positions/assessments` (recent thesis-break assessments), `GET /positions/:id/assessments` (per-position history)
+- Positions: CRUD at `/positions/` (holdings + thesis, free text or structured `{core_claim, assumptions, kill_criteria, horizon}`), `GET /positions/assessments` (recent thesis-break assessments; retroactive backtests excluded by default), `GET /positions/:id/assessments` (per-position history incl. backtests), `GET /positions/:id/versions` (thesis revisions), `POST /positions/draft-thesis` (AI: raw notes → structured thesis), `POST /positions/:id/analyst` (per-position analyst chat, stateless — send full history), `GET /positions/scorecard` (verdicts vs subsequent 1d/1w price moves). Assessments are two-stage: cheap triage, then a deep pass (full filing text + price reaction) with per-assumption verdicts, confidence, and verbatim citations.
 - WebSocket: Socket.IO namespace `/feed`, auth via `{token}` dict, events: `filing_event`, `connected`, `thesis_alert` (a filing moved a held thesis). The `/feed` socket is owned once at the dashboard layout by `SocketProvider` (`useSocket`) and shared by all pages — it persists across client-side navigation. `thesis_alert` surfaces a global toast anywhere in the app and live-refreshes the Positions page.
 
 ## Project Structure
@@ -26,13 +26,13 @@
 - `src/components/feed/` — FilingCard, FilingList, badges
 - `src/components/watchlist/` — WatchlistPanel, WatchlistItem, Conversation, FilingMessage, CompanyAvatar
 - `src/components/movers/` — MoverList/MoverRow (shared by /movers page)
-- `src/components/positions/` — AddPosition (typeahead + thesis capture), PositionCard, ThesisBadge/ImpactLabel
+- `src/components/positions/` — AddPosition (typeahead + thesis capture), ThesisEditor (structured thesis + "Structure with AI" drafting), PositionCard (assumption verdicts, citations, versions, next catalyst), AnalystPanel (per-position chat), ScorecardStrip, ThesisBadge/ImpactLabel
 - `src/components/layout/` — NavRail, BottomTabs
 - `src/components/auth/` — Login/register/forgot-password forms
 - `src/app/(auth)/` — Auth pages (centered layout, no sidebar)
 - `src/app/(dashboard)/` — Dashboard pages (nav rail + main)
   - `/watchlist` — default landing for signed-in users; two-pane UI (resizable/collapsible company list + filing history), chart toggle swaps the right pane for a full-size price chart (`/chats` redirects here)
-  - `/positions` — holdings + investment thesis per company; filings are judged against each thesis by the API, and positions whose thesis is threatened/broken float to the top with the assessment rationale
+  - `/positions` — holdings + investment thesis per company (structured: core claim, assumptions, kill criteria; AI drafting assist). Filings are judged against each thesis by the API in two stages (triage → deep read of the full filing), positions whose thesis is threatened/broken float to the top, each assumption carries its latest verdict, and new theses are backtested against recent filings. Includes the track-record strip and a per-position analyst chat. Held companies also surface their thesis in the watchlist inbox (status badge on the conversation header, verdict line on judged filings)
   - `/feed` — public live stream of all events in received order (no watchlist filtering)
   - `/movers` — today's gainers/losers among recent filers
   - `/calendar` — upcoming-catalyst agenda across all tracked filings

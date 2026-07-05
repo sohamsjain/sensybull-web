@@ -5,11 +5,18 @@ import type { CompanySearchResult, CompanySearchResponse } from "@/types/api";
 import { api } from "@/lib/api-client";
 import { CompanyAvatar } from "@/components/watchlist/company-avatar";
 import type { OpenPositionInput } from "@/hooks/use-positions";
+import {
+  ThesisEditor,
+  emptyThesis,
+  thesisPayload,
+  type ThesisEditorValue,
+} from "./thesis-editor";
 
 /**
  * Two-step "open a position" flow: pick a company (SEC typeahead), then
  * write the thesis. The thesis is the whole point — the form leads with it
- * and treats size/basis as optional.
+ * (free text or the AI-structured falsifiable form) and treats size/basis
+ * as optional.
  */
 export function AddPosition({
   onOpen,
@@ -23,7 +30,7 @@ export function AddPosition({
   const [picked, setPicked] = useState<CompanySearchResult | null>(null);
 
   const [direction, setDirection] = useState<"long" | "short">("long");
-  const [thesis, setThesis] = useState("");
+  const [thesis, setThesis] = useState<ThesisEditorValue>(emptyThesis());
   const [shares, setShares] = useState("");
   const [costBasis, setCostBasis] = useState("");
   const [saving, setSaving] = useState(false);
@@ -51,7 +58,7 @@ export function AddPosition({
     setResults([]);
     setPicked(null);
     setDirection("long");
-    setThesis("");
+    setThesis(emptyThesis());
     setShares("");
     setCostBasis("");
   };
@@ -63,7 +70,7 @@ export function AddPosition({
       await onOpen({
         company_id: picked.id,
         direction,
-        thesis: thesis.trim() || null,
+        ...thesisPayload(thesis),
         shares: shares.trim() || null,
         cost_basis: costBasis.trim() || null,
       });
@@ -152,12 +159,11 @@ export function AddPosition({
         </div>
       </div>
 
-      <textarea
+      <ThesisEditor
         value={thesis}
-        onChange={(e) => setThesis(e.target.value)}
-        placeholder="Why do you hold this? Your thesis — the claim filings will be judged against. e.g. 'Services margin expansion outweighs hardware slowdown.'"
-        rows={3}
-        className={`${inputClass} resize-none`}
+        onChange={setThesis}
+        companyId={picked.id}
+        direction={direction}
         autoFocus
       />
 
