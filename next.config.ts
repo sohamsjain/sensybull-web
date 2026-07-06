@@ -44,7 +44,13 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
+    return [
+      // Everything except /embed/* — the embed button is the one surface
+      // that must be frameable by third-party sites, so it opts out of the
+      // global frame-ancestors 'none' / X-Frame-Options: DENY and sets its
+      // own strict CSP in the route handler (src/app/embed/[symbol]/route.ts).
+      { source: "/((?!embed/).*)", headers: securityHeaders },
+    ];
   },
   async redirects() {
     return [
@@ -58,6 +64,13 @@ const nextConfig: NextConfig = {
       {
         source: "/chats",
         destination: "/watchlist",
+        permanent: false,
+      },
+      // Long-form track link → canonical short form (/add/MU)
+      {
+        source: "/watchlist/add",
+        has: [{ type: "query", key: "symbol", value: "(?<symbol>[a-zA-Z0-9.\\-]{1,10})" }],
+        destination: "/add/:symbol",
         permanent: false,
       },
     ];

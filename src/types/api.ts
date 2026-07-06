@@ -348,6 +348,27 @@ export interface AnalystMessage {
   content: string;
 }
 
+/** GET /share/:symbol — public share info (no internal IDs). */
+export interface ShareInfo {
+  symbol: string;
+  company: {
+    name: string;
+    ticker: string;
+    sector: string | null;
+    market_cap: number | null;
+  };
+  url: string;
+  html: string;
+  markdown: string;
+}
+
+/** POST /watchlists/track — idempotent add-by-ticker. */
+export interface TrackResponse {
+  status: "added" | "already_tracking";
+  company: { id: string; name: string; ticker: string };
+  watchlist_id: string;
+}
+
 export interface AnalystResponse {
   reply: string;
   tools_used: string[];

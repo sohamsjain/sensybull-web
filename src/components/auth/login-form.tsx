@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
+import { resolvePostAuthPath } from "@/lib/pending-action";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
@@ -21,7 +22,8 @@ export function LoginForm() {
     setLoading(true);
     try {
       await login(email, password);
-      router.push("/watchlist");
+      // ?next= / a stored pending action (e.g. a shared /add/MU link) wins
+      router.push(resolvePostAuthPath("/watchlist"));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
     }
