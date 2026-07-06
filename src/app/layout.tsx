@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { AuthProvider } from "@/context/auth-context";
 import { ThemeProvider } from "@/components/theme-provider";
+import { AppToaster } from "@/components/ui/app-toaster";
 import "./globals.css";
 
 const siteUrl = "https://www.sensybull.com";
@@ -100,6 +101,9 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <ThemeProvider>
           <AuthProvider>{children}</AuthProvider>
+          {/* Global toast target — mounted once so toasts fired right before
+              a client-side redirect survive the navigation. */}
+          <AppToaster />
         </ThemeProvider>
       </body>
     </html>

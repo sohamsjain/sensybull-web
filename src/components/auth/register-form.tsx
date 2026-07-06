@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
+import { resolvePostAuthPath } from "@/lib/pending-action";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
@@ -22,7 +23,8 @@ export function RegisterForm() {
     setLoading(true);
     try {
       await register(name, email, password);
-      router.push("/feed");
+      // ?next= / a stored pending action (e.g. a shared /add/MU link) wins
+      router.push(resolvePostAuthPath("/feed"));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Registration failed");
     }

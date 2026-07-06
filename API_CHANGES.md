@@ -1,5 +1,35 @@
 # API Changes
 
+## 2026-07-06
+
+### Shareable "Track on Sensybull" links
+
+**GET /share/:symbol (new, public)** — share info for a ticker, rate-limited
+`120/min`. Response: `{ symbol, company: { name, ticker, sector, market_cap }, url, html, markdown }`
+where `url` is the canonical `https://sensybull.com/add/:symbol` link and
+`html`/`markdown` are ready-to-paste snippets. `400 { "error": "invalid_symbol" }`
+for malformed tickers, `404 { "error": "unknown_ticker" }` when no company
+matches. Deliberately exposes **no internal IDs** (companies are addressed by
+ticker only). `sector` is derived from the SIC division; nullable. Base origin
+configurable via new env `SHARE_BASE_URL` (defaults to `FRONTEND_URL`).
+
+**POST /watchlists/track (new, auth, idempotent)** — one-call "track this
+ticker" backing `/add/:symbol`. Body `{ symbol, attribution?: { ref, utm_source, utm_medium, utm_campaign }, referrer? }`.
+Validates the ticker, resolves the company case-insensitively, adds it to the
+user's default watchlist (first list, created as "My Watchlist" on demand) and
+returns `{ status: "added" | "already_tracking", company: { id, name, ticker }, watchlist_id }`.
+Re-posting never duplicates. Errors: `400 invalid_symbol`, `404 unknown_ticker`.
+Rate-limited `30/min`. Records `watchlist_added` / `already_in_watchlist`
+funnel analytics server-side with the passed attribution.
+
+**POST /share/events (new, public)** — funnel analytics sink, rate-limited
+`60/min`. Body `{ event, symbol?, ref?, utm_source?, utm_medium?, utm_campaign?, referrer?, logged_in? }`
+with `event` ∈ `link_opened | button_clicked | auth_started | auth_completed | failed`
+(plus the two server-recorded ones above). Device/browser/country are derived
+server-side from UA + edge headers, never trusted from the body. A valid JWT
+(optional) attaches `user_id`. Returns `202`. New `share_event` table
+(migration `b7c8d9e0f1a2`).
+
 ## 2026-07-04
 
 ### Refresh token moved to an httpOnly cookie (breaking — coordinated web deploy required)

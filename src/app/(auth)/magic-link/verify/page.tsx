@@ -3,6 +3,7 @@
 import { Suspense, useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
+import { resolvePostAuthPath } from "@/lib/pending-action";
 import Link from "next/link";
 
 function MagicLinkVerifyContent() {
@@ -26,7 +27,9 @@ function MagicLinkVerifyContent() {
       .then(() => {
         setStatus("success");
         setMessage("Signed in successfully! Redirecting...");
-        setTimeout(() => router.push("/watchlist"), 1000);
+        // A stored pending action (e.g. a shared /add/MU link) resumes here —
+        // the email round-trip loses ?next=, localStorage doesn't.
+        setTimeout(() => router.push(resolvePostAuthPath("/watchlist")), 1000);
       })
       .catch((err) => {
         setStatus("error");

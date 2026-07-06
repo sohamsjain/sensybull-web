@@ -15,6 +15,7 @@
 - Events (single): `GET /events/all/:id` (public, permalinks)
 - Watchlist inbox: `GET /watchlist/` (companies + unread counts under `items`), `POST /watchlist/:companyId/read`, `PUT /watchlist/:companyId/mute`
 - Positions: CRUD at `/positions/` (holdings + thesis, free text or structured `{core_claim, assumptions, kill_criteria, horizon}`), `GET /positions/assessments` (recent thesis-break assessments; retroactive backtests excluded by default), `GET /positions/:id/assessments` (per-position history incl. backtests), `GET /positions/:id/versions` (thesis revisions), `POST /positions/draft-thesis` (AI: raw notes → structured thesis), `POST /positions/:id/analyst` (per-position analyst chat, stateless — send full history), `GET /positions/scorecard` (verdicts vs subsequent 1d/1w price moves). Assessments are two-stage: cheap triage, then a deep pass (full filing text + price reaction) with per-assumption verdicts, confidence, and verbatim citations.
+- Share links: `GET /share/:symbol` (public share info, no internal IDs), `POST /watchlists/track` (auth, idempotent add-by-ticker), `POST /share/events` (public funnel analytics). See `docs/TRACK_LINKS.md`
 - WebSocket: Socket.IO namespace `/feed`, auth via `{token}` dict, events: `filing_event`, `connected`, `thesis_alert` (a filing moved a held thesis). The `/feed` socket is owned once at the dashboard layout by `SocketProvider` (`useSocket`) and shared by all pages — it persists across client-side navigation. `thesis_alert` surfaces a global toast anywhere in the app and live-refreshes the Positions page.
 
 ## Project Structure
@@ -37,6 +38,10 @@
   - `/movers` — today's gainers/losers among recent filers
   - `/calendar` — upcoming-catalyst agenda across all tracked filings
   - `/e/[id]` — public per-event permalink (backed by GET /events/all/:id)
+- `src/app/add/[symbol]/` — public "Track on Sensybull" deep link (`/add/MU`): SEO/OG page + client flow that adds the ticker to the watchlist, preserving intent through auth via `src/lib/pending-action.ts` (see `docs/TRACK_LINKS.md`)
+- `src/app/embed/[symbol]/` — iframe-able track button (route handler, frameable by design; header carve-out in next.config.ts)
+- `src/components/share/` — TrackButton, ShareDialog (company sheet), AddFlow
+- `src/lib/share.ts` (canonical link/snippet builders) + `src/lib/share-analytics.ts` (funnel events); global toast in `src/components/ui/app-toaster.tsx` (mounted in root layout)
 
 ## Related Projects
 - Backend API: ~/Projects/sensybull-api (Flask)
@@ -49,3 +54,4 @@
 - Filter state lives in `(dashboard)/layout.tsx` via React context
 - Dual theme (class-based dark mode). Accent: indigo, reserved for interactive elements. Decorative color is avoided: category/form tags are plain muted text, only High materiality gets a restrained red, emerald/red appear only on price/sentiment data. Dark surfaces: #0b0d12 base, #12141b/#14161c cards, #1a1d25 hover
 - The UI presents a single watchlist (adds go to the user's first list via `src/lib/default-watchlist.ts`); the API still supports multiple lists
+- Unit tests: `npm test` (vitest, `src/**/*.test.ts`)

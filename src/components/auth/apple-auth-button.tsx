@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
+import { resolvePostAuthPath } from "@/lib/pending-action";
 
 const APPLE_CLIENT_ID = process.env.NEXT_PUBLIC_APPLE_CLIENT_ID;
 
@@ -65,7 +66,7 @@ export function AppleAuthButton() {
           }
         : undefined;
       await appleAuth(idToken, user);
-      router.push("/watchlist");
+      router.push(resolvePostAuthPath("/watchlist"));
     } catch (err) {
       if (err && typeof err === "object" && "error" in err) {
         const appleErr = err as { error: string };

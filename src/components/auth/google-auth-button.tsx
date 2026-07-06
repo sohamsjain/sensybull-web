@@ -3,6 +3,7 @@
 import { useEffect, useRef, useCallback, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
+import { resolvePostAuthPath } from "@/lib/pending-action";
 
 const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
@@ -34,7 +35,7 @@ export function GoogleAuthButton() {
       setError("");
       try {
         await googleAuth(response.code);
-        router.push("/watchlist");
+        router.push(resolvePostAuthPath("/watchlist"));
       } catch (err) {
         setError(
           err instanceof Error ? err.message : "Google sign-in failed"

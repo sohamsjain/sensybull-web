@@ -19,6 +19,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import { ShareDialog } from "@/components/share/share-dialog";
 
 export interface CompanyRef {
   id: string;
@@ -43,6 +44,7 @@ export function CompanySheet({
   >("loading");
   const [adding, setAdding] = useState(false);
   const [detail, setDetail] = useState<Company | null>(null);
+  const [sharing, setSharing] = useState(false);
 
   const isWatchlisted = useMemo(
     () =>
@@ -174,33 +176,45 @@ export function CompanySheet({
                 </div>
               </div>
 
-              {user && (
-                <div className="flex items-center gap-2 mt-3">
-                  <Link href={`/watchlist?c=${company.id}`} onClick={onClose}>
-                    <Button
-                      size="sm"
-                      className="bg-indigo-600 hover:bg-indigo-500 text-white"
-                    >
-                      View filings
-                    </Button>
-                  </Link>
-                  {isWatchlisted ? (
-                    <span className="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 dark:bg-white/[0.06] text-slate-500 dark:text-slate-400">
-                      In watchlist ✓
-                    </span>
-                  ) : (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      disabled={adding}
-                      onClick={handleWatch}
-                      className="border-indigo-500/30 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-500/10"
-                    >
-                      {adding ? "Adding..." : "+ Watch"}
-                    </Button>
-                  )}
-                </div>
-              )}
+              <div className="flex items-center gap-2 mt-3">
+                {user && (
+                  <>
+                    <Link href={`/watchlist?c=${company.id}`} onClick={onClose}>
+                      <Button
+                        size="sm"
+                        className="bg-indigo-600 hover:bg-indigo-500 text-white"
+                      >
+                        View filings
+                      </Button>
+                    </Link>
+                    {isWatchlisted ? (
+                      <span className="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 dark:bg-white/[0.06] text-slate-500 dark:text-slate-400">
+                        In watchlist ✓
+                      </span>
+                    ) : (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        disabled={adding}
+                        onClick={handleWatch}
+                        className="border-indigo-500/30 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-500/10"
+                      >
+                        {adding ? "Adding..." : "+ Watch"}
+                      </Button>
+                    )}
+                  </>
+                )}
+                {company.ticker && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setSharing(true)}
+                    className="border-slate-300 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/[0.06]"
+                  >
+                    Share
+                  </Button>
+                )}
+              </div>
             </SheetHeader>
 
             <div className="px-5 py-4 space-y-5">
@@ -294,6 +308,12 @@ export function CompanySheet({
           </>
         )}
       </SheetContent>
+      {sharing && company?.ticker && (
+        <ShareDialog
+          company={{ name: company.name, ticker: company.ticker }}
+          onClose={() => setSharing(false)}
+        />
+      )}
     </Sheet>
   );
 }
