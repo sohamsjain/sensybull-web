@@ -131,17 +131,23 @@ export function ThesisEditor({
   autoFocus?: boolean;
 }) {
   const [drafting, setDrafting] = useState(false);
-  const [draftError, setDraftError] = useState(false);
+  const [draftError, setDraftError] = useState<string | null>(null);
 
   const structure = async () => {
     if (!value.thesis.trim()) return;
     setDrafting(true);
-    setDraftError(false);
+    setDraftError(null);
     try {
       const draft = await draftThesis(value.thesis, companyId, direction);
       onChange({ ...value, structured: draft, source: "assist" });
-    } catch {
-      setDraftError(true);
+    } catch (err) {
+      // The API names the cause (e.g. "AI is not configured on this
+      // server") — show it rather than a generic shrug.
+      setDraftError(
+        err instanceof Error && err.message
+          ? err.message
+          : "Drafting is unavailable right now"
+      );
     } finally {
       setDrafting(false);
     }
@@ -179,7 +185,7 @@ export function ThesisEditor({
           </button>
           <span className="text-[11px] text-slate-400 dark:text-slate-500">
             {draftError
-              ? "Drafting is unavailable right now — your text still works as-is."
+              ? `${draftError} — your text still works as-is.`
               : "Breaks your notes into falsifiable assumptions the engine can judge one by one."}
           </span>
         </div>

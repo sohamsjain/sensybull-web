@@ -14,7 +14,7 @@ export function AnalystPanel({ positionId }: { positionId: string }) {
   const [messages, setMessages] = useState<AnalystMessage[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const send = async (text: string) => {
@@ -24,12 +24,18 @@ export function AnalystPanel({ positionId }: { positionId: string }) {
     setMessages(next);
     setInput("");
     setBusy(true);
-    setError(false);
+    setError(null);
     try {
       const res = await askAnalyst(positionId, next);
       setMessages([...next, { role: "assistant", content: res.reply }]);
-    } catch {
-      setError(true);
+    } catch (err) {
+      // The API names the cause (e.g. "AI is not configured on this
+      // server") — show it rather than a generic shrug.
+      setError(
+        err instanceof Error && err.message
+          ? err.message
+          : "The analyst is unavailable right now"
+      );
       // Leave the user's message in place so retry resends it.
     } finally {
       setBusy(false);
@@ -92,7 +98,7 @@ export function AnalystPanel({ positionId }: { positionId: string }) {
         )}
         {error && (
           <p className="text-[11px] text-slate-400 dark:text-slate-500">
-            The analyst is unavailable right now.{" "}
+            {error}.{" "}
             <button
               onClick={retry}
               className="text-indigo-600 dark:text-indigo-400 hover:underline"
