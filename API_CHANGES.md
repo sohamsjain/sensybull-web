@@ -229,3 +229,13 @@ Server env: `THESIS_DEEP_MODEL` overrides the deep model (default
 ### Misc
 
 - `GET /events/catalysts` accepts `?company_id=` to narrow to one company (backs the per-position "next test of your thesis" view).
+
+### Deep model default changed (fix)
+
+Groq deprecated `llama-3.3-70b-versatile` (June 17, 2026), which broke the
+analyst and the thesis drafting assistant in production (503s). The default
+deep model is now `openai/gpt-oss-120b` (Groq's recommended replacement;
+`THESIS_DEEP_MODEL` still overrides), and the model chain now falls back to
+the next model on **any** provider error rather than only 404/429 — so a
+future decommission degrades to the triage models instead of an outage.
+No frontend change.
