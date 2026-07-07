@@ -22,6 +22,30 @@ interface PriceReactionUpdate {
   explosive: boolean;
 }
 
+const receivedOrderKey = (e: FilingEvent) =>
+  e.received_at || e.filing_date || "";
+
+/**
+ * Merge a socket-delivered filing into the feed in received-order position,
+ * mirroring /events/all (created_at desc). The shared /feed socket also
+ * replays the signed-in user's watchlist history on connect; blindly
+ * prepending those would pin old watchlist filings to the top, upranking
+ * them above newer events. A genuinely new filing carries the newest
+ * received_at and still lands first; an older replayed one slots into its
+ * true chronological place. Duplicates (by edgar_id) are ignored.
+ */
+export function insertByReceivedOrder(
+  list: FilingEvent[],
+  event: FilingEvent
+): FilingEvent[] {
+  if (list.some((e) => e.edgar_id === event.edgar_id)) return list;
+  const ts = receivedOrderKey(event);
+  const idx = list.findIndex((e) => receivedOrderKey(e) < ts);
+  return idx === -1
+    ? [...list, event]
+    : [...list.slice(0, idx), event, ...list.slice(idx)];
+}
+
 export function useEvents({
   significanceFilter,
   eventTypeFilter,
@@ -59,7 +83,15 @@ export function useEvents({
       const data = await api<PaginatedEvents>(
         `/events/all?page=${pageRef.current}&per_page=50`
       );
-      setEvents((prev) => [...prev, ...(data.events || [])]);
+      setEvents((prev) => {
+        // A replayed watchlist filing may already sit in the list at its
+        // chronological spot; skip it so a later page doesn't duplicate it.
+        const seen = new Set(prev.map((e) => e.edgar_id));
+        const incoming = (data.events || []).filter(
+          (e) => !seen.has(e.edgar_id)
+        );
+        return [...prev, ...incoming];
+      });
       setHasMore(
         events.length + (data.events?.length || 0) < data.total
       );
@@ -72,10 +104,7 @@ export function useEvents({
     if (!socket) return;
 
     const onFiling = (event: FilingEvent) => {
-      setEvents((prev) => {
-        if (prev.some((e) => e.edgar_id === event.edgar_id)) return prev;
-        return [event, ...prev];
-      });
+      setEvents((prev) => insertByReceivedOrder(prev, event));
     };
 
     // Reactions are measured minutes-to-days after the filing arrives;
