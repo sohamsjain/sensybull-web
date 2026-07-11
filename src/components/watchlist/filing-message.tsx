@@ -148,6 +148,12 @@ export function FilingMessage({
                 {briefing.summary}
               </p>
             )}
+            {briefing.mode === "facts_only" && (
+              <p className="text-slate-400 dark:text-slate-500 text-[12px] leading-[1.5] mt-1.5">
+                Showing verified filing facts only — an AI summary wasn&apos;t
+                available for this filing.
+              </p>
+            )}
             {briefing.deal_terms &&
               Object.keys(briefing.deal_terms).length > 0 && (
                 <DealTerms terms={briefing.deal_terms} />

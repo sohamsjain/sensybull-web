@@ -7,6 +7,15 @@ export interface Briefing {
   investor_takeaway: string;
   catalysts: Catalyst[];
   deal_terms: Record<string, string>;
+  /**
+   * Provenance of the briefing content:
+   * - "llm_verified": AI narrative that passed grounding checks against the filing text
+   * - "facts_only": deterministic fields only — the AI narrative was withheld
+   *   because it could not be verified (or there was too little text to summarize)
+   * - "structured": built programmatically from structured data (Form 4)
+   * Absent on events ingested before verification shipped.
+   */
+  mode?: "llm_verified" | "facts_only" | "structured";
 }
 
 export interface Catalyst {
