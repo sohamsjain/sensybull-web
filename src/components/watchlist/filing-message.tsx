@@ -2,55 +2,34 @@
 
 import { useState } from "react";
 import type { FilingEvent } from "@/types/events";
-import type { ThesisAssessment } from "@/types/api";
-import type { Significance, Sentiment } from "@/config/constants";
 import { messageTime, fullDateTime } from "@/lib/utils";
+import { isImportant } from "@/lib/event-actions";
 import { DealTerms } from "@/components/feed/deal-terms";
 import { CatalystsTable } from "@/components/feed/catalysts-table";
-import { InvestorTakeaway } from "@/components/feed/investor-takeaway";
-import { SignificanceExplainer } from "@/components/feed/significance-explainer";
 import { PriceReactionStrip } from "@/components/feed/price-reaction-strip";
-import { ImpactLabel } from "@/components/positions/thesis-badge";
+import { UpdateActions } from "@/components/feed/update-actions";
 import { formPhrase, formTag, formTagDuplicatesEventType } from "@/lib/forms";
 
 /**
  * One filing event rendered as an incoming message bubble.
- * Collapsed, it shows only the category label and headline; the briefing
- * details live behind the "Read more" toggle. When the company is held and
- * the thesis engine judged this filing, the verdict leads the message.
+ * Collapsed, it shows only the category label and headline; the summary,
+ * key dates, and action buttons live behind the "Read more" toggle.
  */
-export function FilingMessage({
-  event,
-  assessment = null,
-}: {
-  event: FilingEvent;
-  assessment?: ThesisAssessment | null;
-}) {
+export function FilingMessage({ event }: { event: FilingEvent }) {
   const [expanded, setExpanded] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const { briefing, exhibits, edgar_url } = event;
+  const { briefing, edgar_url } = event;
 
-  const copyPermalink = () => {
-    navigator.clipboard
-      .writeText(`${window.location.origin}/e/${event.id}`)
-      .then(() => {
-        setCopied(true);
-        setTimeout(() => setCopied(false), 1500);
-      })
-      .catch(() => {});
-  };
-
-  const significance = (briefing?.significance as Significance) || "Medium";
-  const sentiment = (briefing?.sentiment as Sentiment) || "Neutral";
+  const important = isImportant(event);
   const catalysts =
     event.catalysts?.length > 0 ? event.catalysts : briefing?.catalysts || [];
+  const hasDealTerms =
+    !!briefing?.deal_terms && Object.keys(briefing.deal_terms).length > 0;
 
   const hasDetails = !!(
-    briefing?.investor_takeaway ||
     briefing?.summary ||
-    (briefing?.deal_terms && Object.keys(briefing.deal_terms).length > 0) ||
+    hasDealTerms ||
     catalysts.length > 0 ||
-    exhibits?.length > 0
+    edgar_url
   );
 
   const toggleExpanded = () => {
@@ -65,54 +44,29 @@ export function FilingMessage({
         className="max-w-[92%] md:max-w-[70%] bg-white ring-1 ring-slate-200/80 dark:ring-0 dark:bg-[#14161c] rounded-xl rounded-tl-sm px-3.5 py-2.5 shadow-sm shadow-slate-300/40 dark:shadow-md dark:shadow-black/20 cursor-pointer transition-colors hover:bg-slate-50 dark:hover:bg-[#171a21]"
         onClick={toggleExpanded}
       >
-        {/* Meta row: category name + form type (links to the filing on EDGAR) */}
-        <div className="flex items-center gap-1.5 mb-1.5">
+        {/* Meta row: Important marker + category + form type */}
+        <div className="flex items-center gap-2 mb-1.5">
+          {important && (
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-red-600 dark:text-red-400">
+              <span className="w-1.5 h-1.5 rounded-full bg-red-500 dark:bg-red-400" />
+              Important
+            </span>
+          )}
           {briefing?.primary_event_type &&
             briefing.primary_event_type !== "Other" && (
               <span className="text-slate-700 dark:text-slate-200 text-[11px] font-semibold uppercase tracking-wide">
                 {briefing.primary_event_type}
               </span>
             )}
-          {edgar_url ? (
-            <a
-              href={edgar_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-              title="View this filing on SEC EDGAR"
-              className="text-slate-400 dark:text-slate-500 text-[10.5px] ml-auto whitespace-nowrap uppercase tracking-wide hover:underline underline-offset-2 hover:text-slate-600 dark:hover:text-slate-300"
-            >
-              {/* Corner slot is form identity: fall back to the raw form name
-                  when the friendly tag would repeat the category label */}
-              {formTagDuplicatesEventType(
-                event.signal_type,
-                briefing?.primary_event_type
-              )
-                ? event.signal_type
-                : formTag(event.signal_type)}
-            </a>
-          ) : (
-            <span className="text-slate-400 dark:text-slate-500 text-[10.5px] ml-auto whitespace-nowrap uppercase tracking-wide">
-              {formTagDuplicatesEventType(
-                event.signal_type,
-                briefing?.primary_event_type
-              )
-                ? event.signal_type
-                : formTag(event.signal_type)}
-            </span>
-          )}
+          <span className="text-slate-400 dark:text-slate-500 text-[10.5px] ml-auto whitespace-nowrap uppercase tracking-wide">
+            {formTagDuplicatesEventType(
+              event.signal_type,
+              briefing?.primary_event_type
+            )
+              ? event.signal_type
+              : formTag(event.signal_type)}
+          </span>
         </div>
-
-        {/* Thesis verdict, when this filing was judged against a held thesis */}
-        {assessment && assessment.impact !== "neutral" && (
-          <p className="mb-1 text-[12px] leading-snug">
-            <ImpactLabel impact={assessment.impact} />{" "}
-            <span className="text-slate-500 dark:text-slate-400">
-              your thesis
-              {assessment.rationale ? ` — ${assessment.rationale}` : ""}
-            </span>
-          </p>
-        )}
 
         {/* Headline */}
         {briefing ? (
@@ -125,71 +79,29 @@ export function FilingMessage({
           </p>
         )}
 
-        {/* Price reaction since filing */}
-        {event.price_reactions && (
-          <PriceReactionStrip
-            reactions={event.price_reactions}
-            className="mt-1.5"
-          />
-        )}
-
         {/* Details, on demand */}
-        {expanded && briefing && (
+        {expanded && (
           <>
-            {briefing.investor_takeaway && (
-              <InvestorTakeaway
-                text={briefing.investor_takeaway}
-                sentiment={sentiment}
-                className="mt-1.5 text-[13px]"
-              />
-            )}
-            {briefing.summary && (
+            {briefing?.summary && (
               <p className="text-slate-600/90 dark:text-slate-300/90 text-[13px] leading-[1.5] mt-1.5">
                 {briefing.summary}
               </p>
             )}
-            {briefing.mode === "facts_only" && (
+            {briefing?.mode === "facts_only" && (
               <p className="text-slate-400 dark:text-slate-500 text-[12px] leading-[1.5] mt-1.5">
                 Showing verified filing facts only — an AI summary wasn&apos;t
                 available for this filing.
               </p>
             )}
-            {briefing.deal_terms &&
-              Object.keys(briefing.deal_terms).length > 0 && (
-                <DealTerms terms={briefing.deal_terms} />
-              )}
+            {hasDealTerms && <DealTerms terms={briefing!.deal_terms} />}
             {catalysts.length > 0 && <CatalystsTable catalysts={catalysts} />}
-            {exhibits?.length > 0 && (
-              <div
-                className="mt-3 pt-3 border-t border-slate-200 dark:border-white/[0.06]"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <p className="text-slate-400 dark:text-slate-500 text-[10px] uppercase tracking-wider mb-1">
-                  Exhibits
-                </p>
-                {exhibits.map((ex, i) => (
-                  <a
-                    key={i}
-                    href={ex.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 text-xs mb-0.5"
-                  >
-                    {ex.type} &mdash; {ex.description}
-                  </a>
-                ))}
-              </div>
+            {event.price_reactions && (
+              <PriceReactionStrip
+                reactions={event.price_reactions}
+                className="mt-2"
+              />
             )}
-            <SignificanceExplainer level={significance} items={event.items} />
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                copyPermalink();
-              }}
-              className="mt-1.5 text-[11px] text-indigo-600 dark:text-indigo-400 hover:underline underline-offset-2"
-            >
-              {copied ? "Copied!" : "Copy link to this event"}
-            </button>
+            <UpdateActions event={event} />
           </>
         )}
 

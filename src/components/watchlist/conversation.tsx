@@ -1,15 +1,13 @@
 "use client";
 
 import { useState, useRef, useLayoutEffect, useMemo } from "react";
-import Link from "next/link";
-import type { Position, ThesisAssessment, WatchlistEntry } from "@/types/api";
+import type { WatchlistEntry } from "@/types/api";
 import type { FilingEvent } from "@/types/events";
 import { dayLabel, formatCatalystDate } from "@/lib/utils";
 import { useDashboard } from "@/app/(dashboard)/layout";
 import { usePinnedCompanies } from "@/hooks/use-pinned-companies";
 import { CompanyAvatar } from "./company-avatar";
 import { FilingMessage } from "./filing-message";
-import { ThesisBadge } from "@/components/positions/thesis-badge";
 import { PriceChart } from "@/components/company/price-chart";
 import {
   DropdownMenu,
@@ -23,10 +21,6 @@ interface ConversationProps {
   events: FilingEvent[]; // newest first
   loading: boolean;
   hasMore: boolean;
-  /** The user's position in this company, when held — surfaces the thesis. */
-  position?: Position | null;
-  /** Thesis verdicts keyed by filing_event_id, for held companies. */
-  assessmentByEventId?: Map<string, ThesisAssessment>;
   onLoadEarlier: () => void;
   onBack: () => void;
   onToggleMute: () => void;
@@ -101,8 +95,6 @@ export function Conversation({
   events,
   loading,
   hasMore,
-  position = null,
-  assessmentByEventId,
   onLoadEarlier,
   onBack,
   onToggleMute,
@@ -234,22 +226,13 @@ export function Conversation({
             )}
           </p>
         </div>
-        {position && (
-          <Link
-            href="/positions"
-            className="shrink-0"
-            title="You hold this — view the position and its thesis"
-          >
-            <ThesisBadge status={position.thesis_status} />
-          </Link>
-        )}
         {muted && <MutedBellIcon />}
         {company.ticker && (
           <button
             onClick={() => setView((v) => (v === "chart" ? "messages" : "chart"))}
             className={`p-1.5 rounded transition-colors ${
               view === "chart"
-                ? "bg-slate-200 dark:bg-white/[0.08] text-slate-900 dark:text-white"
+                ? "bg-indigo-600 text-white"
                 : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
             }`}
             aria-label={view === "chart" ? "Back to messages" : "Show price chart"}
@@ -382,10 +365,7 @@ export function Conversation({
                     </span>
                   </div>
                 )}
-                <FilingMessage
-                  event={event}
-                  assessment={assessmentByEventId?.get(event.id) ?? null}
-                />
+                <FilingMessage event={event} />
               </div>
             );
           })

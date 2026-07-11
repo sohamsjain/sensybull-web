@@ -34,19 +34,6 @@ function FeedIcon() {
   );
 }
 
-function PositionsIcon() {
-  return (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={1.8}
-        d="M8 7V5.5A1.5 1.5 0 019.5 4h5A1.5 1.5 0 0116 5.5V7m4 0H4a1 1 0 00-1 1v10a1 1 0 001 1h16a1 1 0 001-1V8a1 1 0 00-1-1zM3 12h18"
-      />
-    </svg>
-  );
-}
-
 function MoversIcon() {
   return (
     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -55,19 +42,6 @@ function MoversIcon() {
         strokeLinejoin="round"
         strokeWidth={1.8}
         d="M3 17l5.5-5.5 4 4L21 7m0 0h-5m5 0v5"
-      />
-    </svg>
-  );
-}
-
-function CalendarIcon() {
-  return (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={1.8}
-        d="M6.75 3v2.25M17.25 3v2.25M3.75 18.75V7.5a2.25 2.25 0 012.25-2.25h12a2.25 2.25 0 012.25 2.25v11.25m-16.5 0a2.25 2.25 0 002.25 2.25h12a2.25 2.25 0 002.25-2.25m-16.5 0v-7.5a2.25 2.25 0 012.25-2.25h12a2.25 2.25 0 012.25 2.25v7.5"
       />
     </svg>
   );
@@ -106,8 +80,8 @@ function RailLink({
       aria-label={label}
       className={`relative flex items-center justify-center w-10 h-10 rounded-xl transition-colors ${
         active
-          ? "bg-slate-200 dark:bg-white/[0.08] text-slate-900 dark:text-white"
-          : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/[0.05]"
+          ? "bg-indigo-600 text-white"
+          : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/[0.06]"
       }`}
     >
       {children}
@@ -138,13 +112,6 @@ export function NavRail() {
         <WatchlistIcon />
       </RailLink>
       <RailLink
-        href="/positions"
-        label="Positions"
-        active={pathname?.startsWith("/positions") ?? false}
-      >
-        <PositionsIcon />
-      </RailLink>
-      <RailLink
         href="/feed"
         label="Feed"
         active={pathname?.startsWith("/feed") ?? false}
@@ -157,13 +124,6 @@ export function NavRail() {
         active={pathname?.startsWith("/movers") ?? false}
       >
         <MoversIcon />
-      </RailLink>
-      <RailLink
-        href="/calendar"
-        label="Catalyst calendar"
-        active={pathname?.startsWith("/calendar") ?? false}
-      >
-        <CalendarIcon />
       </RailLink>
 
       <div className="mt-auto flex flex-col items-center gap-1.5">

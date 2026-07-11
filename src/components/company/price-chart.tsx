@@ -12,6 +12,7 @@ import {
 } from "lightweight-charts";
 import type { FilingEvent } from "@/types/events";
 import { useBars, type BarsLookback } from "@/hooks/use-bars";
+import { isImportant } from "@/lib/event-actions";
 
 const LOOKBACKS: BarsLookback[] = ["1M", "3M", "6M", "1Y"];
 
@@ -106,10 +107,9 @@ export function PriceChart({
         position: "aboveBar",
         shape: "arrowDown",
         color: markerColor(event),
-        text:
-          event.briefing?.significance === "High"
-            ? event.briefing?.primary_event_type ?? ""
-            : "",
+        text: isImportant(event)
+          ? event.briefing?.primary_event_type ?? ""
+          : "",
       });
     }
     markers.sort((a, b) => (a.time as number) - (b.time as number));
@@ -141,7 +141,7 @@ export function PriceChart({
             onClick={() => setLookback(lb)}
             className={`px-2 py-0.5 rounded text-[11px] font-medium transition-colors ${
               lookback === lb
-                ? "bg-indigo-500/15 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-400"
+                ? "bg-indigo-600 text-white"
                 : "text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300"
             }`}
           >

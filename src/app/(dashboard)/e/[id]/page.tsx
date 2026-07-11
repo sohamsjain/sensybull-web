@@ -49,7 +49,7 @@ export default function EventPermalinkPage({
             </p>
           </div>
         ) : (
-          <FilingCard event={event} density="comfortable" />
+          <FilingCard event={event} expanded />
         )}
         <p className="text-center mt-6">
           <Link

@@ -9,7 +9,7 @@ export function CatalystsTable({ catalysts }: { catalysts: Catalyst[] }) {
       <div className="flex items-center gap-1.5 mb-2.5">
         <span className="w-1 h-3.5 rounded-full bg-slate-300 dark:bg-white/[0.15]" />
         <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400 tracking-wide">
-          Catalysts
+          Key dates
         </span>
       </div>
 

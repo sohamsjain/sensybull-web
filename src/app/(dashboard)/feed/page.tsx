@@ -8,20 +8,13 @@ import { useAuth } from "@/hooks/use-auth";
 import { addToDefaultWatchlist } from "@/lib/default-watchlist";
 import { FilingList } from "@/components/feed/filing-list";
 import { FeedToolbar } from "@/components/feed/feed-toolbar";
-import { UpcomingCatalysts } from "@/components/feed/upcoming-catalysts";
 
 export default function FeedPage() {
   const { user } = useAuth();
-  const { significanceFilter, eventTypeFilter, marketCapFilter, search } =
-    useDashboard();
+  const { filter, search } = useDashboard();
 
   const { events, allEvents, loading, hasMore, loadMore, connected } =
-    useEvents({
-      significanceFilter,
-      eventTypeFilter,
-      marketCapFilter,
-      search,
-    });
+    useEvents({ filter, search });
 
   const { watchlists, refetch } = useWatchlists();
   const [addingCompanyId, setAddingCompanyId] = useState<string | null>(null);
@@ -51,24 +44,19 @@ export default function FeedPage() {
   return (
     <div className="h-full flex flex-col min-w-0">
       <FeedToolbar />
-      <div className="flex-1 flex overflow-hidden">
-        <div className="flex-1 min-w-0 overflow-hidden">
-          <FilingList
-            events={events}
-            allCount={allEvents.length}
-            loading={loading}
-            hasMore={hasMore}
-            connected={connected}
-            onLoadMore={loadMore}
-            watchlistedCompanyIds={watchlistedCompanyIds}
-            onAddToWatchlist={handleAddToWatchlist}
-            addingCompanyId={addingCompanyId}
-            isLoggedIn={!!user}
-          />
-        </div>
-        <aside className="hidden xl:flex xl:flex-col w-80 shrink-0 border-l border-slate-200 dark:border-white/[0.06]">
-          <UpcomingCatalysts />
-        </aside>
+      <div className="flex-1 min-w-0 overflow-hidden">
+        <FilingList
+          events={events}
+          allCount={allEvents.length}
+          loading={loading}
+          hasMore={hasMore}
+          connected={connected}
+          onLoadMore={loadMore}
+          watchlistedCompanyIds={watchlistedCompanyIds}
+          onAddToWatchlist={handleAddToWatchlist}
+          addingCompanyId={addingCompanyId}
+          isLoggedIn={!!user}
+        />
       </div>
     </div>
   );

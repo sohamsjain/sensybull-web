@@ -64,6 +64,10 @@ export interface FilingEvent {
   edgar_url: string | null;
   accession_number: string | null;
   max_tier: 1 | 2 | 3;
+  /** True when this is the kind of event that typically moves the stock.
+   *  Backs the feed's All/Important toggle. Absent on cached payloads from
+   *  before the flag shipped — use isImportant() in lib/event-actions. */
+  important?: boolean;
   items: FilingItem[];
   exhibits: Exhibit[];
   briefing: Briefing | null;

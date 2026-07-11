@@ -3,11 +3,9 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useMemo } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useWatchlistInbox } from "@/hooks/use-watchlist-inbox";
 import { useCompanyEvents } from "@/hooks/use-company-events";
-import { usePositions } from "@/hooks/use-positions";
 import { usePaneWidth } from "@/hooks/use-pane-width";
 import { WatchlistPanel } from "@/components/watchlist/watchlist-panel";
 import { Conversation } from "@/components/watchlist/conversation";
@@ -48,23 +46,6 @@ export default function WatchlistPage() {
   const { events, loading: eventsLoading, hasMore, loadEarlier } =
     useCompanyEvents(activeCompanyId, socket);
   const pane = usePaneWidth();
-
-  // Held companies carry their thesis into the inbox: a status badge on the
-  // conversation header and the engine's verdict on each judged filing.
-  const { positions, assessments } = usePositions();
-  const activePosition = useMemo(
-    () => positions.find((p) => p.company_id === activeCompanyId) ?? null,
-    [positions, activeCompanyId]
-  );
-  const assessmentByEventId = useMemo(() => {
-    const map = new Map<string, (typeof assessments)[number]>();
-    for (const a of assessments) {
-      if (!activePosition || a.position_id === activePosition.id) {
-        map.set(a.filing_event_id, a);
-      }
-    }
-    return map;
-  }, [assessments, activePosition]);
 
   // Unread count in the tab title
   useEffect(() => {
@@ -219,8 +200,6 @@ export default function WatchlistPage() {
               events={events}
               loading={eventsLoading}
               hasMore={hasMore}
-              position={activePosition}
-              assessmentByEventId={assessmentByEventId}
               onLoadEarlier={loadEarlier}
               onBack={() => setActiveCompanyId(null)}
               onToggleMute={() =>

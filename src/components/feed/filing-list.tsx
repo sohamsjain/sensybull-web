@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import type { FilingEvent } from "@/types/events";
 import { dayLabel } from "@/lib/utils";
-import { useDensity } from "@/hooks/use-density";
 import { FilingCard } from "./filing-card";
 import { Button } from "@/components/ui/button";
 
@@ -34,7 +33,6 @@ export function FilingList({
   addingCompanyId,
   isLoggedIn,
 }: FilingListProps) {
-  const [density] = useDensity();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Where the reader left off last session; written once per visit
@@ -274,7 +272,6 @@ export function FilingList({
                   )}
                   <FilingCard
                     event={event}
-                    density={density}
                     expanded={expandedIds.has(event.id)}
                     onToggleExpanded={() => toggleExpanded(event.id)}
                     selected={i === selectedIdx}
@@ -315,10 +312,10 @@ export function FilingList({
                 </svg>
               </div>
               <p className="text-slate-500 dark:text-slate-400 text-sm">
-                No events match your filters.
+                Nothing matches.
               </p>
               <p className="text-slate-400 dark:text-slate-600 text-xs mt-1">
-                Try adjusting your significance or event type filters.
+                Try switching to &ldquo;All&rdquo; or clearing the search.
               </p>
             </div>
           )}
@@ -346,17 +343,6 @@ export function FilingList({
             </div>
           )}
 
-          {/* Keyboard hints */}
-          {displayed.length > 0 && (
-            <p className="hidden md:block text-center text-[11px] text-slate-400 dark:text-slate-600 mt-6 mb-2 select-none">
-              <kbd className="font-mono">j</kbd>/<kbd className="font-mono">k</kbd> navigate
-              &nbsp;·&nbsp; <kbd className="font-mono">o</kbd> expand
-              &nbsp;·&nbsp; <kbd className="font-mono">e</kbd> EDGAR
-              &nbsp;·&nbsp; <kbd className="font-mono">c</kbd> copy link
-              {isLoggedIn && <>&nbsp;·&nbsp; <kbd className="font-mono">w</kbd> watch</>}
-              &nbsp;·&nbsp; <kbd className="font-mono">/</kbd> search
-            </p>
-          )}
         </div>
       </div>
     </div>

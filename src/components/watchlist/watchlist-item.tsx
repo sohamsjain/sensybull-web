@@ -23,11 +23,6 @@ function MutedIcon() {
   );
 }
 
-// Only genuinely material events get an accent; everything else stays quiet
-const SIG_ACCENT: Record<string, string> = {
-  High: "border-l-red-400/60 dark:border-l-red-400/40",
-};
-
 function PinIcon() {
   return (
     <svg
@@ -54,14 +49,15 @@ export function WatchlistItem({
 }) {
   const { company, last_event, last_activity_at, unread_count, muted } = entry;
   const hasUnread = unread_count > 0;
-  const accent = SIG_ACCENT[last_event?.significance ?? ""] ?? "border-l-transparent";
 
   return (
     <button
       onClick={onSelect}
       data-company-id={company.id}
-      className={`w-full flex items-center gap-3 px-3 py-3 text-left transition-colors outline-none border-l-2 ${accent} focus-visible:bg-slate-100/80 dark:focus-visible:bg-[#14161c]/80 ${
-        active ? "bg-slate-100 dark:bg-[#14161c]" : "hover:bg-slate-100/60 dark:hover:bg-white/[0.04]"
+      className={`w-full flex items-center gap-3 px-3 py-3 text-left transition-colors outline-none border-l-2 focus-visible:bg-slate-100/80 dark:focus-visible:bg-[#14161c]/80 ${
+        active
+          ? "border-l-indigo-600 dark:border-l-indigo-400 bg-indigo-50 dark:bg-indigo-500/[0.12]"
+          : "border-l-transparent hover:bg-slate-100/60 dark:hover:bg-white/[0.04]"
       }`}
     >
       <CompanyAvatar

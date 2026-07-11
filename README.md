@@ -2,8 +2,7 @@
 
 The production frontend for Sensybull — a real-time SEC filing intelligence app.
 Next.js (App Router) + TypeScript + Tailwind CSS, with a WhatsApp-style chat
-inbox, a chronological filing feed, catalyst calendar, and live filing events
-over Socket.IO.
+inbox, a chronological filing feed, and live filing events over Socket.IO.
 
 ## Tech stack
 
@@ -40,7 +39,7 @@ See `.env.example`. All are `NEXT_PUBLIC_` (client-visible by design):
 
 ## Project layout
 
-- `src/app/` — routes: `(auth)`, `(dashboard)` (`/chats`, `/feed`, `/calendar`,
+- `src/app/` — routes: `(auth)`, `(dashboard)` (`/watchlist`, `/feed`, `/movers`,
   `/e/[id]`), `(legal)`.
 - `src/components/` — by domain: `ui/`, `feed/`, `chat/`, `auth/`, `alerts/`,
   `watchlist/`, `layout/`, `company/`, `landing/`.
