@@ -105,24 +105,24 @@ export function FilingMessage({ event }: { event: FilingEvent }) {
           </>
         )}
 
-        {/* Expand affordance */}
-        {hasDetails && (
-          <div className="mt-1.5 flex items-center gap-1 text-[11px] text-slate-400 dark:text-slate-500 select-none">
-            <svg
-              width="10"
-              height="10"
-              viewBox="0 0 10 10"
-              fill="none"
-              className={`transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
-            >
-              <path d="M2 3.5 5 6.5 8 3.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            {expanded ? "Show less" : "Read more"}
-          </div>
-        )}
-
-        {/* Timestamp */}
-        <div className="flex justify-end mt-1.5">
+        {/* Footer row: expand affordance + timestamp */}
+        <div className="mt-1.5 flex items-center justify-between gap-3">
+          {hasDetails ? (
+            <div className="flex items-center gap-1 text-[11px] text-slate-400 dark:text-slate-500 select-none">
+              <svg
+                width="10"
+                height="10"
+                viewBox="0 0 10 10"
+                fill="none"
+                className={`transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
+              >
+                <path d="M2 3.5 5 6.5 8 3.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              {expanded ? "Show less" : "Read more"}
+            </div>
+          ) : (
+            <span />
+          )}
           <span
             className="text-slate-400/80 dark:text-slate-500/80 text-[11px] whitespace-nowrap tabular-nums"
             title={fullDateTime(event.received_at || event.filing_date)}
