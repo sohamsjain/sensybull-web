@@ -24,6 +24,9 @@ export type FeedFilter = "all" | "important";
 interface DashboardContextValue {
   filter: FeedFilter;
   setFilter: (filter: FeedFilter) => void;
+  /** Event-type category filter (null = all types). */
+  eventType: string | null;
+  setEventType: (value: string | null) => void;
   search: string;
   setSearch: (value: string) => void;
   openCompany: (company: CompanyRef) => void;
@@ -32,6 +35,8 @@ interface DashboardContextValue {
 const DashboardContext = createContext<DashboardContextValue>({
   filter: "all",
   setFilter: () => {},
+  eventType: null,
+  setEventType: () => {},
   search: "",
   setSearch: () => {},
   openCompany: () => {},
@@ -48,6 +53,9 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
   const [filter, setFilter] = useState<FeedFilter>(() =>
     searchParams.get("f") === "important" ? "important" : "all"
   );
+  const [eventType, setEventType] = useState<string | null>(
+    () => searchParams.get("t") || null
+  );
   const [search, setSearch] = useState(() => searchParams.get("q") ?? "");
   const [companySheet, setCompanySheet] = useState<CompanyRef | null>(null);
 
@@ -56,10 +64,11 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
     if (!pathname?.startsWith("/feed")) return;
     const params = new URLSearchParams();
     if (filter === "important") params.set("f", "important");
+    if (eventType) params.set("t", eventType);
     if (search) params.set("q", search);
     const qs = params.toString();
     window.history.replaceState(null, "", qs ? `${pathname}?${qs}` : pathname);
-  }, [filter, search, pathname]);
+  }, [filter, eventType, search, pathname]);
 
   const openCompany = useCallback(
     (company: CompanyRef) => setCompanySheet(company),
@@ -68,7 +77,7 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
 
   return (
     <DashboardContext.Provider
-      value={{ filter, setFilter, search, setSearch, openCompany }}
+      value={{ filter, setFilter, eventType, setEventType, search, setSearch, openCompany }}
     >
       {/* One socket for the whole session, owned above the pages so it
           survives navigation. */}

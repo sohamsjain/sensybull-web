@@ -11,10 +11,10 @@ import { FeedToolbar } from "@/components/feed/feed-toolbar";
 
 export default function FeedPage() {
   const { user } = useAuth();
-  const { filter, search } = useDashboard();
+  const { filter, eventType, search } = useDashboard();
 
   const { events, allEvents, loading, hasMore, loadMore, connected } =
-    useEvents({ filter, search });
+    useEvents({ filter, eventType, search });
 
   const { watchlists, refetch } = useWatchlists();
   const [addingCompanyId, setAddingCompanyId] = useState<string | null>(null);

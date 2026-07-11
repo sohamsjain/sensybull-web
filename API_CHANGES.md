@@ -1,5 +1,27 @@
 # API Changes
 
+## 2026-07-11 (8-K-only rollback + narrowed event types)
+
+### Ingest rolled back to 8-K only
+
+The multi-form ingest pipeline (SC 13D/G stakes, tenders, merger/contested
+proxies, delistings/deregistrations, NT late filings, Form 4 insider buys)
+was deleted — other form types were too hard to debug. New events now only
+ever have `signal_type` of `8-K` or `8-K/A`. The `filed_by` field no longer
+appears on the ingest event contract (it was never in the API payload).
+Historical non-8-K events remain in the DB and are still served by
+`GET /events/*` unchanged, so keep the display fallbacks for their form
+types.
+
+### `GET /events/types` narrowed to a small material list
+
+The canonical event-type list shrank from 36 labels to 11 highly material
+categories: Acquisition, Material Agreement, Earnings, Bankruptcy,
+Debt / Financing, Restructuring, Leadership Change, Delisting, Restatement,
+Cybersecurity Incident, Other. This list backs the feed's new event-type
+filter chips. `?event_type=` filtering on `GET /events/`, `/events/all`,
+and `/events/company/:id` is unchanged (old labels still match old events).
+
 ## 2026-07-11 (simplification overhaul)
 
 ### Binary importance: `important` on filing events

@@ -8,7 +8,7 @@
 ## API
 - Base URL: `NEXT_PUBLIC_API_URL` (default: `https://api.sensybull.com/api/v1`)
 - Auth: `POST /auth/login`, `/auth/register`, `/auth/google`, `/auth/refresh`, `GET /auth/me`
-- Events: `GET /events/` (auth, watchlist-filtered), `/events/all` (public), `/events/types`, `/events/company/:id` (auth, per-company history). Every event carries a boolean `important` (backs the feed's All/Important toggle — use `isImportant()` from `src/lib/event-actions.ts`, which handles legacy payloads)
+- Events: `GET /events/` (auth, watchlist-filtered), `/events/all` (public), `/events/types` (small canonical category list — backs the feed's event-type chips), `/events/company/:id` (auth, per-company history). Every event carries a boolean `important` (backs the feed's All/Important toggle — use `isImportant()` from `src/lib/event-actions.ts`, which handles legacy payloads) and `event_types` (use `matchesEventType()` from `src/hooks/use-events.ts`). Only the 8-K family is ingested since the July 2026 rollback; older events keep other `signal_type` values
 - Watchlists: CRUD at `/watchlists/`, company management at `/watchlists/:id/companies`
 - Companies: `GET /companies/?q=...` (search by ticker or name), `GET /companies/search?q=` (typeahead)
 - Alerts: `GET/PUT /alerts/preferences`, `GET /alerts/notifications`, `GET /alerts/channels`, Web Push at `/alerts/push/*` (see `src/lib/push.ts` + `public/sw.js`). The sensitivity UI is binary (Important only ↔ Everything) mapped onto the API's `max_tier` (1 ↔ 3)
@@ -24,7 +24,7 @@
 - `src/hooks/` — useAuth, useSocket, useEvents (REST+Socket merge), useWatchlists, useWatchlistInbox (inbox + live unread), useCompanyEvents (per-company history), usePaneWidth (resizable pane)
 - `src/context/` — AuthProvider (login/register/google/logout), SocketProvider (session-wide `/feed` socket + `useSocket`)
 - `src/components/ui/` — shadcn/ui primitives
-- `src/components/feed/` — FilingCard, FilingList, FeedToolbar (All/Important + search), UpdateActions (Read the filing / Copy for AI chat / Share — shown only on expanded updates), CatalystsTable ("Key dates"), DealTerms, PriceReactionStrip, CompanyLogo
+- `src/components/feed/` — FilingCard (flat row, no box), FilingList (divider-separated), FeedToolbar (All/Important + search + event-type chips), UpdateActions (Read the filing / Copy for AI chat / Share — shown only on expanded updates), CatalystsTable ("Key dates"), DealTerms, PriceReactionStrip, CompanyLogo
 - `src/components/watchlist/` — WatchlistPanel, WatchlistItem, Conversation, FilingMessage, CompanyAvatar
 - `src/components/movers/` — MoverList/MoverRow (shared by /movers page)
 - `src/components/layout/` — NavRail, BottomTabs
@@ -32,7 +32,7 @@
 - `src/app/(auth)/` — Auth pages (centered layout, no sidebar)
 - `src/app/(dashboard)/` — Dashboard pages (nav rail + main)
   - `/watchlist` — default landing for signed-in users; two-pane UI (resizable/collapsible company list + filing history), chart toggle swaps the right pane for a full-size price chart (`/chats` redirects here)
-  - `/feed` — public live stream of all events in received order; one All/Important toggle + search, no sidebar
+  - `/feed` — public live stream of all events in received order; All/Important toggle, event-type chips, and search, no sidebar. Substack/Twitter-style flat list: rows separated by simple dividers, no card boxes
   - `/movers` — today's gainers/losers among recent filers
   - `/e/[id]` — public per-event permalink (backed by GET /events/all/:id), rendered expanded
 - `src/app/add/[symbol]/` — public "Track on Sensybull" deep link (`/add/MU`): SEO/OG page + client flow that adds the ticker to the watchlist, preserving intent through auth via `src/lib/pending-action.ts` (see `docs/TRACK_LINKS.md`)
@@ -54,7 +54,7 @@
 ## Conventions
 - Files: kebab-case. Exports: PascalCase for components, camelCase for hooks/utils
 - All dashboard/auth components are client components (`"use client"`)
-- Filter state (All/Important + search) lives in `(dashboard)/layout.tsx` via React context
+- Filter state (All/Important + event type + search) lives in `(dashboard)/layout.tsx` via React context (URL params `f`, `t`, `q`)
 - Dual theme (class-based dark mode). Accent: indigo, reserved for interactive elements; selected states are solid indigo with white text/icon — selection contrast must be obvious at a glance. Decorative color is avoided: category/form tags are plain muted text, red is reserved for the Important marker and negative price data, emerald appears only on positive price data. Dark surfaces: #0b0d12 base, #12141b/#14161c cards, #1a1d25 hover
 - The UI presents a single watchlist (adds go to the user's first list via `src/lib/default-watchlist.ts`); the API still supports multiple lists
 - Unit tests: `npm test` (vitest, `src/**/*.test.ts`)

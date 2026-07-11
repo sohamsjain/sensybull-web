@@ -11,7 +11,15 @@ import { isImportant } from "@/lib/event-actions";
 interface UseEventsOptions {
   /** "important" keeps only market-moving updates; "all" keeps everything. */
   filter: "all" | "important";
+  /** Event-type category (from GET /events/types); null keeps every type. */
+  eventType?: string | null;
   search: string;
+}
+
+/** True when the event carries the given category label. */
+export function matchesEventType(e: FilingEvent, type: string): boolean {
+  if (e.event_types?.includes(type)) return true;
+  return e.briefing?.primary_event_type === type;
 }
 
 interface PriceReactionUpdate {
@@ -45,7 +53,7 @@ export function insertByReceivedOrder(
     : [...list.slice(0, idx), event, ...list.slice(idx)];
 }
 
-export function useEvents({ filter, search }: UseEventsOptions) {
+export function useEvents({ filter, eventType = null, search }: UseEventsOptions) {
   const { user } = useAuth();
   const { socket, connected } = useSocket();
   const [events, setEvents] = useState<FilingEvent[]>([]);
@@ -128,6 +136,7 @@ export function useEvents({ filter, search }: UseEventsOptions) {
   // Client-side filtering
   const filtered = events.filter((e) => {
     if (filter === "important" && !isImportant(e)) return false;
+    if (eventType && !matchesEventType(e, eventType)) return false;
 
     if (search) {
       const q = search.toLowerCase();

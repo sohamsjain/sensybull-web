@@ -1,8 +1,8 @@
 /**
  * Display helpers for SEC form types (`FilingEvent.signal_type`).
- * The backend now ingests event-driven forms beyond 8-K — 13D stakes,
- * tenders, merger/contested proxies, delistings, late filings, Form 4
- * insider buys.
+ * Since the July 2026 rollback the backend ingests ONLY the 8-K family;
+ * the other entries below keep HISTORICAL events (13D stakes, tenders,
+ * proxies, delistings, late filings, Form 4 buys) readable in the feed.
  */
 
 /** Sentence fragment: "AcmeCo filed {formPhrase(t)}" */
