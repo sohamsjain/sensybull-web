@@ -1,5 +1,33 @@
 # API Changes
 
+## 2026-07-11 (simplification overhaul)
+
+### Binary importance: `important` on filing events
+
+Every filing-event payload (WebSocket `filing_event`, `GET /events/*`) now
+carries a top-level boolean `important` — true when the event is the kind
+that typically moves the stock. Computed server-side from the briefing's
+internal significance grade (High → important), falling back to
+`max_tier == 1` when no grade exists. The frontend's feed filter is now just
+All / Important; `briefing.significance` is still present in stored payloads
+but should no longer drive UI.
+
+### Removed: positions / thesis API (hard rollback)
+
+All `/api/v1/positions/*` routes are gone (CRUD, assessments, versions,
+draft-thesis, analyst chat, scorecard), along with the thesis engine, the
+`thesis_alert` socket event, and thesis-aware alert formatting on every
+notification channel. Database tables (`position`, `thesis_assessment`,
+`thesis_version`) were left in place so historical data survives, but no
+code reads or writes them.
+
+### Removed: `GET /events/catalysts`
+
+The upcoming-catalysts endpoint is gone (its consumers — the catalyst
+calendar page, the feed sidebar, and the positions view — were removed).
+Catalyst key dates still arrive inside each event payload (`catalysts`) and
+render inside expanded updates and the company sheet.
+
 ## 2026-07-11
 
 ### Briefing provenance: `briefing.mode` (anti-hallucination hardening)

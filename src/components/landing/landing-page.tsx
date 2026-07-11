@@ -76,64 +76,36 @@ function HeroSection() {
 }
 
 function ValueProps() {
+  const props = [
+    {
+      title: "Know before the crowd.",
+      body: "The moment a company files with the SEC, you get the briefing. Not hours later. Seconds.",
+    },
+    {
+      title: "Every filing, in plain English.",
+      body: "Dense legalese distilled to what matters — the headline, and the summary when you want more.",
+    },
+    {
+      title: "Your companies. Always watched.",
+      body: "Build your watchlist. Get alerts. Every filing lands in your company's thread, so you never lose context.",
+    },
+  ];
   return (
     <section className="py-24 border-t border-white/[0.04]">
-      <div className="mx-auto max-w-5xl px-6">
-        <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-16 md:gap-24 items-start">
-          {/* Left: three value propositions */}
-          <div className="space-y-12">
-            <div>
-              <p className="text-xl font-bold text-white/90 mb-2">
-                Know before the crowd.
-              </p>
-              <p className="text-base text-white/50 leading-relaxed">
-                The moment a company files with the SEC, you get the briefing.
-                Not hours later. Seconds.
-              </p>
-            </div>
-
-            <div className="border-t border-white/[0.04] pt-12">
-              <p className="text-xl font-bold text-white/90 mb-2">
-                Every filing, in plain English.
-              </p>
-              <p className="text-base text-white/50 leading-relaxed">
-                Dense legalese distilled to what matters — the headline, the
-                impact, the key dates. No noise.
-              </p>
-            </div>
-
-            <div className="border-t border-white/[0.04] pt-12">
-              <p className="text-xl font-bold text-white/90 mb-2">
-                Your companies. Always watched.
-              </p>
-              <p className="text-base text-white/50 leading-relaxed">
-                Build your watchlist. Get alerts. Every filing lands in your
-                company&apos;s thread, so you never lose context.
-              </p>
-            </div>
+      <div className="mx-auto max-w-2xl px-6 space-y-12">
+        {props.map(({ title, body }, i) => (
+          <div key={title} className={i > 0 ? "border-t border-white/[0.04] pt-12" : ""}>
+            <p className="text-xl font-bold text-white/90 mb-2">{title}</p>
+            <p className="text-base text-white/50 leading-relaxed">{body}</p>
           </div>
-
-          {/* Right: logo mark + CTA */}
-          <div className="hidden md:flex flex-col items-center text-center pt-4">
-            <div className="w-48 h-48 rounded-2xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center mb-6">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/logo.png"
-                alt="Sensybull"
-                className="w-28 h-28 invert opacity-90"
-              />
-            </div>
-            <p className="text-2xl font-semibold text-white/90 mb-1">
-              Sensybull
-            </p>
-            <p className="text-white/40 text-sm mb-4">Free without limits.</p>
-            <Link
-              href="/register"
-              className="text-indigo-400 hover:text-indigo-300 text-sm transition-colors"
-            >
-              Start tracking &rarr;
-            </Link>
-          </div>
+        ))}
+        <div className="pt-2 text-center">
+          <Link
+            href="/register"
+            className="inline-flex items-center gap-2 px-7 py-3 rounded-md bg-indigo-600 hover:bg-indigo-500 text-white text-base font-semibold transition-colors"
+          >
+            Start tracking — it&apos;s free
+          </Link>
         </div>
       </div>
     </section>

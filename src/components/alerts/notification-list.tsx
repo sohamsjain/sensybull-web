@@ -2,18 +2,11 @@
 
 import { useAlertNotifications } from "@/hooks/use-alerts";
 import { timeAgo } from "@/lib/utils";
-import { SIGNIFICANCE_CONFIG } from "@/config/constants";
 
 const STATUS_STYLES: Record<string, string> = {
   sent: "bg-green-500/15 text-green-400",
   pending: "bg-amber-500/15 text-amber-400",
   failed: "bg-red-500/15 text-red-400",
-};
-
-const TIER_TO_SIGNIFICANCE: Record<number, keyof typeof SIGNIFICANCE_CONFIG> = {
-  1: "High",
-  2: "Medium",
-  3: "Low",
 };
 
 export function NotificationList() {
@@ -49,8 +42,7 @@ export function NotificationList() {
     <div className="bg-slate-100 dark:bg-[#14161c] border border-slate-200 dark:border-white/[0.06] rounded-lg overflow-hidden">
       <div className="divide-y divide-slate-200 dark:divide-white/[0.06]">
         {notifications.map((n) => {
-          const sigKey = TIER_TO_SIGNIFICANCE[n.filing_event.max_tier] || "Low";
-          const sigConfig = SIGNIFICANCE_CONFIG[sigKey];
+          const important = n.filing_event.max_tier === 1;
 
           return (
             <div
@@ -63,11 +55,11 @@ export function NotificationList() {
                     <span className="text-slate-900 dark:text-white text-sm font-medium">
                       {n.filing_event.ticker}
                     </span>
-                    <span
-                      className={`px-1.5 py-0.5 rounded text-[10px] font-semibold ${sigConfig.badge}`}
-                    >
-                      {sigConfig.label}
-                    </span>
+                    {important && (
+                      <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold text-red-600/80 dark:text-red-400/80">
+                        IMPORTANT
+                      </span>
+                    )}
                     <span
                       className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${
                         STATUS_STYLES[n.status] || STATUS_STYLES.pending

@@ -1,4 +1,4 @@
-import type { FilingEvent, Catalyst } from "./events";
+import type { FilingEvent } from "./events";
 
 export interface User {
   id: string;
@@ -105,17 +105,6 @@ export interface PaginatedCompanies extends PaginatedResponse<Company> {
 
 export interface EventTypesResponse {
   event_types: string[];
-}
-
-export interface CatalystsResponse {
-  catalysts: Array<
-    Catalyst & {
-      id: string;
-      filing_event_id: string;
-      ticker: string;
-      company_name: string;
-    }
-  >;
 }
 
 export interface CompanySearchResult {
@@ -233,121 +222,6 @@ export interface ApiError {
   details?: Record<string, string>;
 }
 
-// ── Positions & thesis ────────────────────────────────────────────────
-export type ThesisStatus = "intact" | "watch" | "broken";
-export type ThesisImpact = "supports" | "neutral" | "threatens" | "breaks";
-
-/** Structured thesis: the falsifiable form the deep judge reasons over. */
-export interface ThesisStructured {
-  core_claim: string;
-  assumptions: string[];
-  kill_criteria: string[];
-  horizon: string | null;
-}
-
-export interface Position {
-  id: string;
-  company_id: string;
-  direction: "long" | "short";
-  shares: string | null;
-  cost_basis: string | null;
-  thesis: string | null;
-  thesis_structured: ThesisStructured | null;
-  thesis_version: number;
-  thesis_status: ThesisStatus;
-  thesis_reviewed_at: string | null;
-  opened_at: string | null;
-  notes: string | null;
-  created_at: string;
-  updated_at: string | null;
-  company: Company;
-}
-
-export interface PositionsResponse {
-  positions: Position[];
-}
-
-export interface PositionResponse {
-  position: Position;
-  message?: string;
-}
-
-/** Deep-pass verdict on one numbered assumption of the structured thesis. */
-export interface AssumptionVerdict {
-  index: number;
-  impact: ThesisImpact;
-  rationale: string | null;
-}
-
-export interface ThesisAssessment {
-  id: string;
-  position_id: string;
-  filing_event_id: string;
-  impact: ThesisImpact;
-  rationale: string | null;
-  /** Which pass produced the verdict: cheap triage or the deep read. */
-  stage: "triage" | "deep";
-  /** When a deep pass ran, what the triage pass had said. */
-  triage_impact: ThesisImpact | null;
-  confidence: number | null;
-  assumption_verdicts: AssumptionVerdict[];
-  /** Verbatim quotes from the filing that ground the verdict. */
-  citations: string[];
-  /** Backtest row (thesis judged against a historical filing). */
-  retroactive: boolean;
-  thesis_version: number | null;
-  prior_status: ThesisStatus | null;
-  new_status: ThesisStatus | null;
-  created_at: string;
-}
-
-export interface AssessmentsResponse {
-  assessments: ThesisAssessment[];
-}
-
-export interface ThesisVersionEntry {
-  id: string;
-  position_id: string;
-  version: number;
-  thesis: string | null;
-  thesis_structured: ThesisStructured | null;
-  source: "user" | "assist";
-  created_at: string | null;
-}
-
-export interface ThesisVersionsResponse {
-  versions: ThesisVersionEntry[];
-}
-
-export interface ThesisDraft {
-  core_claim: string;
-  assumptions: string[];
-  kill_criteria: string[];
-  horizon: string | null;
-}
-
-export interface ThesisDraftResponse {
-  draft: ThesisDraft;
-}
-
-export interface Scorecard {
-  assessed_filings: number;
-  verdict_counts: Partial<Record<ThesisImpact, number>>;
-  avg_move_after_verdict: Partial<
-    Record<ThesisImpact, { "1d"?: number; "1w"?: number }>
-  >;
-  position_status_counts: Partial<Record<ThesisStatus, number>>;
-}
-
-export interface ScorecardResponse {
-  scorecard: Scorecard;
-}
-
-export interface AnalystMessage {
-  role: "user" | "assistant";
-  content: string;
-}
-
 /** GET /share/:symbol — public share info (no internal IDs). */
 export interface ShareInfo {
   symbol: string;
@@ -367,24 +241,4 @@ export interface TrackResponse {
   status: "added" | "already_tracking";
   company: { id: string; name: string; ticker: string };
   watchlist_id: string;
-}
-
-export interface AnalystResponse {
-  reply: string;
-  tools_used: string[];
-}
-
-/** Payload of the `/feed` socket `thesis_alert` event. */
-export interface ThesisAlert {
-  position_id: string;
-  company_id: string;
-  ticker: string | null;
-  company_name: string;
-  impact: ThesisImpact;
-  rationale: string | null;
-  confidence?: number | null;
-  stage?: "triage" | "deep" | null;
-  thesis_status: ThesisStatus;
-  filing_event_id: string;
-  headline: string | null;
 }

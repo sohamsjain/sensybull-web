@@ -6,12 +6,11 @@ import type { PaginatedEvents } from "@/types/api";
 import { api } from "@/lib/api-client";
 import { useAuth } from "@/hooks/use-auth";
 import { useSocket } from "@/context/socket-provider";
-import { marketCapBucket } from "@/config/constants";
+import { isImportant } from "@/lib/event-actions";
 
 interface UseEventsOptions {
-  significanceFilter: Set<string>;
-  eventTypeFilter: Set<string>;
-  marketCapFilter?: Set<string>;
+  /** "important" keeps only market-moving updates; "all" keeps everything. */
+  filter: "all" | "important";
   search: string;
 }
 
@@ -46,12 +45,7 @@ export function insertByReceivedOrder(
     : [...list.slice(0, idx), event, ...list.slice(idx)];
 }
 
-export function useEvents({
-  significanceFilter,
-  eventTypeFilter,
-  marketCapFilter,
-  search,
-}: UseEventsOptions) {
+export function useEvents({ filter, search }: UseEventsOptions) {
   const { user } = useAuth();
   const { socket, connected } = useSocket();
   const [events, setEvents] = useState<FilingEvent[]>([]);
@@ -133,17 +127,7 @@ export function useEvents({
 
   // Client-side filtering
   const filtered = events.filter((e) => {
-    const sig = e.briefing?.significance || "Medium";
-    if (!significanceFilter.has(sig)) return false;
-
-    if (eventTypeFilter.size > 0) {
-      if (!e.event_types?.some((t) => eventTypeFilter.has(t))) return false;
-    }
-
-    if (marketCapFilter && marketCapFilter.size > 0) {
-      const bucket = marketCapBucket(e.market_cap);
-      if (!bucket || !marketCapFilter.has(bucket)) return false;
-    }
+    if (filter === "important" && !isImportant(e)) return false;
 
     if (search) {
       const q = search.toLowerCase();

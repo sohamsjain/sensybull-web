@@ -97,11 +97,6 @@ export function CommandPalette() {
       ...(user
         ? [
             {
-              id: "calendar",
-              label: "Go to Calendar",
-              run: () => router.push("/calendar"),
-            },
-            {
               id: "alerts",
               label: "Go to Alerts",
               run: () => router.push("/alerts"),

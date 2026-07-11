@@ -18,37 +18,26 @@ import { useAuth } from "@/hooks/use-auth";
 
 export type { CompanyRef };
 
+/** The one feed filter: everything, or only market-moving updates. */
+export type FeedFilter = "all" | "important";
+
 interface DashboardContextValue {
-  significanceFilter: Set<string>;
-  eventTypeFilter: Set<string>;
-  marketCapFilter: Set<string>;
+  filter: FeedFilter;
+  setFilter: (filter: FeedFilter) => void;
   search: string;
-  toggleSignificance: (level: string) => void;
-  toggleEventType: (type: string) => void;
-  clearEventTypes: () => void;
-  toggleMarketCap: (bucket: string) => void;
-  clearMarketCaps: () => void;
   setSearch: (value: string) => void;
   openCompany: (company: CompanyRef) => void;
 }
 
 const DashboardContext = createContext<DashboardContextValue>({
-  significanceFilter: new Set(["High", "Medium", "Low"]),
-  eventTypeFilter: new Set(),
-  marketCapFilter: new Set(),
+  filter: "all",
+  setFilter: () => {},
   search: "",
-  toggleSignificance: () => {},
-  toggleEventType: () => {},
-  clearEventTypes: () => {},
-  toggleMarketCap: () => {},
-  clearMarketCaps: () => {},
   setSearch: () => {},
   openCompany: () => {},
 });
 
 export const useDashboard = () => useContext(DashboardContext);
-
-const ALL_SIGNIFICANCE = ["High", "Medium", "Low"];
 
 function DashboardInner({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
@@ -56,25 +45,9 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams();
 
   // Filters initialize from the URL so filtered views are shareable
-  const [significanceFilter, setSignificanceFilter] = useState<Set<string>>(
-    () => {
-      const sig = searchParams.get("sig");
-      if (sig === null) return new Set(ALL_SIGNIFICANCE);
-      return new Set(
-        sig.split(",").filter((s) => ALL_SIGNIFICANCE.includes(s))
-      );
-    }
+  const [filter, setFilter] = useState<FeedFilter>(() =>
+    searchParams.get("f") === "important" ? "important" : "all"
   );
-  const [eventTypeFilter, setEventTypeFilter] = useState<Set<string>>(() => {
-    const types = searchParams.get("types");
-    return types
-      ? new Set(types.split(",").filter(Boolean))
-      : new Set<string>();
-  });
-  const [marketCapFilter, setMarketCapFilter] = useState<Set<string>>(() => {
-    const mcap = searchParams.get("mcap");
-    return mcap ? new Set(mcap.split(",").filter(Boolean)) : new Set<string>();
-  });
   const [search, setSearch] = useState(() => searchParams.get("q") ?? "");
   const [companySheet, setCompanySheet] = useState<CompanyRef | null>(null);
 
@@ -82,54 +55,11 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!pathname?.startsWith("/feed")) return;
     const params = new URLSearchParams();
-    if (significanceFilter.size !== ALL_SIGNIFICANCE.length) {
-      params.set("sig", [...significanceFilter].join(","));
-    }
-    if (eventTypeFilter.size > 0) {
-      params.set("types", [...eventTypeFilter].join(","));
-    }
-    if (marketCapFilter.size > 0) {
-      params.set("mcap", [...marketCapFilter].join(","));
-    }
+    if (filter === "important") params.set("f", "important");
     if (search) params.set("q", search);
     const qs = params.toString();
     window.history.replaceState(null, "", qs ? `${pathname}?${qs}` : pathname);
-  }, [significanceFilter, eventTypeFilter, marketCapFilter, search, pathname]);
-
-  const toggleSignificance = useCallback((level: string) => {
-    setSignificanceFilter((prev) => {
-      const next = new Set(prev);
-      if (next.has(level)) next.delete(level);
-      else next.add(level);
-      return next;
-    });
-  }, []);
-
-  const toggleEventType = useCallback((type: string) => {
-    setEventTypeFilter((prev) => {
-      const next = new Set(prev);
-      if (next.has(type)) next.delete(type);
-      else next.add(type);
-      return next;
-    });
-  }, []);
-
-  const clearEventTypes = useCallback(() => {
-    setEventTypeFilter(new Set());
-  }, []);
-
-  const toggleMarketCap = useCallback((bucket: string) => {
-    setMarketCapFilter((prev) => {
-      const next = new Set(prev);
-      if (next.has(bucket)) next.delete(bucket);
-      else next.add(bucket);
-      return next;
-    });
-  }, []);
-
-  const clearMarketCaps = useCallback(() => {
-    setMarketCapFilter(new Set());
-  }, []);
+  }, [filter, search, pathname]);
 
   const openCompany = useCallback(
     (company: CompanyRef) => setCompanySheet(company),
@@ -138,22 +68,10 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
 
   return (
     <DashboardContext.Provider
-      value={{
-        significanceFilter,
-        eventTypeFilter,
-        marketCapFilter,
-        search,
-        toggleSignificance,
-        toggleEventType,
-        clearEventTypes,
-        toggleMarketCap,
-        clearMarketCaps,
-        setSearch,
-        openCompany,
-      }}
+      value={{ filter, setFilter, search, setSearch, openCompany }}
     >
       {/* One socket for the whole session, owned above the pages so it
-          survives navigation and can surface thesis alerts anywhere. */}
+          survives navigation. */}
       <SocketProvider>
         {/* overflow-hidden pins the app shell to the viewport so the document
             itself never grows a second scrollbar */}

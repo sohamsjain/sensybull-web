@@ -4,13 +4,12 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import Link from "next/link";
 import type { FilingEvent } from "@/types/events";
 import type { Company, PaginatedEvents } from "@/types/api";
-import type { Significance } from "@/config/constants";
 import { api } from "@/lib/api-client";
 import { useAuth } from "@/hooks/use-auth";
 import { useWatchlists } from "@/hooks/use-watchlists";
 import { timeAgo, formatCatalystDate, formatMarketCap } from "@/lib/utils";
+import { isImportant } from "@/lib/event-actions";
 import { CompanyAvatar } from "@/components/watchlist/company-avatar";
-import { SignificanceBadge } from "@/components/feed/significance-badge";
 import { PriceChart } from "@/components/company/price-chart";
 import {
   Sheet,
@@ -285,12 +284,14 @@ export function CompanySheet({
                         className="rounded-lg px-2.5 py-2 -mx-1 hover:bg-slate-100/70 dark:hover:bg-white/[0.03] transition-colors"
                       >
                         <div className="flex items-center justify-between gap-2 mb-0.5">
-                          <SignificanceBadge
-                            level={
-                              (e.briefing?.significance as Significance) ||
-                              "Medium"
-                            }
-                          />
+                          {isImportant(e) ? (
+                            <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-red-600 dark:text-red-400">
+                              <span className="w-1.5 h-1.5 rounded-full bg-red-500 dark:bg-red-400" />
+                              Important
+                            </span>
+                          ) : (
+                            <span />
+                          )}
                           <span className="text-[11px] text-slate-400 dark:text-slate-500 tabular-nums shrink-0">
                             {timeAgo(e.received_at || e.filing_date)}
                           </span>

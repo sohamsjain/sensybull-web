@@ -45,32 +45,6 @@ function MoversIcon() {
   );
 }
 
-function PositionsIcon() {
-  return (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={1.8}
-        d="M8 7V5.5A1.5 1.5 0 019.5 4h5A1.5 1.5 0 0116 5.5V7m4 0H4a1 1 0 00-1 1v10a1 1 0 001 1h16a1 1 0 001-1V8a1 1 0 00-1-1zM3 12h18"
-      />
-    </svg>
-  );
-}
-
-function CalendarIcon() {
-  return (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={1.8}
-        d="M6.75 3v2.25M17.25 3v2.25M3.75 18.75V7.5a2.25 2.25 0 012.25-2.25h12a2.25 2.25 0 012.25 2.25v11.25m-16.5 0a2.25 2.25 0 002.25 2.25h12a2.25 2.25 0 002.25-2.25m-16.5 0v-7.5a2.25 2.25 0 012.25-2.25h12a2.25 2.25 0 012.25 2.25v7.5"
-      />
-    </svg>
-  );
-}
-
 function BellIcon() {
   return (
     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -102,7 +76,7 @@ function Tab({
       href={href}
       className={`relative flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors ${
         active
-          ? "text-indigo-600 dark:text-indigo-400"
+          ? "text-indigo-600 dark:text-indigo-400 font-semibold"
           : "text-slate-500 dark:text-slate-400"
       }`}
       aria-current={active ? "page" : undefined}
@@ -142,13 +116,6 @@ export function BottomTabs() {
         <WatchlistIcon />
       </Tab>
       <Tab
-        href="/positions"
-        label="Positions"
-        active={pathname?.startsWith("/positions") ?? false}
-      >
-        <PositionsIcon />
-      </Tab>
-      <Tab
         href="/feed"
         label="Feed"
         active={pathname?.startsWith("/feed") ?? false}
@@ -161,13 +128,6 @@ export function BottomTabs() {
         active={pathname?.startsWith("/movers") ?? false}
       >
         <MoversIcon />
-      </Tab>
-      <Tab
-        href="/calendar"
-        label="Calendar"
-        active={pathname?.startsWith("/calendar") ?? false}
-      >
-        <CalendarIcon />
       </Tab>
       <Tab
         href="/alerts"
