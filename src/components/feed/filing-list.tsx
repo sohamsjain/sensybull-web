@@ -179,9 +179,9 @@ export function FilingList({
         onScroll={handleScroll}
         className="h-full overflow-y-auto"
       >
-        <div className="max-w-3xl mx-auto px-4 py-5">
+        <div className="max-w-2xl mx-auto px-2 sm:px-4 py-5">
           {/* Connection status */}
-          <div className="flex items-center gap-2.5 mb-5">
+          <div className="flex items-center gap-2.5 mb-4 px-4 sm:px-5">
             <div className="flex items-center gap-2">
               <span className="relative flex h-2.5 w-2.5">
                 {connected && (
@@ -237,8 +237,8 @@ export function FilingList({
               </p>
             )}
 
-          {/* Event cards, grouped by day */}
-          <div className="space-y-3">
+          {/* Event rows, grouped by day, separated by simple dividers */}
+          <div className="divide-y divide-slate-200 dark:divide-white/[0.06]">
             {displayed.map((event, i) => {
               const ts = event.received_at || event.filing_date || "";
               const prev = i > 0 ? displayed[i - 1] : null;
@@ -315,7 +315,8 @@ export function FilingList({
                 Nothing matches.
               </p>
               <p className="text-slate-400 dark:text-slate-600 text-xs mt-1">
-                Try switching to &ldquo;All&rdquo; or clearing the search.
+                Try switching to &ldquo;All&rdquo;, picking &ldquo;All
+                types&rdquo;, or clearing the search.
               </p>
             </div>
           )}

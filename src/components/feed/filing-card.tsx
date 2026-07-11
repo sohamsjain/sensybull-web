@@ -27,6 +27,9 @@ interface FilingCardProps {
 /**
  * One update in the feed. Collapsed it's just who + when + the headline;
  * a click opens the summary, key dates, and the action buttons.
+ *
+ * Rendered as a flat row (no card box) — the list separates updates with
+ * a simple divider, like Substack or Twitter's timeline.
  */
 export function FilingCard({
   event,
@@ -71,17 +74,14 @@ export function FilingCard({
     <div
       className={`
         group/card relative
-        bg-white dark:bg-[#12141b]
-        rounded-xl border border-slate-200/80 dark:border-white/[0.06]
-        shadow-sm shadow-slate-200/50 dark:shadow-none
         transition-colors
-        hover:border-slate-300 dark:hover:bg-[#15181f] dark:hover:border-white/[0.1]
-        ${selected ? "ring-2 ring-indigo-500 dark:ring-indigo-400" : ""}
+        hover:bg-slate-50 dark:hover:bg-white/[0.02]
+        ${selected ? "bg-indigo-500/[0.06] dark:bg-indigo-400/[0.08]" : ""}
         cursor-pointer
       `}
       onClick={toggleExpanded}
     >
-      <div className="p-4 sm:p-5">
+      <div className="px-4 sm:px-5 py-4">
         {/* ---- Header: Logo + company + time ---- */}
         <div className="flex gap-3.5">
           <CompanyLogo ticker={ticker} name={company_name} />

@@ -1,8 +1,10 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/hooks/use-auth";
 import { useDashboard, type FeedFilter } from "@/app/(dashboard)/layout";
+import { api } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -12,57 +14,127 @@ const FILTERS: { key: FeedFilter; label: string }[] = [
   { key: "important", label: "Important" },
 ];
 
-/** Feed header: one All/Important toggle and a search box. Nothing else. */
+/** Fallback while GET /events/types loads (mirrors the API's canonical list). */
+const DEFAULT_EVENT_TYPES = [
+  "Acquisition",
+  "Material Agreement",
+  "Earnings",
+  "Bankruptcy",
+  "Debt / Financing",
+  "Restructuring",
+  "Leadership Change",
+  "Delisting",
+  "Restatement",
+  "Cybersecurity Incident",
+];
+
+/**
+ * Feed header: the All/Important toggle, a search box, and a scrollable
+ * row of event-type chips ("All types", Acquisition, Earnings, ...).
+ */
 export function FeedToolbar() {
   const { user } = useAuth();
-  const { filter, setFilter, search, setSearch } = useDashboard();
+  const { filter, setFilter, eventType, setEventType, search, setSearch } =
+    useDashboard();
+
+  const [eventTypes, setEventTypes] = useState<string[]>(DEFAULT_EVENT_TYPES);
+  useEffect(() => {
+    let cancelled = false;
+    api<{ event_types: string[] }>("/events/types")
+      .then((data) => {
+        if (cancelled || !data.event_types?.length) return;
+        // "Other" isn't a useful filter — the All chip already covers it
+        setEventTypes(data.event_types.filter((t) => t !== "Other"));
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
-    <div className="h-12 border-b border-slate-200 dark:border-white/[0.06] flex items-center px-4 gap-3 shrink-0 bg-white dark:bg-[#0b0d12]">
-      {/* All / Important — one click, unmistakable selected state */}
+    <div className="border-b border-slate-200 dark:border-white/[0.06] shrink-0 bg-white dark:bg-[#0b0d12]">
+      <div className="h-12 flex items-center px-4 gap-3">
+        {/* All / Important — one click, unmistakable selected state */}
+        <div
+          className="flex p-0.5 rounded-lg bg-slate-100 dark:bg-white/[0.06]"
+          role="tablist"
+          aria-label="Show all updates or only important ones"
+        >
+          {FILTERS.map(({ key, label }) => (
+            <button
+              key={key}
+              role="tab"
+              aria-selected={filter === key}
+              onClick={() => setFilter(key)}
+              className={`px-3.5 py-1 rounded-md text-[13px] font-semibold transition-colors ${
+                filter === key
+                  ? "bg-indigo-600 text-white shadow-sm"
+                  : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {/* Search */}
+        <Input
+          id="feed-search"
+          type="text"
+          placeholder="Search company..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="flex-1 max-w-xs bg-slate-100 dark:bg-[#14161c] border-slate-200 dark:border-white/[0.06] text-sm text-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus-visible:border-indigo-500/60 focus-visible:ring-0"
+        />
+
+        {/* Guests have no nav rail; give them theme + sign-in here */}
+        {!user && (
+          <div className="ml-auto flex items-center gap-2">
+            <ThemeToggle className="w-8 h-8" />
+            <Link href="/login">
+              <Button size="sm" className="bg-indigo-600 hover:bg-indigo-500 text-white">
+                Sign In
+              </Button>
+            </Link>
+          </div>
+        )}
+      </div>
+
+      {/* Event-type chips — horizontally scrollable, Substack-style */}
       <div
-        className="flex p-0.5 rounded-lg bg-slate-100 dark:bg-white/[0.06]"
+        className="flex items-center gap-1.5 px-4 pb-2.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         role="tablist"
-        aria-label="Show all updates or only important ones"
+        aria-label="Filter by event type"
       >
-        {FILTERS.map(({ key, label }) => (
+        <button
+          role="tab"
+          aria-selected={eventType === null}
+          onClick={() => setEventType(null)}
+          className={`shrink-0 px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+            eventType === null
+              ? "bg-indigo-600 text-white"
+              : "bg-slate-100 dark:bg-white/[0.06] text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+          }`}
+        >
+          All types
+        </button>
+        {eventTypes.map((type) => (
           <button
-            key={key}
+            key={type}
             role="tab"
-            aria-selected={filter === key}
-            onClick={() => setFilter(key)}
-            className={`px-3.5 py-1 rounded-md text-[13px] font-semibold transition-colors ${
-              filter === key
-                ? "bg-indigo-600 text-white shadow-sm"
-                : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+            aria-selected={eventType === type}
+            onClick={() => setEventType(eventType === type ? null : type)}
+            className={`shrink-0 px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+              eventType === type
+                ? "bg-indigo-600 text-white"
+                : "bg-slate-100 dark:bg-white/[0.06] text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
             }`}
           >
-            {label}
+            {type}
           </button>
         ))}
       </div>
-
-      {/* Search */}
-      <Input
-        id="feed-search"
-        type="text"
-        placeholder="Search company..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="flex-1 max-w-xs bg-slate-100 dark:bg-[#14161c] border-slate-200 dark:border-white/[0.06] text-sm text-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus-visible:border-indigo-500/60 focus-visible:ring-0"
-      />
-
-      {/* Guests have no nav rail; give them theme + sign-in here */}
-      {!user && (
-        <div className="ml-auto flex items-center gap-2">
-          <ThemeToggle className="w-8 h-8" />
-          <Link href="/login">
-            <Button size="sm" className="bg-indigo-600 hover:bg-indigo-500 text-white">
-              Sign In
-            </Button>
-          </Link>
-        </div>
-      )}
     </div>
   );
 }

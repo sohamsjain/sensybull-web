@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { insertByReceivedOrder } from "./use-events";
+import { insertByReceivedOrder, matchesEventType } from "./use-events";
 import type { FilingEvent } from "@/types/events";
 
 // Minimal FilingEvent factory — only the fields the ordering logic reads.
@@ -62,5 +62,34 @@ describe("insertByReceivedOrder", () => {
     const list = [ev("b", "2026-07-07T10:00:00Z"), ev("a", "2026-07-07T08:00:00Z")];
     const next = insertByReceivedOrder(list, ev("mid", "", "2026-07-07T09:00:00Z"));
     expect(ids(next)).toEqual(["b", "mid", "a"]);
+  });
+});
+
+describe("matchesEventType", () => {
+  it("matches on the event_types list", () => {
+    const e = { ...ev("a", "2026-07-07T10:00:00Z"), event_types: ["Earnings"] };
+    expect(matchesEventType(e, "Earnings")).toBe(true);
+    expect(matchesEventType(e, "Acquisition")).toBe(false);
+  });
+
+  it("falls back to the briefing's primary_event_type", () => {
+    const e = {
+      ...ev("a", "2026-07-07T10:00:00Z"),
+      briefing: {
+        headline: "h",
+        summary: "",
+        primary_event_type: "Acquisition",
+        significance: "High" as const,
+        sentiment: "Neutral" as const,
+        investor_takeaway: "",
+        catalysts: [],
+        deal_terms: {},
+      },
+    };
+    expect(matchesEventType(e, "Acquisition")).toBe(true);
+  });
+
+  it("is false when the event carries no type data", () => {
+    expect(matchesEventType(ev("a", "2026-07-07T10:00:00Z"), "Earnings")).toBe(false);
   });
 });
