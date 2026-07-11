@@ -1,5 +1,30 @@
 # API Changes
 
+## 2026-07-11
+
+### Briefing provenance: `briefing.mode` (anti-hallucination hardening)
+
+Filing-event briefings (WebSocket `filing_event`, `GET /events/*`) now carry
+`briefing.mode`:
+
+- `"llm_verified"` — AI narrative that passed deterministic grounding checks
+  (every number, date, and named entity verified against the filing text the
+  model was shown) plus an independent LLM fact-check pass.
+- `"facts_only"` — the AI narrative was **withheld**: either the filing had
+  too little substantive text to summarize (e.g. exhibit-only 8-K/A
+  amendments) or the generated narrative failed verification. `headline` is
+  deterministic ("8-K/A filed: Contract"), `summary`/`investor_takeaway` are
+  empty, `deal_terms`/`catalysts` are empty. Frontend shows a "verified
+  filing facts only" note and points to the EDGAR document.
+- `"structured"` — briefing built programmatically from structured data
+  (Form 4 insider buys; no LLM involved).
+
+Events ingested before this change have no `mode` field — treat absent as
+legacy/unknown. Ungrounded individual fields (a fabricated `premium`, a
+catalyst date not present in the filing) are dropped server-side even when
+the narrative itself passes, so `deal_terms`/`catalysts` may be sparser than
+before — render conditionally (already the case).
+
 ## 2026-07-06
 
 ### Shareable "Track on Sensybull" links
