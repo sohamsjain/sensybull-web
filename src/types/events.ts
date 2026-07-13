@@ -8,14 +8,16 @@ export interface Briefing {
   catalysts: Catalyst[];
   deal_terms: Record<string, string>;
   /**
-   * Provenance of the briefing content:
-   * - "llm_verified": AI narrative that passed grounding checks against the filing text
-   * - "facts_only": deterministic fields only — the AI narrative was withheld
-   *   because it could not be verified (or there was too little text to summarize)
-   * - "structured": built programmatically from structured data (Form 4)
-   * Absent on events ingested before verification shipped.
+   * How the briefing was produced:
+   * - "llm": AI-authored narrative (single pass, no mechanical verification
+   *   since the July 2026 grounding rollback)
+   * - "facts_only": deterministic fields only — the LLM call failed or the
+   *   filing had too little text to summarize
+   * - "llm_verified" / "structured": historical events from before the
+   *   grounding rollback (verified narrative / programmatic Form 4 briefing)
+   * Absent on the oldest events.
    */
-  mode?: "llm_verified" | "facts_only" | "structured";
+  mode?: "llm" | "facts_only" | "llm_verified" | "structured";
 }
 
 export interface Catalyst {

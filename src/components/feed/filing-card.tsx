@@ -201,12 +201,10 @@ export function FilingCard({
                 </p>
               )}
 
-              {/* Facts-only provenance: the AI summary was withheld because
-                  it couldn't be verified against the filing text */}
               {briefing?.mode === "facts_only" && (
                 <p className="mt-2 text-xs text-slate-400 dark:text-slate-500 leading-relaxed">
-                  Showing verified filing facts only — an AI summary wasn&apos;t
-                  available for this filing. Read the source document below.
+                  An AI summary isn&apos;t available for this filing — read
+                  the source document below.
                 </p>
               )}
 
