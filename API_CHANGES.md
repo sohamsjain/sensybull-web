@@ -1,5 +1,17 @@
 # API Changes
 
+## 2026-07-13 (grounding rollback)
+
+### `briefing.mode` is now `"llm"` on new AI briefings
+
+The ingest pipeline's fact-grounding checks and second LLM verifier pass
+were rolled back (too many false rejections were stripping good summaries).
+New LLM-authored briefings carry `mode: "llm"` instead of
+`mode: "llm_verified"`. `mode: "facts_only"` is unchanged and still means
+"no AI summary" (LLM call failed or the filing had too little text) — keep
+rendering the fallback note for it. `"llm_verified"` and `"structured"`
+now only appear on historical events.
+
 ## 2026-07-11 (8-K-only rollback + narrowed event types)
 
 ### Ingest rolled back to 8-K only

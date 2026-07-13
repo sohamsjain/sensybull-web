@@ -89,8 +89,7 @@ export function FilingMessage({ event }: { event: FilingEvent }) {
             )}
             {briefing?.mode === "facts_only" && (
               <p className="text-slate-400 dark:text-slate-500 text-[12px] leading-[1.5] mt-1.5">
-                Showing verified filing facts only — an AI summary wasn&apos;t
-                available for this filing.
+                An AI summary isn&apos;t available for this filing.
               </p>
             )}
             {hasDealTerms && <DealTerms terms={briefing!.deal_terms} />}
