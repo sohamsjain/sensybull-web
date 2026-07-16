@@ -9,10 +9,10 @@ import {
 } from "@/lib/event-actions";
 
 /**
- * Action row shown only when an update is expanded: read the source filing,
- * copy a ready-made prompt for ChatGPT/Gemini/Claude, and share the update.
- * Kept identical between the feed card and the watchlist message so every
- * update behaves the same way.
+ * Action row shown only when an update is expanded: read the source
+ * document (SEC filing or press release), copy a ready-made prompt for
+ * ChatGPT/Gemini/Claude, and share the update. Kept identical between the
+ * feed card and the watchlist message so every update behaves the same way.
  */
 export function UpdateActions({ event }: { event: FilingEvent }) {
   const [copied, setCopied] = useState(false);
@@ -51,6 +51,22 @@ export function UpdateActions({ event }: { event: FilingEvent }) {
       {event.edgar_url && (
         <a
           href={event.edgar_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={buttonClass}
+        >
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="shrink-0 opacity-60">
+            <path d="M2 2h8v8H2z" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
+            <path d="M4 4.5h4M4 6.5h4M4 8.5h2" stroke="currentColor" strokeWidth="0.8" strokeLinecap="round" />
+          </svg>
+          {event.signal_type === "PR" ? "Read the press release" : "Read the filing"}
+        </a>
+      )}
+
+      {/* A press release gains its SEC-filing link once the 8-K arrives */}
+      {event.signal_type === "PR" && event.filing_url && (
+        <a
+          href={event.filing_url}
           target="_blank"
           rel="noopener noreferrer"
           className={buttonClass}

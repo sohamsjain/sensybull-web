@@ -5,6 +5,7 @@ import type { FilingEvent } from "@/types/events";
 import { useDashboard } from "@/app/(dashboard)/layout";
 import { timeAgo, fullDateTime } from "@/lib/utils";
 import { isImportant } from "@/lib/event-actions";
+import { filedPhrase } from "@/lib/forms";
 import { DealTerms } from "./deal-terms";
 import { CatalystsTable } from "./catalysts-table";
 import { CompanyLogo } from "./company-logo";
@@ -188,7 +189,7 @@ export function FilingCard({
             </h3>
           ) : (
             <h3 className="text-[15px] sm:text-base font-normal text-slate-800 dark:text-slate-100 leading-snug">
-              {company_name} filed an {event.signal_type}.
+              {company_name} {filedPhrase(event.signal_type)}.
             </h3>
           )}
 

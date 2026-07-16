@@ -356,3 +356,48 @@ deep model is now `openai/gpt-oss-120b` (Groq's recommended replacement;
 the next model on **any** provider error rather than only 404/429 — so a
 future decommission degrades to the triage models instead of an outage.
 No frontend change.
+
+## Press-release ingestion (July 2026)
+
+The ingest worker now also polls newswire RSS feeds (GlobeNewswire,
+PR Newswire, Accesswire; Business Wire once a feed URL is configured) and
+publishes first-party, material press releases as events. Feature-flagged
+server-side (`PR_INGEST_ENABLED`); off until feeds are validated.
+
+### Event payload (WS `filing_event` + all `/events/*` endpoints)
+
+- `signal_type` can now be `"PR"` (press release). `edgar_url` holds the
+  press-release article URL for PR events; `edgar_id` is a synthetic
+  `pr:<wire>:<guid>`; `accession_number` is empty.
+- New field `source` — `"edgar"` for filings, wire name
+  (`"globenewswire"`, `"prnewswire"`, `"businesswire"`, `"accesswire"`)
+  for press releases.
+- New field `issuer_name` — the wire-reported issuing organization
+  (PR events only; null otherwise).
+- New fields `filing_url` + `related_accession_number` — set on a PR event
+  once its follow-up SEC filing arrives (the PR event is "backfilled" and
+  the duplicate 8-K feed item is suppressed when the filing merely
+  furnishes the release; an 8-K with substantive extra items still
+  publishes). Render a "Read the filing" link when `filing_url` is set.
+
+### New socket event: `filing_event_update`
+
+Emitted on namespace `/feed` (same rooms as `filing_event`) when an
+existing event gains data — today, a PR event backfilled with its SEC
+filing link. Same payload shape as `filing_event`; replace the event with
+matching `id` in client state, ignore if not present.
+
+### Event types
+
+`GET /events/types` now returns 12 labels: `"Regulatory / Clinical"` was
+added (FDA decisions / clinical-trial results reach the wire before any
+filing). Feed chips pick this up automatically.
+
+### Filters
+
+`signal_type=PR` works on all `/events` list endpoints (plain equality,
+no API change needed). Dedup guarantees: the same announcement appears
+once — wire copies of one release are de-duplicated across wires, a PR
+arriving after its 8-K already published is dropped, and an 8-K that
+merely wraps an already-published PR is suppressed (server env
+`PR_SUPPRESS_8K=0` disables suppression while tuning).

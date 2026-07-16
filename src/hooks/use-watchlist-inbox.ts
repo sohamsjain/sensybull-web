@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import type { WatchlistEntry, WatchlistInboxResponse, EventPreview, ReadStateResponse, PaginatedWatchlists } from "@/types/api";
 import type { FilingEvent } from "@/types/events";
 import { api } from "@/lib/api-client";
-import { formPhrase } from "@/lib/forms";
+import { filedPhrase } from "@/lib/forms";
 import { addToDefaultWatchlist } from "@/lib/default-watchlist";
 import { useAuth } from "@/hooks/use-auth";
 import { useSocket } from "@/context/socket-provider";
@@ -24,7 +24,7 @@ function toPreview(event: FilingEvent): EventPreview {
     id: event.id,
     headline:
       event.briefing?.headline ||
-      `${event.company_name} filed ${formPhrase(event.signal_type)}`,
+      `${event.company_name} ${filedPhrase(event.signal_type)}`,
     significance: event.briefing?.significance || null,
     sentiment: event.briefing?.sentiment || null,
     primary_event_type: event.briefing?.primary_event_type || null,

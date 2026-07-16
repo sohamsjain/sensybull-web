@@ -109,6 +109,16 @@ export function useEvents({ filter, eventType = null, search }: UseEventsOptions
       setEvents((prev) => insertByReceivedOrder(prev, event));
     };
 
+    // An existing event gained data (e.g. a press release backfilled with
+    // its SEC filing link) — replace in place, ignore if not loaded
+    const onFilingUpdate = (event: FilingEvent) => {
+      setEvents((prev) =>
+        prev.some((e) => e.id === event.id)
+          ? prev.map((e) => (e.id === event.id ? event : e))
+          : prev
+      );
+    };
+
     // Reactions are measured minutes-to-days after the filing arrives;
     // merge them into already-rendered events as they complete
     const onReaction = (update: PriceReactionUpdate) => {
@@ -126,9 +136,11 @@ export function useEvents({ filter, eventType = null, search }: UseEventsOptions
     };
 
     socket.on("filing_event", onFiling);
+    socket.on("filing_event_update", onFilingUpdate);
     socket.on("price_reaction", onReaction);
     return () => {
       socket.off("filing_event", onFiling);
+      socket.off("filing_event_update", onFilingUpdate);
       socket.off("price_reaction", onReaction);
     };
   }, [socket]);

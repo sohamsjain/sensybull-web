@@ -128,9 +128,9 @@ export default function WatchlistPage() {
             Your watchlist, decoded
           </h2>
           <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-4">
-            Follow the companies you care about. New SEC filings arrive in
-            plain English — with unread counts, so you never miss the one
-            that matters.
+            Follow the companies you care about. New filings and press
+            releases arrive in plain English — with unread counts, so you
+            never miss the one that matters.
           </p>
           <Link href="/login">
             <Button className="bg-indigo-600 hover:bg-indigo-500">Sign in to start</Button>

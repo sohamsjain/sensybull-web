@@ -57,12 +57,23 @@ export type PriceReactions = Record<string, PriceReactionPoint>;
 export interface FilingEvent {
   id: string;
   edgar_id: string;
+  /** SEC form type ("8-K", "8-K/A", historical forms) or "PR" (press release) */
   signal_type: string;
+  /** "edgar" for SEC filings, wire name ("globenewswire", "prnewswire", …)
+   *  for press releases. Absent on cached payloads from before PRs shipped. */
+  source?: string;
+  /** Wire-reported issuing organization (press releases only). */
+  issuer_name?: string | null;
+  /** Set on a PR event once its follow-up SEC filing arrives (backfill) —
+   *  render a "Read the filing" link alongside the press-release link. */
+  filing_url?: string | null;
+  related_accession_number?: string | null;
   ticker: string | null;
   company_name: string;
   company_id: string | null;
   cik: string;
   filing_date: string | null;
+  /** Source-document link: EDGAR index URL for filings, article URL for PRs */
   edgar_url: string | null;
   accession_number: string | null;
   max_tier: 1 | 2 | 3;

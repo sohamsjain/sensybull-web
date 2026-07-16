@@ -1,6 +1,7 @@
 import type { FilingEvent } from "@/types/events";
 import { SITE_URL } from "@/lib/share";
 import { fullDateTime } from "@/lib/utils";
+import { filedPhrase } from "@/lib/forms";
 
 /**
  * Binary importance: is this the kind of event that typically moves the
@@ -23,23 +24,31 @@ export function eventUrl(event: FilingEvent): string {
 
 /**
  * Self-contained prompt for pasting into ChatGPT / Gemini / Claude — the
- * "ask an AI about this filing" copy button. Carries everything the chatbot
- * needs: who filed, what, when, the briefing text, key dates, and the link
- * to the primary source so the bot (or the user) can verify.
+ * "ask an AI about this update" copy button. Carries everything the chatbot
+ * needs: who published, what, when, the briefing text, key dates, and the
+ * link to the primary source so the bot (or the user) can verify.
  */
 export function buildAiPrompt(event: FilingEvent): string {
   const { briefing } = event;
+  const isPr = event.signal_type === "PR";
   const company = event.ticker
     ? `${event.company_name} (${event.ticker})`
     : event.company_name;
   const filedAt = fullDateTime(event.received_at || event.filing_date);
 
-  const lines: string[] = [
-    `I'm researching a US SEC filing and want your help understanding it.`,
-    ``,
-    `Company: ${company}`,
-    `Filing: ${event.signal_type}${filedAt ? `, filed ${filedAt}` : ""}`,
-  ];
+  const lines: string[] = isPr
+    ? [
+        `I'm researching a company press release and want your help understanding it.`,
+        ``,
+        `Company: ${company}`,
+        `Announcement: press release${filedAt ? `, published ${filedAt}` : ""}`,
+      ]
+    : [
+        `I'm researching a US SEC filing and want your help understanding it.`,
+        ``,
+        `Company: ${company}`,
+        `Filing: ${event.signal_type}${filedAt ? `, filed ${filedAt}` : ""}`,
+      ];
   if (briefing?.headline) lines.push(`What happened: ${briefing.headline}`);
   if (briefing?.summary) lines.push(``, `Summary: ${briefing.summary}`);
 
@@ -53,21 +62,34 @@ export function buildAiPrompt(event: FilingEvent): string {
     event.catalysts?.length ? event.catalysts : briefing?.catalysts ?? []
   ).filter((c) => c.event);
   if (catalysts.length > 0) {
-    lines.push(``, `Key dates mentioned in the filing:`);
+    lines.push(
+      ``,
+      isPr
+        ? `Key dates mentioned in the press release:`
+        : `Key dates mentioned in the filing:`
+    );
     for (const c of catalysts) {
       lines.push(`- ${c.date ?? "Date TBD"}: ${c.event}`);
     }
   }
 
   if (event.edgar_url) {
-    lines.push(``, `Original filing on SEC EDGAR: ${event.edgar_url}`);
+    lines.push(
+      ``,
+      isPr
+        ? `Original press release: ${event.edgar_url}`
+        : `Original filing on SEC EDGAR: ${event.edgar_url}`
+    );
+  }
+  if (isPr && event.filing_url) {
+    lines.push(`Related SEC filing: ${event.filing_url}`);
   }
 
   lines.push(
     ``,
-    `Please explain in plain English what this filing means for the company` +
-      ` and for shareholders, and point out anything I should watch next.` +
-      ` I'll ask follow-up questions.`
+    `Please explain in plain English what this ${isPr ? "announcement" : "filing"}` +
+      ` means for the company and for shareholders, and point out anything` +
+      ` I should watch next. I'll ask follow-up questions.`
   );
   return lines.join("\n");
 }
@@ -78,7 +100,9 @@ export function buildShareText(event: FilingEvent): string {
     ? `${event.company_name} (${event.ticker})`
     : event.company_name;
   const headline = event.briefing?.headline;
-  return headline ? `${company}: ${headline}` : `${company} filed an ${event.signal_type}`;
+  return headline
+    ? `${company}: ${headline}`
+    : `${company} ${filedPhrase(event.signal_type)}`;
 }
 
 /**
