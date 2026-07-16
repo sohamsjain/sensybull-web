@@ -167,9 +167,9 @@ export function WatchlistPanel({
               Track your first company
             </p>
             <p className="text-slate-400 dark:text-slate-500 text-xs leading-relaxed">
-              New SEC filings from companies you follow arrive here in plain
-              English, seconds after they hit EDGAR. Search above (or press /)
-              to add your first company.
+              New filings and press releases from companies you follow arrive
+              here in plain English, seconds after they&apos;re published.
+              Search above (or press /) to add your first company.
             </p>
           </div>
         ) : (

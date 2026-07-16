@@ -8,7 +8,7 @@ import { DealTerms } from "@/components/feed/deal-terms";
 import { CatalystsTable } from "@/components/feed/catalysts-table";
 import { PriceReactionStrip } from "@/components/feed/price-reaction-strip";
 import { UpdateActions } from "@/components/feed/update-actions";
-import { formPhrase, formTag, formTagDuplicatesEventType } from "@/lib/forms";
+import { filedPhrase, formTag, formTagDuplicatesEventType } from "@/lib/forms";
 
 /**
  * One filing event rendered as an incoming message bubble.
@@ -75,7 +75,7 @@ export function FilingMessage({ event }: { event: FilingEvent }) {
           </p>
         ) : (
           <p className="text-slate-600 dark:text-slate-300 text-sm">
-            {event.company_name} filed {formPhrase(event.signal_type)}.
+            {event.company_name} {filedPhrase(event.signal_type)}.
           </p>
         )}
 

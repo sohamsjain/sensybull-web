@@ -87,9 +87,25 @@ export function useCompanyEvents(companyId: string | null, socket: Socket | null
         return { ...prev, events: [event, ...prev.events] };
       });
     };
+    // An already-loaded event gained data (e.g. a press release backfilled
+    // with its SEC filing link) — replace in place, never reorder
+    const updateHandler = (event: FilingEvent) => {
+      if (event.company_id !== companyId) return;
+      setState((prev) => {
+        if (prev.companyId !== companyId) return prev;
+        if (!prev.events.some((e) => e.id === event.id)) return prev;
+        return {
+          ...prev,
+          events: prev.events.map((e) => (e.id === event.id ? event : e)),
+        };
+      });
+    };
+
     socket.on("filing_event", handler);
+    socket.on("filing_event_update", updateHandler);
     return () => {
       socket.off("filing_event", handler);
+      socket.off("filing_event_update", updateHandler);
     };
   }, [companyId, socket]);
 

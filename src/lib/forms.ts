@@ -1,14 +1,17 @@
 /**
- * Display helpers for SEC form types (`FilingEvent.signal_type`).
- * Since the July 2026 rollback the backend ingests ONLY the 8-K family;
- * the other entries below keep HISTORICAL events (13D stakes, tenders,
- * proxies, delistings, late filings, Form 4 buys) readable in the feed.
+ * Display helpers for `FilingEvent.signal_type` — SEC form types plus the
+ * "PR" press-release type added with newswire ingestion.
+ * Since the July 2026 rollback the backend ingests ONLY the 8-K family
+ * (and press releases); the other entries below keep HISTORICAL events
+ * (13D stakes, tenders, proxies, delistings, late filings, Form 4 buys)
+ * readable in the feed.
  */
 
 /** Sentence fragment: "AcmeCo filed {formPhrase(t)}" */
 const FORM_PHRASES: Record<string, string> = {
   "8-K": "an 8-K",
   "8-K/A": "an 8-K amendment",
+  PR: "a press release",
   "4": "a Form 4 insider transaction",
   "SC 13D": "a 13D stake disclosure",
   "SC 13D/A": "a 13D amendment",
@@ -37,8 +40,19 @@ export function formPhrase(signalType: string): string {
   return FORM_PHRASES[signalType] ?? `a ${signalType}`;
 }
 
+/**
+ * Full verb phrase: "filed an 8-K" / "issued a press release".
+ * Press releases aren't "filed" — use this wherever the sentence
+ * hardcoded the verb.
+ */
+export function filedPhrase(signalType: string): string {
+  if (signalType === "PR") return "issued a press release";
+  return `filed ${formPhrase(signalType)}`;
+}
+
 /** Short badge tag: "13D", "Tender", "Form 4"… */
 const FORM_TAGS: Record<string, string> = {
+  PR: "Press Release",
   "4": "Form 4",
   "SC 13D": "13D",
   "SC 13D/A": "13D/A",

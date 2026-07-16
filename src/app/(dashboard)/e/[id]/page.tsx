@@ -45,7 +45,7 @@ export default function EventPermalinkPage({
               Event not found
             </p>
             <p className="text-slate-400 dark:text-slate-500 text-xs">
-              This filing event doesn&apos;t exist or was removed.
+              This update doesn&apos;t exist or was removed.
             </p>
           </div>
         ) : (

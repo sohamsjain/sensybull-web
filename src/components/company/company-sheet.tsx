@@ -9,6 +9,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useWatchlists } from "@/hooks/use-watchlists";
 import { timeAgo, formatCatalystDate, formatMarketCap } from "@/lib/utils";
 import { isImportant } from "@/lib/event-actions";
+import { filedPhrase } from "@/lib/forms";
 import { CompanyAvatar } from "@/components/watchlist/company-avatar";
 import { PriceChart } from "@/components/company/price-chart";
 import {
@@ -298,7 +299,9 @@ export function CompanySheet({
                         </div>
                         <p className="text-[13px] text-slate-700 dark:text-slate-200 leading-snug">
                           {e.briefing?.headline ||
-                            `Filed an ${e.signal_type}`}
+                            filedPhrase(e.signal_type).replace(/^\w/, (c) =>
+                              c.toUpperCase()
+                            )}
                         </p>
                       </li>
                     ))}
