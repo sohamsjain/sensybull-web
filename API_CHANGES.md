@@ -1,5 +1,27 @@
 # API Changes
 
+## 2026-07-18 (mobile app support)
+
+### Mobile auth: refresh token in the body for `X-Client: mobile`
+
+Requests carrying the `X-Client: mobile` header (sent by sensybull-app) get
+`refresh_token` in the JSON body of `POST /auth/login`, `/register`,
+`/google`, `/apple`, and `/magic-link/verify`, and no refresh cookie. The
+browser flow is unchanged (httpOnly cookie, CSRF double-submit). Mobile
+clients refresh with `POST /auth/refresh` and revoke with
+`POST /auth/logout`, sending the refresh token as `Authorization: Bearer`
+(header-located refresh tokens were already accepted; no CSRF applies).
+
+### Expo push devices: `POST/DELETE /alerts/push/devices`
+
+New endpoints (auth) for the mobile app's push registration:
+`POST {token: "ExponentPushToken[…]", platform: "ios"|"android"}` registers
+(or re-claims) a device; `DELETE {token}` removes it. Alerts flow through
+the existing `push` channel preference — `PushChannel` now fans out to Expo
+push (mobile devices) alongside Web Push (browsers). Expo pushes carry
+`data: {event_id, company_id}`; the app deep-links taps to its event
+screen. New `device_token` table (migration `a2b3c4d5e6f7`).
+
 ## 2026-07-13 (grounding rollback)
 
 ### `briefing.mode` is now `"llm"` on new AI briefings
