@@ -16,7 +16,7 @@
 - Watchlist inbox: `GET /watchlist/` (companies + unread counts under `items`), `POST /watchlist/:companyId/read`, `PUT /watchlist/:companyId/mute`
 - Share links: `GET /share/:symbol` (public share info, no internal IDs), `POST /watchlists/track` (auth, idempotent add-by-ticker), `POST /share/events` (public funnel analytics). See `docs/TRACK_LINKS.md`
 - WebSocket: Socket.IO namespace `/feed`, auth via `{token}` dict, events: `filing_event`, `filing_event_update`, `connected`, `price_reaction`. The `/feed` socket is owned once at the dashboard layout by `SocketProvider` (`useSocket`) and shared by all pages — it persists across client-side navigation
-- Removed (July 2026 hard rollback — do not re-add without an explicit decision): all `/positions/*` endpoints, the `thesis_alert` socket event, and `GET /events/catalysts`
+- Removed (July 2026 hard rollback — do not re-add without an explicit decision): all `/positions/*` endpoints, the `thesis_alert` socket event, `GET /events/catalysts`, and `GET /movers`
 
 ## Project Structure
 - `src/types/` — API and event type definitions
@@ -26,20 +26,18 @@
 - `src/components/ui/` — shadcn/ui primitives
 - `src/components/feed/` — FilingCard (flat row, no box), FilingList (divider-separated), FeedToolbar (All/Important + search + event-type chips), UpdateActions (Read the filing / Copy for AI chat / Share — shown only on expanded updates), CatalystsTable ("Key dates"), DealTerms, PriceReactionStrip, CompanyLogo
 - `src/components/watchlist/` — WatchlistPanel, WatchlistItem, Conversation, FilingMessage, CompanyAvatar
-- `src/components/movers/` — MoverList/MoverRow (shared by /movers page)
 - `src/components/layout/` — NavRail, BottomTabs
 - `src/components/auth/` — Login/register/forgot-password forms
 - `src/app/(auth)/` — Auth pages (centered layout, no sidebar)
 - `src/app/(dashboard)/` — Dashboard pages (nav rail + main)
   - `/watchlist` — default landing for signed-in users; two-pane UI (resizable/collapsible company list + filing history), chart toggle swaps the right pane for a full-size price chart (`/chats` redirects here)
   - `/feed` — public live stream of all events in received order; All/Important toggle, event-type chips, and search, no sidebar. Substack/Twitter-style flat list: rows separated by simple dividers, no card boxes
-  - `/movers` — today's gainers/losers among recent filers
   - `/e/[id]` — public per-event permalink (backed by GET /events/all/:id), rendered expanded
 - `src/app/add/[symbol]/` — public "Track on Sensybull" deep link (`/add/MU`): SEO/OG page + client flow that adds the ticker to the watchlist, preserving intent through auth via `src/lib/pending-action.ts` (see `docs/TRACK_LINKS.md`)
 - `src/app/embed/[symbol]/` — iframe-able track button (route handler, frameable by design; header carve-out in next.config.ts)
 - `src/components/share/` — TrackButton, ShareDialog (company sheet), AddFlow
 - `src/lib/share.ts` (canonical link/snippet builders) + `src/lib/share-analytics.ts` (funnel events); global toast in `src/components/ui/app-toaster.tsx` (mounted in root layout)
-- Removed pages (July 2026): `/positions` (thesis feature, hard rollback), `/calendar` (catalyst calendar; key dates live inside updates and the company sheet)
+- Removed pages (July 2026): `/positions` (thesis feature, hard rollback), `/calendar` (catalyst calendar; key dates live inside updates and the company sheet), `/movers` (today's gainers/losers among recent filers — removed with the `GET /movers` API endpoint)
 
 ## Product rules (see PRODUCT_VISION.md)
 - Updates collapse to headline-only; summary, key dates, and action buttons appear only when expanded. No per-update "investor takeaway" bullets, no significance explainers

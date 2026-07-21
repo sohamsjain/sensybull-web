@@ -1,5 +1,16 @@
 # API Changes
 
+## 2026-07-21 (movers removal)
+
+### `GET /movers` removed
+
+The movers feature (top gainers/losers among recent filers) was removed
+end to end. The `GET /movers` endpoint and its blueprint no longer exist;
+requests now 404. The web `/movers` page and mobile Movers tab, along with
+the `Mover` / `MoverEvent` / `MoversResponse` types and `useMovers` hooks,
+were deleted too. Price-reaction snapshots (`price_reaction` socket event)
+and the underlying Alpaca market-data service are unaffected.
+
 ## 2026-07-13 (grounding rollback)
 
 ### `briefing.mode` is now `"llm"` on new AI briefings
