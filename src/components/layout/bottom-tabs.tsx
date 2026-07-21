@@ -32,19 +32,6 @@ function FeedIcon() {
   );
 }
 
-function MoversIcon() {
-  return (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={1.8}
-        d="M3 17l5.5-5.5 4 4L21 7m0 0h-5m5 0v5"
-      />
-    </svg>
-  );
-}
-
 function BellIcon() {
   return (
     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -121,13 +108,6 @@ export function BottomTabs() {
         active={pathname?.startsWith("/feed") ?? false}
       >
         <FeedIcon />
-      </Tab>
-      <Tab
-        href="/movers"
-        label="Movers"
-        active={pathname?.startsWith("/movers") ?? false}
-      >
-        <MoversIcon />
       </Tab>
       <Tab
         href="/alerts"

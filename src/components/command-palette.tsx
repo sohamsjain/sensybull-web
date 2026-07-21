@@ -93,7 +93,6 @@ export function CommandPalette() {
           ]
         : []),
       { id: "feed", label: "Go to Feed", run: () => router.push("/feed") },
-      { id: "movers", label: "Go to Movers", run: () => router.push("/movers") },
       ...(user
         ? [
             {

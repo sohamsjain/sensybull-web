@@ -24,7 +24,7 @@ Three things, done well:
    ever reaches a user.
 
 Supporting surfaces: per-company sheet (price chart, upcoming key dates, filing
-history), movers, public permalinks, and share/track links.
+history), public permalinks, and share/track links.
 
 ## What Sensybull deliberately is not (for now)
 

@@ -39,7 +39,7 @@ See `.env.example`. All are `NEXT_PUBLIC_` (client-visible by design):
 
 ## Project layout
 
-- `src/app/` — routes: `(auth)`, `(dashboard)` (`/watchlist`, `/feed`, `/movers`,
+- `src/app/` — routes: `(auth)`, `(dashboard)` (`/watchlist`, `/feed`,
   `/e/[id]`), `(legal)`.
 - `src/components/` — by domain: `ui/`, `feed/`, `chat/`, `auth/`, `alerts/`,
   `watchlist/`, `layout/`, `company/`, `landing/`.

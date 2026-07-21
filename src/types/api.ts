@@ -37,29 +37,6 @@ export interface Company {
   shares_outstanding?: number | null;
 }
 
-export interface MoverEvent {
-  id: string;
-  headline: string | null;
-  significance: "High" | "Medium" | "Low" | null;
-  primary_event_type: string | null;
-  filing_date: string | null;
-}
-
-export interface Mover {
-  ticker: string;
-  company_name: string | null;
-  company_id: string | null;
-  price: number;
-  change_pct: number;
-  event: MoverEvent | null;
-}
-
-export interface MoversResponse {
-  as_of: string;
-  gainers: Mover[];
-  losers: Mover[];
-}
-
 export interface Bar {
   t: string;
   o: number;
