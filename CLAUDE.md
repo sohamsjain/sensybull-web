@@ -13,7 +13,7 @@
 - Companies: `GET /companies/?q=...` (search by ticker or name), `GET /companies/search?q=` (typeahead)
 - Alerts: `GET/PUT /alerts/preferences`, `GET /alerts/notifications`, `GET /alerts/channels`, Web Push at `/alerts/push/*` (see `src/lib/push.ts` + `public/sw.js`). The sensitivity UI is binary (Important only ↔ Everything) mapped onto the API's `max_tier` (1 ↔ 3)
 - Events (single): `GET /events/all/:id` (public, permalinks)
-- Watchlist inbox: `GET /watchlist/` (companies + unread counts under `items`), `POST /watchlist/:companyId/read`, `PUT /watchlist/:companyId/mute`
+- Watchlist inbox: `GET /watchlist/` (companies + unread counts under `items`), `POST /watchlist/:companyId/read`, `PUT /watchlist/:companyId/mute`. Bulk counterparts back multi-select — `POST /watchlist/read`, `PUT /watchlist/mute`, `POST /watchlist/remove`, all taking `{company_ids}` — and drop ids the user no longer follows instead of failing the batch (trust the echoed `company_ids`)
 - Share links: `GET /share/:symbol` (public share info, no internal IDs), `POST /watchlists/track` (auth, idempotent add-by-ticker), `POST /share/events` (public funnel analytics). See `docs/TRACK_LINKS.md`
 - WebSocket: Socket.IO namespace `/feed`, auth via `{token}` dict, events: `filing_event`, `filing_event_update`, `connected`, `price_reaction`. The `/feed` socket is owned once at the dashboard layout by `SocketProvider` (`useSocket`) and shared by all pages — it persists across client-side navigation
 - Removed (July 2026 hard rollback — do not re-add without an explicit decision): all `/positions/*` endpoints, the `thesis_alert` socket event, `GET /events/catalysts`, and `GET /movers`
@@ -21,16 +21,16 @@
 ## Project Structure
 - `src/types/` — API and event type definitions
 - `src/lib/` — API client (auto-refresh on 401), Socket.IO wrapper, utilities; `event-actions.ts` (isImportant, AI-chat copy prompt, share/permalink helpers)
-- `src/hooks/` — useAuth, useSocket, useEvents (REST+Socket merge), useWatchlists, useWatchlistInbox (inbox + live unread), useCompanyEvents (per-company history), usePaneWidth (resizable pane)
+- `src/hooks/` — useAuth, useSocket, useEvents (REST+Socket merge), useWatchlists, useWatchlistInbox (inbox + live unread + bulk actions), useWatchlistSelection (multi-select mode; range logic in `src/lib/selection.ts`), useCompanyEvents (per-company history), usePaneWidth (resizable pane)
 - `src/context/` — AuthProvider (login/register/google/logout), SocketProvider (session-wide `/feed` socket + `useSocket`)
 - `src/components/ui/` — shadcn/ui primitives
 - `src/components/feed/` — FilingCard (flat row, no box), FilingList (divider-separated), FeedToolbar (All/Important + search + event-type chips), UpdateActions (Read the filing / Copy for AI chat / Share — shown only on expanded updates), CatalystsTable ("Key dates"), DealTerms, PriceReactionStrip, CompanyLogo
-- `src/components/watchlist/` — WatchlistPanel, WatchlistItem, Conversation, FilingMessage, CompanyAvatar
+- `src/components/watchlist/` — WatchlistPanel, WatchlistItem, WatchlistBulkBar, Conversation, FilingMessage, CompanyAvatar
 - `src/components/layout/` — NavRail, BottomTabs
 - `src/components/auth/` — Login/register/forgot-password forms
 - `src/app/(auth)/` — Auth pages (centered layout, no sidebar)
 - `src/app/(dashboard)/` — Dashboard pages (nav rail + main)
-  - `/watchlist` — default landing for signed-in users; two-pane UI (resizable/collapsible company list + filing history), chart toggle swaps the right pane for a full-size price chart (`/chats` redirects here)
+  - `/watchlist` — default landing for signed-in users; two-pane UI (resizable/collapsible company list + filing history), chart toggle swaps the right pane for a full-size price chart (`/chats` redirects here). The company list has a "Select" mode for acting on several companies at once (mute/unmute, mark read, remove); it lives in WatchlistPanel because ranges and "select all" follow the panel's own filters, and the page only learns whether the mode is on so its ↑/↓/Esc shortcuts stand down
   - `/feed` — public live stream of all events in received order; All/Important toggle, event-type chips, and search, no sidebar. Substack/Twitter-style flat list: rows separated by simple dividers, no card boxes
   - `/e/[id]` — public per-event permalink (backed by GET /events/all/:id), rendered expanded
 - `src/app/add/[symbol]/` — public "Track on Sensybull" deep link (`/add/MU`): SEO/OG page + client flow that adds the ticker to the watchlist, preserving intent through auth via `src/lib/pending-action.ts` (see `docs/TRACK_LINKS.md`)

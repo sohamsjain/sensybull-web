@@ -23,6 +23,36 @@ function MutedIcon() {
   );
 }
 
+function CheckIcon() {
+  return (
+    <svg className="w-3 h-3" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+      <path
+        d="M2.5 6.2 4.8 8.5 9.5 3.8"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+/** Selection box. Visual only — the whole row is the hit target. */
+function SelectionBox({ selected }: { selected: boolean }) {
+  return (
+    <span
+      aria-hidden="true"
+      className={`w-[18px] h-[18px] rounded shrink-0 flex items-center justify-center border transition-colors ${
+        selected
+          ? "bg-indigo-600 border-indigo-600 text-white"
+          : "border-slate-300 dark:border-white/[0.2] text-transparent"
+      }`}
+    >
+      <CheckIcon />
+    </span>
+  );
+}
+
 function PinIcon() {
   return (
     <svg
@@ -40,26 +70,47 @@ export function WatchlistItem({
   entry,
   active,
   pinned = false,
+  selectable = false,
+  selected = false,
   onSelect,
+  onToggleSelect,
 }: {
   entry: WatchlistEntry;
   active: boolean;
   pinned?: boolean;
+  /** Selection mode: show a checkbox and toggle instead of opening. */
+  selectable?: boolean;
+  selected?: boolean;
   onSelect: () => void;
+  /** `extend` is the shift key — select the range from the last click. */
+  onToggleSelect?: (extend: boolean) => void;
 }) {
   const { company, last_event, last_activity_at, unread_count, muted } = entry;
   const hasUnread = unread_count > 0;
 
+  // In selection mode the row is a checkbox, not a link to the company —
+  // one hit target, so there's no half-pressed state to reason about.
+  const checkboxProps = selectable
+    ? ({ role: "checkbox", "aria-checked": selected } as const)
+    : {};
+
   return (
     <button
-      onClick={onSelect}
+      onClick={(e) =>
+        selectable ? onToggleSelect?.(e.shiftKey) : onSelect()
+      }
       data-company-id={company.id}
+      {...checkboxProps}
       className={`w-full flex items-center gap-3 px-3 py-3 text-left transition-colors outline-none border-l-2 focus-visible:bg-slate-100/80 dark:focus-visible:bg-[#14161c]/80 ${
-        active
+        selected
           ? "border-l-indigo-600 dark:border-l-indigo-400 bg-indigo-50 dark:bg-indigo-500/[0.12]"
-          : "border-l-transparent hover:bg-slate-100/60 dark:hover:bg-white/[0.04]"
+          : active && !selectable
+            ? "border-l-indigo-600 dark:border-l-indigo-400 bg-indigo-50 dark:bg-indigo-500/[0.12]"
+            : "border-l-transparent hover:bg-slate-100/60 dark:hover:bg-white/[0.04]"
       }`}
     >
+      {selectable && <SelectionBox selected={selected} />}
+
       <CompanyAvatar
         ticker={company.ticker}
         name={company.name}
