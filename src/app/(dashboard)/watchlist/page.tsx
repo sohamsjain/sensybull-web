@@ -30,6 +30,10 @@ export default function WatchlistPage() {
     null
   );
 
+  // Multi-select lives in the panel; the page only tracks whether it's on, so
+  // its own ↑/↓/Esc shortcuts stand down while the user is picking companies.
+  const [selecting, setSelecting] = useState(false);
+
   const {
     entries,
     totalUnread,
@@ -40,6 +44,9 @@ export default function WatchlistPage() {
     setMuted,
     addCompany,
     removeCompany,
+    bulkMarkRead,
+    bulkSetMuted,
+    bulkRemove,
   } = useWatchlistInbox(activeCompanyId);
 
   const activeEntry = entries.find((c) => c.company.id === activeCompanyId) || null;
@@ -82,6 +89,19 @@ export default function WatchlistPage() {
     await removeCompany(id);
   }, [activeCompanyId, removeCompany]);
 
+  // Close the open company first if a bulk remove includes it — on mobile the
+  // panel is hidden while a company is open, so an id pointing at nothing
+  // would strand the user on an empty pane.
+  const handleBulkRemove = useCallback(
+    async (companyIds: string[]) => {
+      if (activeCompanyId && companyIds.includes(activeCompanyId)) {
+        setActiveCompanyId(null);
+      }
+      await bulkRemove(companyIds);
+    },
+    [activeCompanyId, bulkRemove]
+  );
+
   // Keyboard: ↑/↓ move between companies, "/" focuses search, Esc closes
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -100,6 +120,9 @@ export default function WatchlistPage() {
         document.getElementById("watchlist-search")?.focus();
         return;
       }
+      // While selecting, Esc and the arrows belong to the panel: Esc leaves
+      // selection mode, and moving the open company would be a non sequitur.
+      if (selecting) return;
       if (e.key === "Escape") {
         setActiveCompanyId(null);
         return;
@@ -118,7 +141,7 @@ export default function WatchlistPage() {
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [entries, activeCompanyId, handleSelect]);
+  }, [entries, activeCompanyId, handleSelect, selecting]);
 
   if (!authLoading && !user) {
     return (
@@ -157,6 +180,10 @@ export default function WatchlistPage() {
           onSelect={handleSelect}
           onAddCompany={addCompany}
           onCollapse={pane.collapse}
+          onBulkSetMuted={bulkSetMuted}
+          onBulkMarkRead={bulkMarkRead}
+          onBulkRemove={handleBulkRemove}
+          onSelectionModeChange={setSelecting}
         />
       </div>
 

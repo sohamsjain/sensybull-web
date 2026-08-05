@@ -1,5 +1,36 @@
 # API Changes
 
+## 2026-08-05 (bulk watchlist actions)
+
+### New: `POST /watchlist/read`, `PUT /watchlist/mute`, `POST /watchlist/remove`
+
+Collection-level counterparts to the existing per-company inbox endpoints,
+backing the watchlist panel's multi-select. Each takes
+`{"company_ids": ["...", ...]}`; `PUT /watchlist/mute` also takes
+`{"muted": true|false}`.
+
+Semantics worth knowing on the client:
+
+- Ids the user doesn't follow are **dropped, not rejected** — a stale list
+  (another tab removed a company) still succeeds for the rest. The response
+  echoes `company_ids` with what was actually acted on, so trust that over
+  what you sent. A batch with nothing left to act on returns `403`.
+- Batches are capped at 500 ids (`400` beyond that); an empty or non-list
+  `company_ids` is a `400`.
+- `POST /watchlist/remove` drops each company from **every** watchlist the
+  user owns, matching the single-watchlist product surface. Read state
+  (last read + mute) survives removal, so re-adding a company doesn't
+  resurrect its whole history as unread.
+
+Responses: `{message, company_ids, updated}` for read/mute (`mute` also
+echoes `muted`, `read` echoes `last_read_at`), and
+`{message, company_ids, removed}` for remove.
+
+The per-company endpoints (`POST /watchlist/:id/read`,
+`PUT /watchlist/:id/mute`) are unchanged. `useWatchlistInbox.removeCompany`
+now goes through `POST /watchlist/remove` instead of fetching `/watchlists/`
+and issuing a DELETE per list, so single-company removal is one request too.
+
 ## 2026-07-21 (movers removal)
 
 ### `GET /movers` removed

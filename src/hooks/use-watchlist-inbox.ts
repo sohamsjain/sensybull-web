@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import type { WatchlistEntry, WatchlistInboxResponse, EventPreview, ReadStateResponse, PaginatedWatchlists } from "@/types/api";
+import type { WatchlistEntry, WatchlistInboxResponse, EventPreview, ReadStateResponse } from "@/types/api";
 import type { FilingEvent } from "@/types/events";
 import { api } from "@/lib/api-client";
 import { filedPhrase } from "@/lib/forms";
@@ -119,23 +119,79 @@ export function useWatchlistInbox(activeCompanyId: string | null) {
     [refetch]
   );
 
-  /** Remove a company from every watchlist that contains it. */
-  const removeCompany = useCallback(
-    async (companyId: string) => {
-      const data = await api<PaginatedWatchlists>("/watchlists/");
-      const containing = (data.watchlists || []).filter((wl) =>
-        wl.companies?.some((c) => c.id === companyId)
-      );
-      await Promise.all(
-        containing.map((wl) =>
-          api(`/watchlists/${wl.id}/companies/${companyId}`, {
-            method: "DELETE",
-          })
+  // ── Bulk actions (multi-select) ──────────────────────────────────
+  // One request per action regardless of how many companies are selected.
+  // Each applies optimistically and reconciles from the server on failure,
+  // so a dropped request can't leave the panel lying about mute or unread.
+
+  const bulkMarkRead = useCallback(
+    async (companyIds: string[]) => {
+      if (companyIds.length === 0) return;
+      const targets = new Set(companyIds);
+      const now = new Date().toISOString();
+      setEntries((prev) =>
+        prev.map((c) =>
+          targets.has(c.company.id)
+            ? { ...c, unread_count: 0, last_read_at: now }
+            : c
         )
       );
-      await refetch();
+      try {
+        await api("/watchlist/read", {
+          method: "POST",
+          body: JSON.stringify({ company_ids: companyIds }),
+        });
+      } catch (err) {
+        await refetch();
+        throw err;
+      }
     },
     [refetch]
+  );
+
+  const bulkSetMuted = useCallback(
+    async (companyIds: string[], muted: boolean) => {
+      if (companyIds.length === 0) return;
+      const targets = new Set(companyIds);
+      setEntries((prev) =>
+        prev.map((c) => (targets.has(c.company.id) ? { ...c, muted } : c))
+      );
+      try {
+        await api("/watchlist/mute", {
+          method: "PUT",
+          body: JSON.stringify({ company_ids: companyIds, muted }),
+        });
+      } catch (err) {
+        await refetch();
+        throw err;
+      }
+    },
+    [refetch]
+  );
+
+  /** Remove companies from every watchlist that contains them. */
+  const bulkRemove = useCallback(
+    async (companyIds: string[]) => {
+      if (companyIds.length === 0) return;
+      const targets = new Set(companyIds);
+      setEntries((prev) => prev.filter((c) => !targets.has(c.company.id)));
+      try {
+        await api("/watchlist/remove", {
+          method: "POST",
+          body: JSON.stringify({ company_ids: companyIds }),
+        });
+      } catch (err) {
+        await refetch(); // put the rows back
+        throw err;
+      }
+    },
+    [refetch]
+  );
+
+  /** Remove a single company — the one-company case of the bulk endpoint. */
+  const removeCompany = useCallback(
+    (companyId: string) => bulkRemove([companyId]),
+    [bulkRemove]
   );
 
   // Live updates: new filing events reorder the inbox in real time. Attaches
@@ -194,5 +250,8 @@ export function useWatchlistInbox(activeCompanyId: string | null) {
     setMuted,
     addCompany,
     removeCompany,
+    bulkMarkRead,
+    bulkSetMuted,
+    bulkRemove,
   };
 }
