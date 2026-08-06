@@ -71,8 +71,13 @@ export function marketSession(
  * Add thousands separators to bare digit runs of 5+ characters, so
  * "1250000" → "1,250,000" and "$43400000" → "$43,400,000" while leaving
  * years, small numbers, and already-formatted values untouched.
+ *
+ * Values that aren't scalar-shaped are returned as-is: a stringified
+ * container that leaked through ingest ("{'$sum': '11500000000'}") should
+ * read as the malformed data it is, not get dressed up with separators.
  */
 export function formatDealValue(value: string): string {
+  if (/[{}[\]]/.test(value)) return value;
   return value.replace(/\d{5,}(?:\.\d+)?/g, (m) =>
     Number(m).toLocaleString("en-US", { maximumFractionDigits: 2 })
   );
