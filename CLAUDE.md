@@ -10,7 +10,7 @@
 - Auth: `POST /auth/login`, `/auth/register`, `/auth/google`, `/auth/refresh`, `GET /auth/me`
 - Events: `GET /events/` (auth, watchlist-filtered), `/events/all` (public), `/events/types` (small canonical category list — backs the feed's event-type chips), `/events/company/:id` (auth, per-company history). Every event carries a boolean `important` (backs the feed's All/Important toggle — use `isImportant()` from `src/lib/event-actions.ts`, which handles legacy payloads) and `event_types` (use `matchesEventType()` from `src/hooks/use-events.ts`). Only the 8-K family is ingested among SEC forms since the July 2026 rollback; older events keep other `signal_type` values. Press releases arrive as `signal_type="PR"` (`source` = wire name, `edgar_url` = article URL; use `filedPhrase()` from `src/lib/forms.ts` for "filed/issued" copy). A PR event gains `filing_url` once its SEC filing arrives — delivered via socket event `filing_event_update` (same payload shape; replace by `id` in state)
 - Watchlists: CRUD at `/watchlists/`, company management at `/watchlists/:id/companies`
-- Companies: `GET /companies/?q=...` (search by ticker or name), `GET /companies/search?q=` (typeahead)
+- Companies: `GET /companies/?q=...` (search by ticker or name), `GET /companies/search?q=` (typeahead), `GET /companies/:id/bars` (chart OHLCV), `GET /companies/:id/quote` (last price + day change; `change_pct` is null when there's no previous close, `stale: true` when it's the daily-synced price rather than a live one)
 - Alerts: `GET/PUT /alerts/preferences`, `GET /alerts/notifications`, `GET /alerts/channels`, Web Push at `/alerts/push/*` (see `src/lib/push.ts` + `public/sw.js`). The sensitivity UI is binary (Important only ↔ Everything) mapped onto the API's `max_tier` (1 ↔ 3)
 - Events (single): `GET /events/all/:id` (public, permalinks)
 - Watchlist inbox: `GET /watchlist/` (companies + unread counts under `items`), `POST /watchlist/:companyId/read`, `PUT /watchlist/:companyId/mute`. Bulk counterparts back multi-select — `POST /watchlist/read`, `PUT /watchlist/mute`, `POST /watchlist/remove`, all taking `{company_ids}` — and drop ids the user no longer follows instead of failing the batch (trust the echoed `company_ids`)
@@ -21,11 +21,12 @@
 ## Project Structure
 - `src/types/` — API and event type definitions
 - `src/lib/` — API client (auto-refresh on 401), Socket.IO wrapper, utilities; `event-actions.ts` (isImportant, AI-chat copy prompt, share/permalink helpers)
-- `src/hooks/` — useAuth, useSocket, useEvents (REST+Socket merge), useWatchlists, useWatchlistInbox (inbox + live unread + bulk actions), useWatchlistSelection (multi-select mode; range logic in `src/lib/selection.ts`), useCompanyEvents (per-company history), usePaneWidth (resizable pane)
+- `src/hooks/` — useAuth, useSocket, useEvents (REST+Socket merge), useWatchlists, useWatchlistInbox (inbox + live unread + bulk actions), useWatchlistSelection (multi-select mode; range logic in `src/lib/selection.ts`), useCompanyEvents (per-company history), usePaneWidth (resizable pane), useBars (chart data), useQuote (header price; polls 60s, pauses on hidden tabs)
 - `src/context/` — AuthProvider (login/register/google/logout), SocketProvider (session-wide `/feed` socket + `useSocket`)
 - `src/components/ui/` — shadcn/ui primitives
 - `src/components/feed/` — FilingCard (flat row, no box), FilingList (divider-separated), FeedToolbar (All/Important + search + event-type chips), UpdateActions (Read the filing / Copy for AI chat / Share — shown only on expanded updates), CatalystsTable ("Key dates"), DealTerms, PriceReactionStrip, CompanyLogo
 - `src/components/watchlist/` — WatchlistPanel, WatchlistItem, WatchlistBulkBar, Conversation, FilingMessage, CompanyAvatar
+- `src/components/company/` — CompanySheet, PriceChart, StockQuote (price + day change in the conversation header; formatters in `src/lib/quote.ts`)
 - `src/components/layout/` — NavRail, BottomTabs
 - `src/components/auth/` — Login/register/forgot-password forms
 - `src/app/(auth)/` — Auth pages (centered layout, no sidebar)

@@ -6,9 +6,11 @@ import type { FilingEvent } from "@/types/events";
 import { dayLabel, formatCatalystDate } from "@/lib/utils";
 import { useDashboard } from "@/app/(dashboard)/layout";
 import { usePinnedCompanies } from "@/hooks/use-pinned-companies";
+import { useQuote } from "@/hooks/use-quote";
 import { CompanyAvatar } from "./company-avatar";
 import { FilingMessage } from "./filing-message";
 import { PriceChart } from "@/components/company/price-chart";
+import { StockQuote } from "@/components/company/stock-quote";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -112,6 +114,10 @@ export function Conversation({
     setViewCompanyId(company.id);
     setView("messages");
   }
+  // Live price beside the name — only tickered companies have one
+  const { quote, state: quoteState } = useQuote(
+    company.ticker ? company.id : null
+  );
   const scrollRef = useRef<HTMLDivElement>(null);
   const loadingEarlierRef = useRef(false);
   const prevHeightRef = useRef(0);
@@ -191,22 +197,28 @@ export function Conversation({
           size="sm"
         />
         <div className="min-w-0 flex-1">
-          <button
-            onClick={() =>
-              openCompany({
-                id: company.id,
-                name: company.name,
-                ticker: company.ticker,
-                cik: company.cik,
-              })
-            }
-            className="block max-w-full text-left"
-            title={`View ${company.name}`}
-          >
-            <p className="text-slate-900 dark:text-white/90 text-sm font-medium truncate leading-tight hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
-              {company.name}
-            </p>
-          </button>
+          <div className="flex items-baseline gap-2 min-w-0">
+            <button
+              onClick={() =>
+                openCompany({
+                  id: company.id,
+                  name: company.name,
+                  ticker: company.ticker,
+                  cik: company.cik,
+                })
+              }
+              className="block min-w-0 text-left"
+              title={`View ${company.name}`}
+            >
+              <p className="text-slate-900 dark:text-white/90 text-sm font-medium truncate leading-tight hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                {company.name}
+              </p>
+            </button>
+            {/* Price sits beside the name; the name truncates before it does */}
+            {company.ticker && (
+              <StockQuote quote={quote} loading={quoteState === "loading"} />
+            )}
+          </div>
           <p className="text-slate-400 dark:text-slate-500 text-xs truncate">
             {company.ticker && (
               <span className="font-mono">{company.ticker}</span>
