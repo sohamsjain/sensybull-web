@@ -1,5 +1,29 @@
 # API Changes
 
+## 2026-08-06 (deal_terms values are always scalar strings)
+
+### No endpoint change — payload content fix
+
+`briefing.deal_terms` (and the mirrored `event_type.attributes`) is
+documented as a flat str→str map, but ingest coerced every LLM value with a
+bare `str()`. When the model answered with a nested object — it did this for
+AbbVie's 8-K, wrapping a total it had to add up as
+`{"deal_value": {"$sum": "11500000000"}}` — the Python repr was stored and
+shipped verbatim, so the UI rendered the literal string
+`{'$sum': '11500000000'}`.
+
+Ingest now unwraps single-scalar containers and drops anything ambiguous
+(a multi-value list has no unambiguous display form), so values arriving at
+clients are always plain strings. Prompt guidance on both the 8-K and
+press-release paths now states the constraint explicitly and asks for a
+display-ready total (`"$11.5B"`).
+
+Clients need no change to consume this, but both `formatDealValue`
+implementations gained a guard so any value that still isn't scalar-shaped
+renders verbatim instead of getting thousands separators inserted into the
+middle of a repr. Rows written before this fix are repaired by
+`services/api/scripts/repair_deal_terms.py` (supports `--dry-run`).
+
 ## 2026-08-05 (bulk watchlist actions)
 
 ### New: `POST /watchlist/read`, `PUT /watchlist/mute`, `POST /watchlist/remove`
