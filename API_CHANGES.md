@@ -1,5 +1,38 @@
 # API Changes
 
+## 2026-08-06 (company quote for the watchlist header)
+
+### New: `GET /companies/:id/quote`
+
+Last price and day change for a company's ticker — backs the price shown
+beside the company name in the watchlist header. Auth required. Alpaca
+snapshot proxy, Redis-cached 60s (the same TTL the client polls at).
+
+```json
+{
+  "ticker": "AAPL",
+  "price": 214.32,
+  "prev_close": 216.18,
+  "change": -1.86,
+  "change_pct": -0.86,
+  "as_of": "2026-08-06T18:22:03Z",
+  "stale": false
+}
+```
+
+- `price` walks the snapshot from `latestTrade` → `dailyBar` → `prevDailyBar`,
+  because the free IEX feed has no trade at all for thin names.
+- `change` / `change_pct` are measured against the previous session's close
+  and are **null** when Alpaca has no `prevDailyBar` (freshly listed symbol) —
+  render the price alone rather than assuming a zero move.
+- `stale: true` means Alpaca was unreachable and `price` is the last value the
+  daily market-data sync stored on the company; `change` is null and `as_of`
+  is the sync time. Clients should mute the number rather than hide it.
+- `422 no_ticker` for companies with no ticker, `503` when there's no live
+  quote *and* no synced price to fall back on.
+
+Consumed by `useQuote` + `StockQuote` in sensybull-web.
+
 ## 2026-08-06 (deal_terms values are always scalar strings)
 
 ### No endpoint change — payload content fix

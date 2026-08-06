@@ -53,6 +53,18 @@ export interface BarsResponse {
   bars: Bar[];
 }
 
+/** Last price + day change (GET /companies/:id/quote). */
+export interface Quote {
+  ticker: string;
+  price: number;
+  prev_close: number | null;
+  change: number | null;
+  change_pct: number | null;
+  as_of: string | null;
+  /** True when Alpaca was unreachable and this is the last synced price. */
+  stale: boolean;
+}
+
 export interface Watchlist {
   id: string;
   name: string;
