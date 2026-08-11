@@ -1,5 +1,35 @@
 # API Changes
 
+## 2026-08-11 (deal_terms keys and values are normalized on write)
+
+### No endpoint change — payload content fix
+
+`briefing.deal_terms` (and the mirrored `event_type.attributes`) carried
+whatever casing the briefing model produced, so the UI's Deal Terms panel
+rendered values like `definitive agreement signed` and `stock` verbatim.
+
+The subscriber now normalizes deal terms before persisting them
+(`app/utils/deal_terms.normalize_deal_terms`), which is also the shape sent
+on the `filing_event` socket payload:
+
+- **Keys** are canonicalized to snake_case — `"Deal Value"` and
+  `"dealValue"` both store as `deal_value`, so client-side ordering and
+  labels hold whatever shape the model answers with. Colliding keys keep
+  the first value; empty keys/values are dropped.
+- **Values** are Title Cased, leaving figures (`$2.5B`, `45%`, `Q4 2026`)
+  and anything already capitalized (`SPAC`, `Inc.`) alone. Compounds are
+  cased per segment (`Stock-for-Stock`), and values longer than six words
+  get sentence case instead of a title-cased sentence.
+
+Prompt guidance on both the 8-K and press-release paths now asks for Title
+Case values, so this is a safety net rather than the only defense. Rows
+written before the fix are normalized by
+`services/api/scripts/normalize_deal_terms_case.py` (supports `--dry-run`).
+
+Clients need no change, but sensybull-web applies the same rules at render
+time (`src/lib/deal-terms.ts`) for events served from rows that predate the
+backfill — keep the two implementations in sync.
+
 ## 2026-08-06 (company quote for the watchlist header)
 
 ### New: `GET /companies/:id/quote`

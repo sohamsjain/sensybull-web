@@ -1,5 +1,6 @@
 import type { FilingEvent } from "@/types/events";
 import { SITE_URL } from "@/lib/share";
+import { dealTermEntries } from "@/lib/deal-terms";
 import { fullDateTime } from "@/lib/utils";
 import { filedPhrase } from "@/lib/forms";
 
@@ -52,10 +53,10 @@ export function buildAiPrompt(event: FilingEvent): string {
   if (briefing?.headline) lines.push(`What happened: ${briefing.headline}`);
   if (briefing?.summary) lines.push(``, `Summary: ${briefing.summary}`);
 
-  const dealTerms = Object.entries(briefing?.deal_terms ?? {});
+  const dealTerms = dealTermEntries(briefing?.deal_terms);
   if (dealTerms.length > 0) {
     lines.push(``, `Deal terms:`);
-    for (const [key, value] of dealTerms) lines.push(`- ${key}: ${value}`);
+    for (const { label, value } of dealTerms) lines.push(`- ${label}: ${value}`);
   }
 
   const catalysts = (
