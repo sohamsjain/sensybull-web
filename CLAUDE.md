@@ -20,7 +20,7 @@
 
 ## Project Structure
 - `src/types/` — API and event type definitions
-- `src/lib/` — API client (auto-refresh on 401), Socket.IO wrapper, utilities; `event-actions.ts` (isImportant, AI-chat copy prompt, share/permalink helpers)
+- `src/lib/` — API client (auto-refresh on 401), Socket.IO wrapper, utilities; `event-actions.ts` (isImportant, AI-chat copy prompt, share/permalink helpers); `deal-terms.ts` (label/value/order rules for `briefing.deal_terms` — Title Case values, snake_case keys; mirrors the API's `app/utils/deal_terms.py`, keep in sync. Both the Deal Terms panel and the AI-chat prompt read terms through `dealTermEntries()`)
 - `src/hooks/` — useAuth, useSocket, useEvents (REST+Socket merge), useWatchlists, useWatchlistInbox (inbox + live unread + bulk actions), useWatchlistSelection (multi-select mode; range logic in `src/lib/selection.ts`), useCompanyEvents (per-company history), usePaneWidth (resizable pane), useBars (chart data), useQuote (header price; polls 60s, pauses on hidden tabs)
 - `src/context/` — AuthProvider (login/register/google/logout), SocketProvider (session-wide `/feed` socket + `useSocket`)
 - `src/components/ui/` — shadcn/ui primitives

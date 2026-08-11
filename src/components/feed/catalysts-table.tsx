@@ -6,11 +6,9 @@ export function CatalystsTable({ catalysts }: { catalysts: Catalyst[] }) {
 
   return (
     <div className="mt-3 rounded-lg bg-slate-100/60 dark:bg-slate-900/40 ring-1 ring-slate-300/40 dark:ring-slate-700/40 p-3">
-      <div className="flex items-center gap-1.5 mb-2.5">
-        <span className="w-1 h-3.5 rounded-full bg-slate-300 dark:bg-white/[0.15]" />
-        <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400 tracking-wide">
-          Key dates
-        </span>
+      {/* Header matches Deal Terms: label only, no decorative marker. */}
+      <div className="text-[11px] font-medium text-slate-500 dark:text-slate-400 tracking-wide mb-2.5">
+        Key dates
       </div>
 
       <div className="space-y-0">
