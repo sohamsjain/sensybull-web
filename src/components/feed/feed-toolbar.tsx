@@ -8,25 +8,16 @@ import { api } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { EVENT_CATEGORIES } from "@/lib/event-categories";
 
 const FILTERS: { key: FeedFilter; label: string }[] = [
   { key: "all", label: "All" },
   { key: "important", label: "Important" },
 ];
 
-/** Fallback while GET /events/types loads (mirrors the API's canonical list). */
-const DEFAULT_EVENT_TYPES = [
-  "Acquisition",
-  "Material Agreement",
-  "Earnings",
-  "Bankruptcy",
-  "Debt / Financing",
-  "Restructuring",
-  "Leadership Change",
-  "Delisting",
-  "Restatement",
-  "Cybersecurity Incident",
-];
+/** Fallback while GET /events/types loads. "Other" is never a chip — the
+ *  All chip already covers it. */
+const DEFAULT_EVENT_TYPES = EVENT_CATEGORIES.filter((t) => t !== "Other");
 
 /**
  * Feed header: the All/Important toggle, a search box, and a scrollable

@@ -2,6 +2,7 @@
 
 import { useAlertNotifications } from "@/hooks/use-alerts";
 import { timeAgo } from "@/lib/utils";
+import { toCurrentCategory } from "@/lib/event-categories";
 
 const STATUS_STYLES: Record<string, string> = {
   sent: "bg-green-500/15 text-green-400",
@@ -71,7 +72,11 @@ export function NotificationList() {
                   <p className="text-slate-500 dark:text-slate-400 text-xs truncate">
                     {n.filing_event.company_name}
                     {n.filing_event.event_types?.length > 0 &&
-                      ` — ${n.filing_event.event_types.join(", ")}`}
+                      ` — ${[
+                        ...new Set(
+                          n.filing_event.event_types.map(toCurrentCategory)
+                        ),
+                      ].join(", ")}`}
                   </p>
                   {n.error_message && (
                     <p className="text-red-400/70 text-xs mt-1">

@@ -65,31 +65,50 @@ describe("insertByReceivedOrder", () => {
   });
 });
 
+const briefingWith = (primary_event_type: string) => ({
+  headline: "h",
+  summary: "",
+  primary_event_type,
+  significance: "High" as const,
+  sentiment: "Neutral" as const,
+  investor_takeaway: "",
+  catalysts: [],
+  deal_terms: {},
+});
+
 describe("matchesEventType", () => {
   it("matches on the event_types list", () => {
-    const e = { ...ev("a", "2026-07-07T10:00:00Z"), event_types: ["Earnings"] };
-    expect(matchesEventType(e, "Earnings")).toBe(true);
-    expect(matchesEventType(e, "Acquisition")).toBe(false);
+    const e = {
+      ...ev("a", "2026-07-07T10:00:00Z"),
+      event_types: ["Financial Results"],
+    };
+    expect(matchesEventType(e, "Financial Results")).toBe(true);
+    expect(matchesEventType(e, "Strategic Transactions")).toBe(false);
   });
 
   it("falls back to the briefing's primary_event_type", () => {
     const e = {
       ...ev("a", "2026-07-07T10:00:00Z"),
-      briefing: {
-        headline: "h",
-        summary: "",
-        primary_event_type: "Acquisition",
-        significance: "High" as const,
-        sentiment: "Neutral" as const,
-        investor_takeaway: "",
-        catalysts: [],
-        deal_terms: {},
-      },
+      briefing: briefingWith("Strategic Transactions"),
     };
-    expect(matchesEventType(e, "Acquisition")).toBe(true);
+    expect(matchesEventType(e, "Strategic Transactions")).toBe(true);
+  });
+
+  it("finds events labelled before the taxonomy shipped", () => {
+    // Historical rows keep "Acquisition"; the chip says the category it
+    // folds into, and the two still have to meet.
+    const e = {
+      ...ev("a", "2026-07-07T10:00:00Z"),
+      event_types: ["Acquisition"],
+      briefing: briefingWith("Acquisition"),
+    };
+    expect(matchesEventType(e, "Strategic Transactions")).toBe(true);
+    expect(matchesEventType(e, "Financial Results")).toBe(false);
   });
 
   it("is false when the event carries no type data", () => {
-    expect(matchesEventType(ev("a", "2026-07-07T10:00:00Z"), "Earnings")).toBe(false);
+    expect(matchesEventType(ev("a", "2026-07-07T10:00:00Z"), "Earnings")).toBe(
+      false
+    );
   });
 });

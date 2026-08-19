@@ -5,6 +5,7 @@ import type { FilingEvent } from "@/types/events";
 import { useDashboard } from "@/app/(dashboard)/layout";
 import { timeAgo, fullDateTime } from "@/lib/utils";
 import { isImportant } from "@/lib/event-actions";
+import { eventCategory } from "@/lib/event-categories";
 import { filedPhrase } from "@/lib/forms";
 import { DealTerms } from "./deal-terms";
 import { CatalystsTable } from "./catalysts-table";
@@ -52,6 +53,7 @@ export function FilingCard({
   } = event;
 
   const important = isImportant(event);
+  const category = eventCategory(briefing);
   const { openCompany } = useDashboard();
   const [internalExpanded, setInternalExpanded] = useState(false);
   const expanded = expandedProp ?? internalExpanded;
@@ -160,9 +162,7 @@ export function FilingCard({
             </div>
 
             {/* Meta line: category + Important marker */}
-            {(important ||
-              (briefing?.primary_event_type &&
-                briefing.primary_event_type !== "Other")) && (
+            {(important || category) && (
               <div className="flex items-center gap-2.5 flex-wrap">
                 {important && (
                   <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-red-600 dark:text-red-400">
@@ -170,12 +170,11 @@ export function FilingCard({
                     Important
                   </span>
                 )}
-                {briefing?.primary_event_type &&
-                  briefing.primary_event_type !== "Other" && (
-                    <span className="text-slate-500 dark:text-slate-400 text-[10px] font-semibold uppercase tracking-wider">
-                      {briefing.primary_event_type}
-                    </span>
-                  )}
+                {category && (
+                  <span className="text-slate-500 dark:text-slate-400 text-[10px] font-semibold uppercase tracking-wider">
+                    {category}
+                  </span>
+                )}
               </div>
             )}
           </div>

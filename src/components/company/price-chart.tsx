@@ -13,6 +13,7 @@ import {
 import type { FilingEvent } from "@/types/events";
 import { useBars, type BarsLookback } from "@/hooks/use-bars";
 import { isImportant } from "@/lib/event-actions";
+import { eventCategory } from "@/lib/event-categories";
 
 const LOOKBACKS: BarsLookback[] = ["1M", "3M", "6M", "1Y"];
 
@@ -107,9 +108,7 @@ export function PriceChart({
         position: "aboveBar",
         shape: "arrowDown",
         color: markerColor(event),
-        text: isImportant(event)
-          ? event.briefing?.primary_event_type ?? ""
-          : "",
+        text: isImportant(event) ? eventCategory(event.briefing) ?? "" : "",
       });
     }
     markers.sort((a, b) => (a.time as number) - (b.time as number));

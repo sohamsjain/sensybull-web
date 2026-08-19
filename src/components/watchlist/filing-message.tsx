@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { FilingEvent } from "@/types/events";
 import { messageTime, fullDateTime } from "@/lib/utils";
 import { isImportant } from "@/lib/event-actions";
+import { eventCategory } from "@/lib/event-categories";
 import { DealTerms } from "@/components/feed/deal-terms";
 import { CatalystsTable } from "@/components/feed/catalysts-table";
 import { PriceReactionStrip } from "@/components/feed/price-reaction-strip";
@@ -20,6 +21,7 @@ export function FilingMessage({ event }: { event: FilingEvent }) {
   const { briefing, edgar_url } = event;
 
   const important = isImportant(event);
+  const category = eventCategory(briefing);
   const catalysts =
     event.catalysts?.length > 0 ? event.catalysts : briefing?.catalysts || [];
   const hasDealTerms =
@@ -52,17 +54,13 @@ export function FilingMessage({ event }: { event: FilingEvent }) {
               Important
             </span>
           )}
-          {briefing?.primary_event_type &&
-            briefing.primary_event_type !== "Other" && (
-              <span className="text-slate-700 dark:text-slate-200 text-[11px] font-semibold uppercase tracking-wide">
-                {briefing.primary_event_type}
-              </span>
-            )}
+          {category && (
+            <span className="text-slate-700 dark:text-slate-200 text-[11px] font-semibold uppercase tracking-wide">
+              {category}
+            </span>
+          )}
           <span className="text-slate-400 dark:text-slate-500 text-[10.5px] ml-auto whitespace-nowrap uppercase tracking-wide">
-            {formTagDuplicatesEventType(
-              event.signal_type,
-              briefing?.primary_event_type
-            )
+            {formTagDuplicatesEventType(event.signal_type, category)
               ? event.signal_type
               : formTag(event.signal_type)}
           </span>
