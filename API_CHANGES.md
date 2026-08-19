@@ -1,5 +1,20 @@
 # API Changes
 
+## 2026-08-19 (briefing model chain replaced — Groq retired Llama 3.x)
+
+### No endpoint change — payload content fix
+
+Groq decommissioned `llama-3.3-70b-versatile` and `llama-3.1-8b-instant`,
+the two models the ingest briefing chain ran on. Both answered 404
+`model_not_found`, so every filing exhausted the chain and published with
+`briefing.mode = "facts_only"` — form type and item categories, no
+headline, summary, takeaway, deal terms or catalysts. Events published
+between the retirement and this fix keep that shape.
+
+The chain is now `openai/gpt-oss-120b` → `openai/gpt-oss-20b` →
+`qwen/qwen3.6-27b`, so new events carry `mode = "llm"` narratives again.
+No payload shape change: clients already handle both modes.
+
 ## 2026-08-11 (deal_terms keys and values are normalized on write)
 
 ### No endpoint change — payload content fix
