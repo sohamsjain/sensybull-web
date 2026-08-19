@@ -7,6 +7,7 @@ import { api } from "@/lib/api-client";
 import { useAuth } from "@/hooks/use-auth";
 import { useSocket } from "@/context/socket-provider";
 import { isImportant } from "@/lib/event-actions";
+import { toCurrentCategory } from "@/lib/event-categories";
 
 interface UseEventsOptions {
   /** "important" keeps only market-moving updates; "all" keeps everything. */
@@ -16,10 +17,18 @@ interface UseEventsOptions {
   search: string;
 }
 
-/** True when the event carries the given category label. */
+/**
+ * True when the event belongs to the given category.
+ *
+ * Events classified before the taxonomy shipped carry the old labels, so
+ * both sides are read through toCurrentCategory() — a filter on "Strategic
+ * Transactions" still finds the historical Acquisitions.
+ */
 export function matchesEventType(e: FilingEvent, type: string): boolean {
-  if (e.event_types?.includes(type)) return true;
-  return e.briefing?.primary_event_type === type;
+  const target = toCurrentCategory(type);
+  if (e.event_types?.some((t) => toCurrentCategory(t) === target)) return true;
+  const primary = e.briefing?.primary_event_type;
+  return !!primary && toCurrentCategory(primary) === target;
 }
 
 interface PriceReactionUpdate {

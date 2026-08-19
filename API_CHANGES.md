@@ -1,5 +1,51 @@
 # API Changes
 
+## 2026-08-19 (event categories replaced — classification moved to a taxonomy)
+
+### `GET /events/types` returns a new label set
+
+Ingest used to ask the briefing model to pick one of 12 broad labels
+("Acquisition", "Material Agreement", "Earnings", …). It now classifies
+against a three-tier taxonomy of ~120 specific events
+(`services/ingest/taxonomy.py`) and collapses the answer onto that
+taxonomy's top tier before publishing — so the reader still sees exactly
+one simple category, but the model answers a much easier question.
+
+`GET /events/types` now returns these 9 labels, in this order:
+
+```
+Leadership & Governance, Financial Results, Strategic Transactions,
+Capital & Financing, Operations & Strategy, Risk Events,
+Regulatory & Compliance, Shareholder Activity, Other
+```
+
+`briefing.primary_event_type` and `event_types` are unchanged in shape —
+still plain strings from that list, still 1-3 of them per event. Only the
+vocabulary changed.
+
+### Filtering keeps working on historical events
+
+Events classified before this change keep their old labels in the database
+forever. `?event_type=` matches those legacy labels alongside the current
+one they fold into, so a filter on `Strategic Transactions` still returns
+the historical `Acquisition` events. The web client mirrors the same map in
+`src/lib/event-categories.ts` for its client-side filter and for display,
+so the feed never shows two vocabularies in one column.
+
+### New (optional, do not render): `briefing.taxonomy`
+
+New events carry the taxonomy leaves behind their category:
+
+```json
+"taxonomy": ["merger_agreement", "debt_issuance"],
+"taxonomy_version": "1.0"
+```
+
+This is internal detail for analytics and future routing. **The end user
+sees one simple category — never these slugs, never the middle tier.**
+Absent on facts-only briefings (no LLM ran, so no leaf-level claim is made)
+and on events from before this change.
+
 ## 2026-08-19 (briefing model chain replaced — Groq retired Llama 3.x)
 
 ### No endpoint change — payload content fix

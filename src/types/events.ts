@@ -1,7 +1,17 @@
 export interface Briefing {
   headline: string;
   summary: string;
+  /** The one simple category shown to the reader (see EVENT_CATEGORIES). */
   primary_event_type: string;
+  /**
+   * Ingest's taxonomy leaf slugs behind that category ("ceo_departure",
+   * "covenant_violation"). Internal detail for analytics — never render
+   * these; the whole point of the taxonomy is that the reader sees one
+   * simple category, not the tiers underneath it. Absent on events
+   * classified before the taxonomy shipped and on facts-only briefings.
+   */
+  taxonomy?: string[];
+  taxonomy_version?: string;
   significance: "High" | "Medium" | "Low";
   sentiment: "Positive" | "Negative" | "Neutral" | "Mixed";
   investor_takeaway: string;
