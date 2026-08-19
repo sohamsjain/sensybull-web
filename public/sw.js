@@ -10,7 +10,7 @@ self.addEventListener("push", (event) => {
   event.waitUntil(
     self.registration.showNotification(data.title || "Sensybull", {
       body: data.body || "",
-      icon: "/logo.png",
+      icon: "/logo-tile.png",
       tag: data.tag,
       data: { url: data.url || "/" },
     })

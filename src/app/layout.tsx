@@ -36,9 +36,11 @@ export const metadata: Metadata = {
     title: "Sensybull — SEC Filings, Decoded",
     description:
       "Every material SEC filing decoded into a plain-English briefing, seconds after it hits EDGAR. Free to use.",
+    // The opaque tile rather than the transparent mark: social cards paint
+    // their own background, so a bare silhouette can land invisible.
     images: [
       {
-        url: "/logo.png",
+        url: "/logo-tile.png",
         width: 1024,
         height: 1024,
         alt: "Sensybull",
@@ -50,7 +52,7 @@ export const metadata: Metadata = {
     title: "Sensybull — SEC Filings, Decoded",
     description:
       "Every material SEC filing decoded into a plain-English briefing, seconds after it hits EDGAR. Free to use.",
-    images: ["/logo.png"],
+    images: ["/logo-tile.png"],
   },
   robots: {
     index: true,
