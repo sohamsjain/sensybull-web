@@ -46,6 +46,7 @@
 - Every expanded update gets UpdateActions (source link, copy-for-AI-chat, share) — keep feed cards and watchlist messages identical here
 
 ## Related Projects
+- Market data / charting plan: `docs/TRADINGVIEW_CHART.md` (frontend) + `docs/vault/Market Data Layer.md` in sensybull-api (backend) — design only, not yet built
 - Backend API: ~/Projects/sensybull-api (Flask)
 - API changes log: see API_CHANGES.md in this repo
 - When unsure about an endpoint's shape, read the backend route file directly
