@@ -58,8 +58,8 @@ export default async function Image({
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          background: "#0b0d12",
-          color: "#f8fafc",
+          background: "#131519",
+          color: "#e9eaee",
           padding: 72,
           fontFamily: "sans-serif",
         }}
@@ -71,16 +71,16 @@ export default async function Image({
               alt=""
               width={112}
               height={112}
-              style={{ borderRadius: 9999, background: "#12141b" }}
+              style={{ borderRadius: 20, background: "#191c22" }}
             />
           ) : (
             <div
               style={{
                 width: 112,
                 height: 112,
-                borderRadius: 9999,
-                background: "#1a1d25",
-                color: "#cbd5e1",
+                borderRadius: 20,
+                background: "#1f222a",
+                color: "#8b90a0",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -92,7 +92,7 @@ export default async function Image({
             </div>
           )}
           <div style={{ display: "flex", flexDirection: "column" }}>
-            <div style={{ fontSize: 30, color: "#818cf8", fontWeight: 600 }}>
+            <div style={{ fontSize: 30, color: "#a99bf5", fontWeight: 600 }}>
               {symbol}
             </div>
             <div
@@ -119,7 +119,7 @@ export default async function Image({
             style={{
               display: "flex",
               alignItems: "center",
-              background: "#4f46e5",
+              background: "#5546c8",
               color: "#ffffff",
               fontSize: 32,
               fontWeight: 600,
@@ -131,7 +131,7 @@ export default async function Image({
           </div>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
             <div style={{ fontSize: 36, fontWeight: 700 }}>Sensybull</div>
-            <div style={{ fontSize: 22, color: "#94a3b8" }}>
+            <div style={{ fontSize: 22, color: "#8b90a0" }}>
               SEC filings, decoded
             </div>
           </div>

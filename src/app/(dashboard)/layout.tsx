@@ -84,7 +84,7 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
       <SocketProvider>
         {/* overflow-hidden pins the app shell to the viewport so the document
             itself never grows a second scrollbar */}
-        <div className="h-dvh overflow-hidden flex bg-slate-50 dark:bg-[#0b0d12] text-slate-800 dark:text-slate-100">
+        <div className="flex h-dvh overflow-hidden bg-canvas text-ink">
           <NavRail />
           <div className="flex-1 flex min-w-0 overflow-hidden">
             {/* pb clears the mobile bottom tab bar */}

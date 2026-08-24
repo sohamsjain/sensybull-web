@@ -8,10 +8,12 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { CloseIcon } from "@/components/ui/icons";
+
 export interface ToastInput {
   title: string;
   description?: string;
-  /** "success" gets the emerald accent; default is neutral. */
+  /** "success" gets the success accent; default is neutral. */
   tone?: "success" | "neutral";
   durationMs?: number;
 }
@@ -61,32 +63,30 @@ export function AppToaster() {
   if (toasts.length === 0) return null;
 
   return (
-    <div className="fixed z-[60] top-3 inset-x-3 flex flex-col gap-2 md:top-auto md:bottom-4 md:right-4 md:left-auto md:w-80">
+    <div className="fixed inset-x-3 top-3 z-[60] flex flex-col gap-2 md:top-auto md:right-4 md:bottom-4 md:left-auto md:w-80">
       {toasts.map((t) => (
         <div
           key={t.key}
           role="status"
-          className={`w-full rounded-lg border border-slate-200 dark:border-white/[0.08] border-l-4 ${
-            t.tone === "success" ? "border-l-emerald-500" : "border-l-slate-400"
-          } bg-white dark:bg-[#14161c] shadow-lg px-3 py-2.5`}
+          className={`w-full rounded-md border border-line border-l-2 bg-surface-raised px-3 py-2.5 shadow-overlay ${
+            t.tone === "success" ? "border-l-success" : "border-l-line-strong"
+          }`}
         >
           <div className="flex items-start gap-2">
             <div className="min-w-0 flex-1">
-              <div className="text-[13px] font-semibold text-slate-900 dark:text-white/90">
-                {t.title}
-              </div>
+              <div className="text-label font-medium text-ink">{t.title}</div>
               {t.description && (
-                <div className="text-xs text-slate-600 dark:text-slate-300 mt-0.5 leading-relaxed">
+                <div className="mt-0.5 text-meta leading-relaxed text-ink-muted">
                   {t.description}
                 </div>
               )}
             </div>
             <button
               onClick={() => dismiss(t.key)}
-              className="text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 text-sm leading-none shrink-0"
+              className="shrink-0 text-ink-faint transition-colors hover:text-ink"
               aria-label="Dismiss"
             >
-              ✕
+              <CloseIcon className="size-3.5" />
             </button>
           </div>
         </div>

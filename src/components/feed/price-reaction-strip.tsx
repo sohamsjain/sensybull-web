@@ -16,7 +16,7 @@ function formatPct(pct: number): string {
 
 /**
  * Horizontal strip of price moves after the filing (5m → 1w).
- * Emerald/red follows the sentiment color convention; ⚡ marks moves
+ * Success/danger follows the price-data colour convention; ⚡ marks moves
  * ≥ 2× ATR(14). For after-hours filings early intervals resolve to the
  * next available print — the tooltip shows when it actually traded.
  */
@@ -32,7 +32,7 @@ export function PriceReactionStrip({
 
   return (
     <div
-      className={`flex items-center gap-1 flex-wrap font-mono text-[11px] tabular-nums ${className}`}
+      className={`flex flex-wrap items-center gap-1 font-mono text-micro tabular-nums ${className}`}
       aria-label="Price reaction since filing"
     >
       {points.map(({ interval, point }) => {
@@ -40,7 +40,7 @@ export function PriceReactionStrip({
           return (
             <span
               key={interval}
-              className="px-1.5 py-0.5 rounded text-slate-300 dark:text-slate-600"
+              className="rounded-xs px-1.5 py-0.5 text-ink-dim"
               title={`${interval} after filing: not yet measured`}
             >
               {interval} —
@@ -59,10 +59,10 @@ export function PriceReactionStrip({
         return (
           <span
             key={interval}
-            className={`px-1.5 py-0.5 rounded ${
+            className={`rounded-xs px-1.5 py-0.5 ${
               positive
-                ? "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-400/10 dark:text-emerald-400"
-                : "bg-red-500/10 text-red-600 dark:bg-red-400/10 dark:text-red-400"
+                ? "bg-success-soft text-success"
+                : "bg-danger-soft text-danger"
             }`}
             title={tooltip}
           >

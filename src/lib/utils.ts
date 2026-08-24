@@ -1,5 +1,60 @@
 import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { extendTailwindMerge } from "tailwind-merge";
+
+/**
+ * The design system's type scale and colour palette, taught to
+ * tailwind-merge.
+ *
+ * Without this it can't tell `text-label` (a size) from `text-ink` (a
+ * colour): both look like `text-*`, so it treats them as conflicting and
+ * silently drops the first one. Every token name used in a `text-*`
+ * utility has to be listed here — see `globals.css`.
+ */
+const TEXT_SIZES = [
+  "nano",
+  "micro",
+  "meta",
+  "label",
+  "body",
+  "body-lg",
+  "title",
+  "heading",
+  "display",
+  "display-lg",
+];
+
+const COLORS = [
+  "canvas",
+  "canvas-sunken",
+  "surface",
+  "surface-hover",
+  "surface-active",
+  "surface-raised",
+  "line",
+  "line-subtle",
+  "line-strong",
+  "ink",
+  "ink-muted",
+  "ink-faint",
+  "ink-dim",
+  "brand",
+  "brand-hover",
+  "brand-soft",
+  "brand-ink",
+  "brand-on",
+  "success",
+  "success-soft",
+  "warning",
+  "warning-soft",
+  "danger",
+  "danger-soft",
+  "info",
+  "info-soft",
+];
+
+const twMerge = extendTailwindMerge({
+  extend: { theme: { text: TEXT_SIZES, color: COLORS } },
+});
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));

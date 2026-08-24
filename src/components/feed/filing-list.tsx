@@ -1,10 +1,16 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import Link from "next/link";
+
 import type { FilingEvent } from "@/types/events";
 import { dayLabel } from "@/lib/utils";
-import { FilingCard } from "./filing-card";
 import { Button } from "@/components/ui/button";
+import { StatusDot } from "@/components/ui/badge";
+import { EmptyState } from "@/components/ui/empty-state";
+import { ArrowUpIcon } from "@/components/ui/icons";
+import { Skeleton } from "@/components/ui/skeleton";
+import { FilingCard } from "./filing-card";
 
 interface FilingListProps {
   events: FilingEvent[];
@@ -161,15 +167,13 @@ export function FilingList({
 
   return (
     <div className="relative h-full">
-      {/* New live events pill */}
+      {/* New live events, held behind a control rather than pushed at you */}
       {newCount > 0 && (
         <button
           onClick={showNewEvents}
-          className="absolute top-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-lg shadow-indigo-900/30 transition-colors"
+          className="absolute top-2.5 left-1/2 z-20 flex -translate-x-1/2 items-center gap-1.5 rounded-md bg-brand px-3 py-1 text-micro font-medium text-brand-on shadow-popover transition-colors hover:bg-brand-hover"
         >
-          <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-            <path d="M5 8.5v-7M2 4.5 5 1.5l3 3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
+          <ArrowUpIcon className="size-3" />
           {newCount} new event{newCount !== 1 ? "s" : ""}
         </button>
       )}
@@ -179,43 +183,27 @@ export function FilingList({
         onScroll={handleScroll}
         className="h-full overflow-y-auto"
       >
-        <div className="max-w-2xl mx-auto px-2 sm:px-4 py-5">
-          {/* Connection status */}
-          <div className="flex items-center gap-2.5 mb-4 px-4 sm:px-5">
-            <div className="flex items-center gap-2">
-              <span className="relative flex h-2.5 w-2.5">
-                {connected && (
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-40" />
-                )}
-                <span
-                  className={`relative inline-flex rounded-full h-2.5 w-2.5 ${
-                    connected ? "bg-green-500" : "bg-red-500"
-                  }`}
-                />
-              </span>
-              <span className="text-slate-500 dark:text-slate-400 text-sm font-medium">
-                {connected ? "Live Feed" : "Connecting..."}
-              </span>
-            </div>
-            <span className="text-slate-300 dark:text-slate-600">&middot;</span>
-            <span className="text-slate-400 dark:text-slate-500 text-sm tabular-nums">
+        <div className="mx-auto w-full max-w-3xl">
+          {/* Stream status */}
+          <div className="flex items-center gap-2 px-4 py-2.5 text-meta text-ink-faint">
+            <StatusDot live={connected} />
+            <span>{connected ? "Live" : "Connecting…"}</span>
+            <span className="text-ink-dim">·</span>
+            <span className="tabular-nums">
               {displayed.length} event{displayed.length !== 1 ? "s" : ""}
             </span>
           </div>
 
           {/* Guest nudge */}
           {!isLoggedIn && displayed.length > 0 && (
-            <div className="mb-4 flex items-center justify-between gap-3 rounded-xl px-4 py-3 bg-indigo-500/[0.06] dark:bg-indigo-500/10 ring-1 ring-indigo-500/15 dark:ring-indigo-500/20">
-              <p className="text-[13px] text-slate-600 dark:text-slate-300 leading-snug">
+            <div className="mx-4 mb-2 flex items-center justify-between gap-3 rounded-md border border-line-subtle bg-surface px-3 py-2.5">
+              <p className="text-meta leading-snug text-ink-muted">
                 Follow the companies you care about — sign in to build a
                 watchlist and get every filing explained in plain English.
               </p>
-              <a
-                href="/login"
-                className="shrink-0 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition-colors"
-              >
-                Sign in
-              </a>
+              <Link href="/login" className="shrink-0">
+                <Button size="sm">Sign in</Button>
+              </Link>
             </div>
           )}
 
@@ -223,22 +211,22 @@ export function FilingList({
           {isLoggedIn &&
             watchlistedCompanyIds?.size === 0 &&
             displayed.length > 0 && (
-              <p className="mb-4 text-[13px] text-slate-500 dark:text-slate-400 leading-snug">
+              <p className="mx-4 mb-2 text-meta leading-snug text-ink-faint">
                 This is everything, from every company. Filings from companies
                 you follow live in your{" "}
-                <a
+                <Link
                   href="/watchlist"
-                  className="text-indigo-600 dark:text-indigo-400 hover:underline underline-offset-2"
+                  className="text-brand-ink underline-offset-2 hover:underline"
                 >
-                  Watchlist
-                </a>
-                {" "}— hit the <span className="font-medium">+ Watch</span>{" "}
-                button on any event to start.
+                  watchlist
+                </Link>
+                {" "}— use <span className="text-ink-muted">Track</span> on any
+                event to start.
               </p>
             )}
 
-          {/* Event rows, grouped by day, separated by simple dividers */}
-          <div className="divide-y divide-slate-200 dark:divide-white/[0.06]">
+          {/* Event rows, grouped by day, separated by hairlines */}
+          <div className="divide-y divide-line-subtle border-t border-line-subtle">
             {displayed.map((event, i) => {
               const ts = event.received_at || event.filing_date || "";
               const prev = i > 0 ? displayed[i - 1] : null;
@@ -255,19 +243,20 @@ export function FilingList({
               return (
                 <div key={event.edgar_id || event.id} data-feed-idx={i}>
                   {showDay && (
-                    <div className="sticky top-0 z-10 flex justify-center py-1 pointer-events-none">
-                      <span className="text-[11px] px-3 py-1 rounded-full bg-white/90 dark:bg-[#0b0d12]/90 backdrop-blur border border-slate-200 dark:border-white/[0.06] text-slate-500 dark:text-slate-400 shadow-sm">
-                        {dayLabel(ts)}
-                      </span>
+                    <div className="sticky top-0 z-10 flex items-center gap-3 border-b border-line-subtle bg-canvas/95 px-4 py-1 backdrop-blur">
+                      <span className="eyebrow">{dayLabel(ts)}</span>
                     </div>
                   )}
                   {showLastVisit && (
-                    <div className="flex items-center gap-3 my-3" aria-label="Events below were already visible on your last visit">
-                      <span className="flex-1 h-px bg-indigo-500/25" />
-                      <span className="text-[11px] text-indigo-600/80 dark:text-indigo-400/80 font-medium">
+                    <div
+                      className="flex items-center gap-3 px-4 py-1.5"
+                      aria-label="Events below were already visible on your last visit"
+                    >
+                      <span className="h-px flex-1 bg-brand/30" />
+                      <span className="text-micro font-medium text-brand-ink">
                         last visit
                       </span>
-                      <span className="flex-1 h-px bg-indigo-500/25" />
+                      <span className="h-px flex-1 bg-brand/30" />
                     </div>
                   )}
                   <FilingCard
@@ -291,59 +280,35 @@ export function FilingList({
 
           {/* Load more */}
           {hasMore && (
-            <div className="flex justify-center mt-6">
-              <Button
-                variant="ghost"
-                onClick={onLoadMore}
-                disabled={loading}
-                className="text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
-              >
-                {loading ? "Loading..." : "Load more"}
+            <div className="flex justify-center py-4">
+              <Button variant="ghost" size="sm" onClick={onLoadMore} disabled={loading}>
+                {loading ? "Loading…" : "Load more"}
               </Button>
             </div>
           )}
 
           {/* Empty states */}
           {displayed.length === 0 && allCount > 0 && (
-            <div className="text-center mt-16">
-              <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-slate-100 dark:bg-white/[0.05] flex items-center justify-center">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="text-slate-400 dark:text-slate-500">
-                  <path d="M8 4H4v12h12v-4M14 2l4 4-8 8H6v-4l8-8z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </div>
-              <p className="text-slate-500 dark:text-slate-400 text-sm">
-                Nothing matches.
-              </p>
-              <p className="text-slate-400 dark:text-slate-600 text-xs mt-1">
-                Try switching to &ldquo;All&rdquo;, picking &ldquo;All
-                types&rdquo;, or clearing the search.
-              </p>
-            </div>
+            <EmptyState
+              className="pt-16"
+              title="Nothing matches"
+              description={`Try switching to "All", clearing the category filter, or emptying the search box.`}
+            />
           )}
           {allCount === 0 && !loading && (
-            <div className="text-center mt-16">
-              <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-slate-100 dark:bg-white/[0.05] flex items-center justify-center">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="text-slate-400 dark:text-slate-500">
-                  <path d="M4 6h12M4 10h12M4 14h8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                </svg>
-              </div>
-              <p className="text-slate-500 dark:text-slate-400 text-sm">
-                No filing events yet.
-              </p>
-              <p className="text-slate-400 dark:text-slate-600 text-xs mt-1">
-                New filings and press releases will appear here in real time.
-              </p>
-            </div>
+            <EmptyState
+              className="pt-16"
+              title="No events yet"
+              description="New filings and press releases appear here in real time, seconds after they're published."
+            />
           )}
           {loading && allCount === 0 && (
-            <div className="flex flex-col items-center gap-3 mt-16">
-              <div className="w-6 h-6 border-2 border-slate-300 dark:border-slate-600 border-t-indigo-500 rounded-full animate-spin" />
-              <p className="text-slate-400 dark:text-slate-500 text-sm">
-                Loading events...
-              </p>
+            <div className="space-y-px pt-2">
+              {[...Array(6)].map((_, i) => (
+                <Skeleton key={i} className="mx-4 h-16" />
+              ))}
             </div>
           )}
-
         </div>
       </div>
     </div>

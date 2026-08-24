@@ -33,7 +33,7 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       <div>
-        <label className="block text-sm font-semibold text-white/80 mb-2">
+        <label className="mb-1.5 block text-label font-medium text-ink-muted">
           Email
         </label>
         <Input
@@ -41,17 +41,17 @@ export function LoginForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="h-12 bg-[#1a1a2e] border-transparent text-base text-white placeholder:text-white/30 focus-visible:border-indigo-500/50 focus-visible:ring-0"
+          className="h-10"
         />
       </div>
       <div>
-        <div className="flex items-center justify-between mb-2">
-          <label className="text-sm font-semibold text-white/80">
+        <div className="mb-1.5 flex items-center justify-between">
+          <label className="text-label font-medium text-ink-muted">
             Password
           </label>
           <Link
             href="/forgot-password"
-            className="text-sm text-indigo-400 hover:text-indigo-300"
+            className="text-label text-brand-ink hover:underline"
           >
             Forgot password?
           </Link>
@@ -62,20 +62,20 @@ export function LoginForm() {
           onChange={(e) => setPassword(e.target.value)}
           required
           minLength={6}
-          className="h-12 bg-[#1a1a2e] border-transparent text-base text-white placeholder:text-white/30 focus-visible:border-indigo-500/50 focus-visible:ring-0"
+          className="h-10"
         />
       </div>
-      {error && <p className="text-red-400 text-sm">{error}</p>}
+      {error && <p className="text-label text-danger">{error}</p>}
       <Button
         type="submit"
         disabled={loading}
-        className="w-full h-12 text-base font-semibold bg-indigo-600 hover:bg-indigo-500"
+        className="h-10 w-full"
       >
         {loading ? "Signing in..." : "Sign In"}
       </Button>
-      <p className="text-center text-base text-white/50">
+      <p className="text-center text-label text-ink-faint">
         Don&apos;t have an account?{" "}
-        <Link href="/register" className="text-indigo-400 hover:text-indigo-300 font-medium">
+        <Link href="/register" className="font-medium text-brand-ink hover:underline">
           Create an account
         </Link>
       </p>

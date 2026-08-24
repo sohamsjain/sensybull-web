@@ -13,17 +13,17 @@ import {
 import type { FilingEvent } from "@/types/events";
 import { useBars, type BarsLookback } from "@/hooks/use-bars";
 import { isImportant } from "@/lib/event-actions";
+import { chartPalette, type ChartPalette } from "@/lib/chart-theme";
+import { Chip } from "@/components/ui/chip";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const LOOKBACKS: BarsLookback[] = ["1M", "3M", "6M", "1Y"];
 
-const UP = "#10b981"; // emerald-500 — matches the sentiment convention
-const DOWN = "#ef4444"; // red-500
-
-function markerColor(event: FilingEvent): string {
+function markerColor(event: FilingEvent, palette: ChartPalette): string {
   const sentiment = event.briefing?.sentiment;
-  if (sentiment === "Positive") return UP;
-  if (sentiment === "Negative") return DOWN;
-  return "#94a3b8"; // slate-400
+  if (sentiment === "Positive") return palette.up;
+  if (sentiment === "Negative") return palette.down;
+  return palette.neutral;
 }
 
 /**
@@ -49,19 +49,19 @@ export function PriceChart({
     const container = containerRef.current;
     if (!container || state !== "ready" || bars.length === 0) return;
 
-    const dark = document.documentElement.classList.contains("dark");
+    const palette = chartPalette();
     const chart = createChart(container, {
       width: container.clientWidth,
       height: fill ? container.clientHeight : 220,
       layout: {
         background: { type: ColorType.Solid, color: "transparent" },
-        textColor: dark ? "#64748b" : "#94a3b8",
+        textColor: palette.text,
         fontSize: 10,
         attributionLogo: false,
       },
       grid: {
         vertLines: { visible: false },
-        horzLines: { color: dark ? "rgba(255,255,255,0.04)" : "rgba(15,23,42,0.05)" },
+        horzLines: { color: palette.grid },
       },
       rightPriceScale: { borderVisible: false },
       timeScale: { borderVisible: false, timeVisible: false },
@@ -72,12 +72,12 @@ export function PriceChart({
     chartRef.current = chart;
 
     const series = chart.addSeries(CandlestickSeries, {
-      upColor: UP,
-      downColor: DOWN,
-      borderUpColor: UP,
-      borderDownColor: DOWN,
-      wickUpColor: UP,
-      wickDownColor: DOWN,
+      upColor: palette.up,
+      downColor: palette.down,
+      borderUpColor: palette.up,
+      borderDownColor: palette.down,
+      wickUpColor: palette.up,
+      wickDownColor: palette.down,
     });
 
     const seriesData = bars.map((b) => ({
@@ -106,7 +106,7 @@ export function PriceChart({
         time: barTime as UTCTimestamp,
         position: "aboveBar",
         shape: "arrowDown",
-        color: markerColor(event),
+        color: markerColor(event, palette),
         text: isImportant(event)
           ? event.briefing?.primary_event_type ?? ""
           : "",
@@ -133,38 +133,34 @@ export function PriceChart({
   }, [bars, events, state, fill]);
 
   return (
-    <div className={fill ? "flex flex-col h-full min-h-0" : undefined}>
-      <div className="flex items-center gap-1 mb-2 shrink-0">
+    <div className={fill ? "flex h-full min-h-0 flex-col" : undefined}>
+      <div className="mb-2 flex shrink-0 items-center gap-1">
         {LOOKBACKS.map((lb) => (
-          <button
+          <Chip
             key={lb}
+            variant="quiet"
+            selected={lookback === lb}
             onClick={() => setLookback(lb)}
-            className={`px-2 py-0.5 rounded text-[11px] font-medium transition-colors ${
-              lookback === lb
-                ? "bg-indigo-600 text-white"
-                : "text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300"
-            }`}
+            className="font-mono"
           >
             {lb}
-          </button>
+          </Chip>
         ))}
       </div>
 
       {state === "loading" ? (
-        <div
-          className={`rounded-lg bg-slate-100 dark:bg-white/[0.04] animate-pulse ${
-            fill ? "flex-1 min-h-0" : "h-[220px]"
-          }`}
+        <Skeleton
+          className={fill ? "min-h-0 flex-1" : "h-[220px]"}
         />
       ) : state === "unavailable" ? (
-        <p className="text-xs text-slate-400 dark:text-slate-500 leading-relaxed py-4">
+        <p className="py-4 text-meta leading-relaxed text-ink-faint">
           No price data available for this company — it may trade OTC or
           outside US exchanges.
         </p>
       ) : (
         <div
           ref={containerRef}
-          className={fill ? "flex-1 min-h-0 w-full" : "w-full"}
+          className={fill ? "min-h-0 w-full flex-1" : "w-full"}
         />
       )}
     </div>

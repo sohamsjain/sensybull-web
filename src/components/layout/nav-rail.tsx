@@ -2,50 +2,19 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+
 import { useAuth } from "@/hooks/use-auth";
 import { useUnreadCount } from "@/hooks/use-unread-count";
+import { openCommandPalette } from "@/components/command-palette";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { CountBadge } from "@/components/ui/badge";
+import { SearchIcon } from "@/components/ui/icons";
+import { Tip, TooltipProvider } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
+
 import { FontSizeToggle } from "./font-size-toggle";
+import { NAV_ITEMS } from "./nav-items";
 import { ProfileMenu } from "./profile-menu";
-
-function WatchlistIcon() {
-  return (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={1.8}
-        d="M11.48 3.5c.2-.4.84-.4 1.04 0l2.12 4.3c.08.16.23.27.4.29l4.75.69c.45.07.63.62.3.94l-3.43 3.35c-.13.12-.19.3-.16.48l.81 4.73c.08.44-.39.78-.79.57l-4.25-2.23a.55.55 0 00-.51 0l-4.25 2.23c-.4.21-.87-.13-.79-.57l.81-4.73a.55.55 0 00-.16-.48L3.94 9.72a.55.55 0 01.3-.94l4.75-.69a.55.55 0 00.4-.29l2.09-4.3z"
-      />
-    </svg>
-  );
-}
-
-function FeedIcon() {
-  return (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={1.8}
-        d="M4 6h16M4 10h16M4 14h10M4 18h7"
-      />
-    </svg>
-  );
-}
-
-function BellIcon() {
-  return (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={1.8}
-        d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"
-      />
-    </svg>
-  );
-}
 
 function RailLink({
   href,
@@ -61,26 +30,35 @@ function RailLink({
   children: React.ReactNode;
 }) {
   return (
-    <Link
-      href={href}
-      title={label}
-      aria-label={label}
-      className={`relative flex items-center justify-center w-10 h-10 rounded-xl transition-colors ${
-        active
-          ? "bg-indigo-600 text-white"
-          : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/[0.06]"
-      }`}
-    >
-      {children}
-      {badge != null && badge > 0 && (
-        <span className="absolute -top-0.5 -right-0.5 min-w-[17px] h-[17px] rounded-full bg-indigo-500 text-white text-[10px] font-bold flex items-center justify-center px-1 leading-none">
-          {badge > 99 ? "99+" : badge}
-        </span>
-      )}
-    </Link>
+    <Tip label={label}>
+      <Link
+        href={href}
+        aria-label={label}
+        aria-current={active ? "page" : undefined}
+        className={cn(
+          "relative flex size-9 items-center justify-center rounded-md transition-colors",
+          active
+            ? "bg-brand text-brand-on"
+            : "text-ink-faint hover:bg-surface-hover hover:text-ink"
+        )}
+      >
+        {children}
+        {badge != null && badge > 0 && (
+          <CountBadge
+            count={badge}
+            className="absolute -top-1 -right-1 h-4 min-w-4 px-1 text-nano ring-2 ring-canvas-sunken"
+          />
+        )}
+      </Link>
+    </Tip>
   );
 }
 
+/**
+ * The desktop rail: a persistent, icon-width column that never scrolls and
+ * never moves. Workspace destinations at the top, settings at the foot,
+ * search reachable from either by pointer or by ⌘K.
+ */
 export function NavRail() {
   const { user } = useAuth();
   const pathname = usePathname();
@@ -88,36 +66,65 @@ export function NavRail() {
 
   if (!user) return null;
 
-  return (
-    <aside className="hidden md:flex w-14 shrink-0 flex-col items-center gap-1.5 py-3 border-r border-slate-200 dark:border-white/[0.04] bg-slate-100 dark:bg-[#07080c]">
-      <RailLink
-        href="/watchlist"
-        label="Watchlist"
-        active={pathname?.startsWith("/watchlist") ?? false}
-        badge={unread}
-      >
-        <WatchlistIcon />
-      </RailLink>
-      <RailLink
-        href="/feed"
-        label="Feed"
-        active={pathname?.startsWith("/feed") ?? false}
-      >
-        <FeedIcon />
-      </RailLink>
+  const isActive = (href: string) => pathname?.startsWith(href) ?? false;
+  const primary = NAV_ITEMS.filter((item) => !item.secondary);
+  const secondary = NAV_ITEMS.filter((item) => item.secondary);
 
-      <div className="mt-auto flex flex-col items-center gap-1.5">
-        <RailLink
-          href="/alerts"
-          label="Alerts"
-          active={pathname?.startsWith("/alerts") ?? false}
+  return (
+    <TooltipProvider delay={400}>
+      <aside className="hidden w-13 shrink-0 flex-col items-center gap-1 border-r border-line-subtle bg-canvas-sunken py-2.5 md:flex">
+        <Link
+          href="/watchlist"
+          aria-label="Sensybull"
+          className="mb-1.5 flex size-9 items-center justify-center"
         >
-          <BellIcon />
-        </RailLink>
-        <FontSizeToggle className="w-10 h-10" />
-        <ThemeToggle className="w-10 h-10" />
-        <ProfileMenu />
-      </div>
-    </aside>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo.png"
+            alt=""
+            className="size-5 opacity-70 invert-0 dark:invert"
+          />
+        </Link>
+
+        {primary.map(({ href, label, Icon, unread: showUnread }) => (
+          <RailLink
+            key={href}
+            href={href}
+            label={label}
+            active={isActive(href)}
+            badge={showUnread ? unread : undefined}
+          >
+            <Icon className="size-[18px]" />
+          </RailLink>
+        ))}
+
+        <Tip label="Search  ⌘K">
+          <button
+            type="button"
+            onClick={openCommandPalette}
+            aria-label="Search companies and actions"
+            className="flex size-9 items-center justify-center rounded-md text-ink-faint transition-colors hover:bg-surface-hover hover:text-ink"
+          >
+            <SearchIcon className="size-[18px]" />
+          </button>
+        </Tip>
+
+        <div className="mt-auto flex flex-col items-center gap-1">
+          {secondary.map(({ href, label, Icon }) => (
+            <RailLink
+              key={href}
+              href={href}
+              label={label}
+              active={isActive(href)}
+            >
+              <Icon className="size-[18px]" />
+            </RailLink>
+          ))}
+          <FontSizeToggle />
+          <ThemeToggle />
+          <ProfileMenu />
+        </div>
+      </aside>
+    </TooltipProvider>
   );
 }

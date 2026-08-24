@@ -41,29 +41,29 @@ function MagicLinkVerifyContent() {
 
   return (
     <div className="text-center space-y-4">
-      <h2 className="text-white font-semibold text-lg">Email Sign-In</h2>
+      <h2 className="text-title font-medium text-ink">Email Sign-In</h2>
 
       {status === "loading" && (
-        <p className="text-white/50 text-sm">Signing you in...</p>
+        <p className="text-label text-ink-faint">Signing you in...</p>
       )}
 
       {status === "success" && (
-        <p className="text-green-400 text-sm">{message}</p>
+        <p className="text-label text-success">{message}</p>
       )}
 
       {status === "error" && (
         <>
-          <p className="text-red-400 text-sm">{message}</p>
+          <p className="text-label text-danger">{message}</p>
           <div className="space-y-2">
             <Link
               href="/magic-link"
-              className="block text-indigo-400 hover:text-indigo-300 text-sm"
+              className="block text-label text-brand-ink hover:underline"
             >
               Request a new link
             </Link>
             <Link
               href="/login"
-              className="block text-indigo-400 hover:text-indigo-300 text-sm"
+              className="block text-label text-brand-ink hover:underline"
             >
               Back to sign in
             </Link>
@@ -78,7 +78,7 @@ export default function MagicLinkVerifyPage() {
   return (
     <Suspense
       fallback={
-        <p className="text-white/50 text-sm text-center">Signing you in...</p>
+        <p className="text-center text-label text-ink-faint">Signing you in...</p>
       }
     >
       <MagicLinkVerifyContent />

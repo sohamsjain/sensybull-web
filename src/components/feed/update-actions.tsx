@@ -1,18 +1,17 @@
 "use client";
 
 import { useState } from "react";
+
 import type { FilingEvent } from "@/types/events";
-import {
-  buildAiPrompt,
-  copyText,
-  shareEvent,
-} from "@/lib/event-actions";
+import { buildAiPrompt, copyText, shareEvent } from "@/lib/event-actions";
+import { Button } from "@/components/ui/button";
+import { CopyIcon, DocumentIcon, ShareIcon } from "@/components/ui/icons";
 
 /**
  * Action row shown only when an update is expanded: read the source
  * document (SEC filing or press release), copy a ready-made prompt for
  * ChatGPT/Gemini/Claude, and share the update. Kept identical between the
- * feed card and the watchlist message so every update behaves the same way.
+ * feed card and the watchlist entry so every update behaves the same way.
  */
 export function UpdateActions({ event }: { event: FilingEvent }) {
   const [copied, setCopied] = useState(false);
@@ -35,75 +34,61 @@ export function UpdateActions({ event }: { event: FilingEvent }) {
     }
   };
 
-  const buttonClass = `
-    inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium
-    bg-slate-100 dark:bg-white/[0.06]
-    text-slate-700 dark:text-slate-200
-    hover:bg-slate-200 dark:hover:bg-white/[0.12]
-    transition-colors
-  `;
-
   return (
     <div
-      className="mt-3 flex items-center gap-2 flex-wrap"
+      className="mt-3 flex flex-wrap items-center gap-1.5"
       onClick={(e) => e.stopPropagation()}
     >
       {event.edgar_url && (
-        <a
-          href={event.edgar_url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={buttonClass}
+        <Button
+          size="xs"
+          variant="secondary"
+          nativeButton={false}
+          render={
+            <a href={event.edgar_url} target="_blank" rel="noopener noreferrer" />
+          }
         >
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="shrink-0 opacity-60">
-            <path d="M2 2h8v8H2z" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
-            <path d="M4 4.5h4M4 6.5h4M4 8.5h2" stroke="currentColor" strokeWidth="0.8" strokeLinecap="round" />
-          </svg>
-          {event.signal_type === "PR" ? "Read the press release" : "Read the filing"}
-        </a>
+          <DocumentIcon />
+          {event.signal_type === "PR"
+            ? "Read the press release"
+            : "Read the filing"}
+        </Button>
       )}
 
       {/* A press release gains its SEC-filing link once the 8-K arrives */}
       {event.signal_type === "PR" && event.filing_url && (
-        <a
-          href={event.filing_url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={buttonClass}
+        <Button
+          size="xs"
+          variant="secondary"
+          nativeButton={false}
+          render={
+            <a href={event.filing_url} target="_blank" rel="noopener noreferrer" />
+          }
         >
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="shrink-0 opacity-60">
-            <path d="M2 2h8v8H2z" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
-            <path d="M4 4.5h4M4 6.5h4M4 8.5h2" stroke="currentColor" strokeWidth="0.8" strokeLinecap="round" />
-          </svg>
+          <DocumentIcon />
           Read the filing
-        </a>
+        </Button>
       )}
 
-      <button
+      <Button
+        size="xs"
+        variant="secondary"
         onClick={handleCopyPrompt}
-        className={buttonClass}
         title="Copy this update as a question you can paste into ChatGPT, Gemini, or Claude"
       >
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="shrink-0 opacity-60">
-          <rect x="4" y="4" width="6.5" height="6.5" rx="1" stroke="currentColor" strokeWidth="1" />
-          <path d="M8 4V2.5A1 1 0 0 0 7 1.5H2.5a1 1 0 0 0-1 1V7a1 1 0 0 0 1 1H4" stroke="currentColor" strokeWidth="1" />
-        </svg>
+        <CopyIcon />
         {copied ? "Copied — paste into any AI chat" : "Copy for AI chat"}
-      </button>
+      </Button>
 
-      <button
+      <Button
+        size="xs"
+        variant="secondary"
         onClick={handleShare}
-        className={buttonClass}
         title="Share this update"
       >
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="shrink-0 opacity-60">
-          <circle cx="3" cy="6" r="1.5" stroke="currentColor" strokeWidth="1" />
-          <circle cx="9" cy="2.7" r="1.5" stroke="currentColor" strokeWidth="1" />
-          <circle cx="9" cy="9.3" r="1.5" stroke="currentColor" strokeWidth="1" />
-          <path d="M4.4 5.3 7.6 3.4M4.4 6.7l3.2 1.9" stroke="currentColor" strokeWidth="1" />
-        </svg>
+        <ShareIcon />
         {shared ? "Link copied" : "Share"}
-      </button>
+      </Button>
     </div>
   );
 }

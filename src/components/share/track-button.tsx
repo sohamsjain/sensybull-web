@@ -32,9 +32,9 @@ export interface TrackButtonProps {
 }
 
 const SIZES = {
-  sm: "h-8 px-3 text-xs gap-1.5",
-  md: "h-10 px-4 text-sm gap-2",
-  lg: "h-12 px-6 text-base gap-2.5",
+  sm: "h-7 gap-1.5 px-2.5 text-meta",
+  md: "h-8 gap-1.5 px-3 text-label",
+  lg: "h-10 gap-2 px-4 text-body",
 } as const;
 
 // [variant][theme] — "auto" pairs the light palette with dark: overrides.
@@ -42,25 +42,28 @@ const VARIANTS: Record<
   NonNullable<TrackButtonProps["variant"]>,
   Record<NonNullable<TrackButtonProps["theme"]>, string>
 > = {
+  // "auto" uses design tokens and follows the app theme. The forced
+  // palettes stay on literal colours on purpose: they render on pages that
+  // are not ours and cannot see our custom properties.
   primary: {
-    auto: "bg-indigo-600 hover:bg-indigo-500 text-white",
-    light: "bg-indigo-600 hover:bg-indigo-500 text-white",
-    dark: "bg-indigo-600 hover:bg-indigo-500 text-white",
+    auto: "bg-brand text-brand-on hover:bg-brand-hover",
+    light: "bg-[#4b3fd4] text-white hover:bg-[#4034bd]",
+    dark: "bg-[#6355e8] text-white hover:bg-[#7466f0]",
   },
   outline: {
-    auto: "border border-indigo-500/40 text-indigo-600 hover:bg-indigo-500/10 dark:text-indigo-400",
-    light: "border border-indigo-500/40 text-indigo-600 hover:bg-indigo-500/10",
-    dark: "border border-indigo-400/40 text-indigo-400 hover:bg-indigo-400/10",
+    auto: "border border-brand/40 text-brand-ink hover:bg-brand-soft",
+    light: "border border-[#4b3fd4]/40 text-[#4b3fd4] hover:bg-[#4b3fd4]/10",
+    dark: "border border-[#8b7cf6]/40 text-[#8b7cf6] hover:bg-[#8b7cf6]/10",
   },
   minimal: {
-    auto: "text-indigo-600 hover:underline underline-offset-4 dark:text-indigo-400 px-0",
-    light: "text-indigo-600 hover:underline underline-offset-4 px-0",
-    dark: "text-indigo-400 hover:underline underline-offset-4 px-0",
+    auto: "px-0 text-brand-ink underline-offset-4 hover:underline",
+    light: "px-0 text-[#4b3fd4] underline-offset-4 hover:underline",
+    dark: "px-0 text-[#8b7cf6] underline-offset-4 hover:underline",
   },
   dark: {
-    auto: "bg-[#12141b] hover:bg-[#1a1d25] text-white border border-white/10",
-    light: "bg-[#12141b] hover:bg-[#1a1d25] text-white border border-white/10",
-    dark: "bg-[#12141b] hover:bg-[#1a1d25] text-white border border-white/10",
+    auto: "border border-white/10 bg-[#13161c] text-white hover:bg-[#1a1d25]",
+    light: "border border-white/10 bg-[#13161c] text-white hover:bg-[#1a1d25]",
+    dark: "border border-white/10 bg-[#13161c] text-white hover:bg-[#1a1d25]",
   },
 };
 
@@ -77,7 +80,7 @@ export function TrackButton({
 }: TrackButtonProps) {
   const normalized = symbol.trim().toUpperCase();
   const radius =
-    rounded === "full" ? "rounded-full" : rounded === false ? "rounded-none" : "rounded-lg";
+    rounded === "full" ? "rounded-full" : rounded === false ? "rounded-none" : "rounded-md";
 
   return (
     <Link
@@ -98,7 +101,7 @@ export function TrackButton({
     >
       {showLogo ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src="/logo.png" alt="" className="w-4 h-4 dark:invert" aria-hidden />
+        <img src="/logo.png" alt="" className="size-4 dark:invert" aria-hidden />
       ) : (
         <span aria-hidden>+</span>
       )}

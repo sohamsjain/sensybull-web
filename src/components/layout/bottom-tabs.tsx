@@ -2,86 +2,19 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+
 import { useAuth } from "@/hooks/use-auth";
 import { useUnreadCount } from "@/hooks/use-unread-count";
+import { CountBadge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+
+import { NAV_ITEMS } from "./nav-items";
 import { ProfileMenu } from "./profile-menu";
 
-function WatchlistIcon() {
-  return (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={1.8}
-        d="M11.48 3.5c.2-.4.84-.4 1.04 0l2.12 4.3c.08.16.23.27.4.29l4.75.69c.45.07.63.62.3.94l-3.43 3.35c-.13.12-.19.3-.16.48l.81 4.73c.08.44-.39.78-.79.57l-4.25-2.23a.55.55 0 00-.51 0l-4.25 2.23c-.4.21-.87-.13-.79-.57l.81-4.73a.55.55 0 00-.16-.48L3.94 9.72a.55.55 0 01.3-.94l4.75-.69a.55.55 0 00.4-.29l2.09-4.3z"
-      />
-    </svg>
-  );
-}
-
-function FeedIcon() {
-  return (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={1.8}
-        d="M4 6h16M4 10h16M4 14h10M4 18h7"
-      />
-    </svg>
-  );
-}
-
-function BellIcon() {
-  return (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={1.8}
-        d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"
-      />
-    </svg>
-  );
-}
-
-function Tab({
-  href,
-  label,
-  active,
-  badge,
-  children,
-}: {
-  href: string;
-  label: string;
-  active: boolean;
-  badge?: number;
-  children: React.ReactNode;
-}) {
-  return (
-    <Link
-      href={href}
-      className={`relative flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors ${
-        active
-          ? "text-indigo-600 dark:text-indigo-400 font-semibold"
-          : "text-slate-500 dark:text-slate-400"
-      }`}
-      aria-current={active ? "page" : undefined}
-    >
-      <span className="relative">
-        {children}
-        {badge != null && badge > 0 && (
-          <span className="absolute -top-1 -right-2 min-w-[16px] h-[16px] rounded-full bg-indigo-500 text-white text-[9px] font-bold flex items-center justify-center px-1 leading-none">
-            {badge > 99 ? "99+" : badge}
-          </span>
-        )}
-      </span>
-      <span className="text-[10px] font-medium">{label}</span>
-    </Link>
-  );
-}
-
-/** Thumb-reachable primary navigation on mobile; the rail covers desktop. */
+/**
+ * Thumb-reachable primary navigation on mobile; the rail covers desktop.
+ * Same destinations, same icons, same order — only the geometry changes.
+ */
 export function BottomTabs() {
   const { user } = useAuth();
   const pathname = usePathname();
@@ -91,32 +24,35 @@ export function BottomTabs() {
 
   return (
     <nav
-      className="md:hidden fixed bottom-0 inset-x-0 z-40 h-14 pb-[env(safe-area-inset-bottom)] flex items-stretch border-t border-slate-200 dark:border-white/[0.06] bg-white/95 dark:bg-[#0b0d12]/95 backdrop-blur"
+      className="fixed inset-x-0 bottom-0 z-40 flex h-14 items-stretch border-t border-line-subtle bg-canvas pb-[env(safe-area-inset-bottom)] md:hidden"
       aria-label="Primary"
     >
-      <Tab
-        href="/watchlist"
-        label="Watchlist"
-        active={pathname?.startsWith("/watchlist") ?? false}
-        badge={unread}
-      >
-        <WatchlistIcon />
-      </Tab>
-      <Tab
-        href="/feed"
-        label="Feed"
-        active={pathname?.startsWith("/feed") ?? false}
-      >
-        <FeedIcon />
-      </Tab>
-      <Tab
-        href="/alerts"
-        label="Alerts"
-        active={pathname?.startsWith("/alerts") ?? false}
-      >
-        <BellIcon />
-      </Tab>
-      <div className="flex-1 flex items-center justify-center">
+      {NAV_ITEMS.map(({ href, label, Icon, unread: showUnread }) => {
+        const active = pathname?.startsWith(href) ?? false;
+        return (
+          <Link
+            key={href}
+            href={href}
+            aria-current={active ? "page" : undefined}
+            className={cn(
+              "flex flex-1 flex-col items-center justify-center gap-1 transition-colors",
+              active ? "text-brand-ink" : "text-ink-faint"
+            )}
+          >
+            <span className="relative">
+              <Icon className="size-[18px]" />
+              {showUnread && unread > 0 && (
+                <CountBadge
+                  count={unread}
+                  className="absolute -top-1.5 -right-2.5 h-4 min-w-4 px-1 text-nano"
+                />
+              )}
+            </span>
+            <span className="text-micro font-medium">{label}</span>
+          </Link>
+        );
+      })}
+      <div className="flex flex-1 items-center justify-center">
         <ProfileMenu side="top" />
       </div>
     </nav>
