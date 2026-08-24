@@ -11,15 +11,16 @@ import { FeedToolbar } from "@/components/feed/feed-toolbar";
 
 export default function FeedPage() {
   const { user } = useAuth();
-  const { filter, eventType, search } = useDashboard();
+  const { scope, filter, eventType, search } = useDashboard();
 
-  const { events, allEvents, loading, hasMore, loadMore, connected } =
-    useEvents({ filter, eventType, search });
-
-  const { watchlists, refetch } = useWatchlists();
+  const { watchlists, loading: watchlistsLoading, refetch } = useWatchlists();
   const [addingCompanyId, setAddingCompanyId] = useState<string | null>(null);
 
+  // Null until the watchlist has actually loaded — the events hook needs to
+  // tell "follows nobody" apart from "not known yet" before it filters the
+  // live stream down to the reader's companies.
   const watchlistedCompanyIds = useMemo(() => {
+    if (!user || watchlistsLoading) return null;
     const ids = new Set<string>();
     for (const wl of watchlists) {
       for (const c of wl.companies || []) {
@@ -27,7 +28,15 @@ export default function FeedPage() {
       }
     }
     return ids;
-  }, [watchlists]);
+  }, [watchlists, watchlistsLoading, user]);
+
+  const { events, allEvents, loading, hasMore, loadMore, connected } = useEvents({
+    filter,
+    eventType,
+    search,
+    scope,
+    followedCompanyIds: watchlistedCompanyIds,
+  });
 
   const handleAddToWatchlist = useCallback(
     async (companyId: string) => {
@@ -48,11 +57,13 @@ export default function FeedPage() {
         <FilingList
           events={events}
           allCount={allEvents.length}
+          scope={scope ?? "all"}
+          followedCount={watchlistedCompanyIds?.size ?? null}
           loading={loading}
           hasMore={hasMore}
           connected={connected}
           onLoadMore={loadMore}
-          watchlistedCompanyIds={watchlistedCompanyIds}
+          watchlistedCompanyIds={watchlistedCompanyIds ?? undefined}
           onAddToWatchlist={handleAddToWatchlist}
           addingCompanyId={addingCompanyId}
           isLoggedIn={!!user}

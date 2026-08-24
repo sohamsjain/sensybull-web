@@ -15,13 +15,34 @@ import { CompanySheet, type CompanyRef } from "@/components/company/company-shee
 import { CommandPalette } from "@/components/command-palette";
 import { SocketProvider } from "@/context/socket-provider";
 import { useAuth } from "@/hooks/use-auth";
+import type { FeedScope } from "@/hooks/use-events";
 
 export type { CompanyRef };
 
 /** The one feed filter: everything, or only market-moving updates. */
 export type FeedFilter = "all" | "important";
 
+export type { FeedScope };
+
+/** Where the reader's last scope choice is remembered between visits. */
+const SCOPE_KEY = "feed-scope";
+
+/** The signed-in reader's remembered scope; their own companies by default. */
+function storedScope(): FeedScope {
+  try {
+    return localStorage.getItem(SCOPE_KEY) === "all" ? "all" : "mine";
+  } catch {
+    return "mine";
+  }
+}
+
 interface DashboardContextValue {
+  /**
+   * Whose updates the feed shows. `null` until it settles — it depends on
+   * whether the visitor is signed in, which resolves after mount.
+   */
+  scope: FeedScope | null;
+  setScope: (scope: FeedScope) => void;
   filter: FeedFilter;
   setFilter: (filter: FeedFilter) => void;
   /** Event-type category filter (null = all types). */
@@ -33,6 +54,8 @@ interface DashboardContextValue {
 }
 
 const DashboardContext = createContext<DashboardContextValue>({
+  scope: "all",
+  setScope: () => {},
   filter: "all",
   setFilter: () => {},
   eventType: null,
@@ -45,9 +68,17 @@ const DashboardContext = createContext<DashboardContextValue>({
 export const useDashboard = () => useContext(DashboardContext);
 
 function DashboardInner({ children }: { children: React.ReactNode }) {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+
+  // Scope initializes from the URL when a shared link names one; otherwise it
+  // stays undecided until auth resolves, so a signed-in reader lands on their
+  // own companies without the public firehose flashing up first.
+  const [scope, setScope] = useState<FeedScope | null>(() => {
+    const s = searchParams.get("s");
+    return s === "mine" || s === "all" ? s : null;
+  });
 
   // Filters initialize from the URL so filtered views are shareable
   const [filter, setFilter] = useState<FeedFilter>(() =>
@@ -59,16 +90,33 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
   const [search, setSearch] = useState(() => searchParams.get("q") ?? "");
   const [companySheet, setCompanySheet] = useState<CompanyRef | null>(null);
 
+  // Settle the scope once we know who's reading: their last choice if they
+  // made one, otherwise their own companies. Done during render rather than
+  // in an effect so the feed never fetches the wrong stream first, and a
+  // reader who signs out drops straight back to the public one.
+  if (!authLoading) {
+    const settled: FeedScope = !user ? "all" : (scope ?? storedScope());
+    if (settled !== scope) setScope(settled);
+  }
+
+  const chooseScope = useCallback((next: FeedScope) => {
+    setScope(next);
+    try {
+      localStorage.setItem(SCOPE_KEY, next);
+    } catch {}
+  }, []);
+
   // Mirror filter state back into the URL (shallow, no navigation)
   useEffect(() => {
     if (!pathname?.startsWith("/feed")) return;
     const params = new URLSearchParams();
+    if (scope === "mine") params.set("s", "mine");
     if (filter === "important") params.set("f", "important");
     if (eventType) params.set("t", eventType);
     if (search) params.set("q", search);
     const qs = params.toString();
     window.history.replaceState(null, "", qs ? `${pathname}?${qs}` : pathname);
-  }, [filter, eventType, search, pathname]);
+  }, [scope, filter, eventType, search, pathname]);
 
   const openCompany = useCallback(
     (company: CompanyRef) => setCompanySheet(company),
@@ -77,7 +125,17 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
 
   return (
     <DashboardContext.Provider
-      value={{ filter, setFilter, eventType, setEventType, search, setSearch, openCompany }}
+      value={{
+        scope,
+        setScope: chooseScope,
+        filter,
+        setFilter,
+        eventType,
+        setEventType,
+        search,
+        setSearch,
+        openCompany,
+      }}
     >
       {/* One socket for the whole session, owned above the pages so it
           survives navigation. */}

@@ -1,5 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { insertByReceivedOrder, matchesEventType } from "./use-events";
+import {
+  insertByReceivedOrder,
+  isFollowed,
+  matchesEventType,
+  matchesSearch,
+  orderKeyFor,
+} from "./use-events";
 import type { FilingEvent } from "@/types/events";
 
 // Minimal FilingEvent factory — only the fields the ordering logic reads.
@@ -91,5 +97,76 @@ describe("matchesEventType", () => {
 
   it("is false when the event carries no type data", () => {
     expect(matchesEventType(ev("a", "2026-07-07T10:00:00Z"), "Earnings")).toBe(false);
+  });
+});
+
+describe("orderKeyFor", () => {
+  it("orders the public stream by receipt, the watchlist stream by filing date", () => {
+    // A press release received today whose SEC filing is dated yesterday.
+    const e = ev("a", "2026-07-07T10:00:00Z", "2026-07-06T00:00:00Z");
+    expect(orderKeyFor("all")(e)).toBe("2026-07-07T10:00:00Z");
+    expect(orderKeyFor("mine")(e)).toBe("2026-07-06T00:00:00Z");
+  });
+
+  it("slots a live event into the watchlist stream by filing date", () => {
+    const list = [
+      ev("b", "2026-07-07T10:00:00Z", "2026-07-07T09:00:00Z"),
+      ev("a", "2026-07-07T09:00:00Z", "2026-07-05T09:00:00Z"),
+    ];
+    // Received now, but filed between the two — belongs in the middle of a
+    // filing-date-ordered list, not at the top.
+    const next = insertByReceivedOrder(
+      list,
+      ev("mid", "2026-07-07T11:00:00Z", "2026-07-06T09:00:00Z"),
+      orderKeyFor("mine")
+    );
+    expect(ids(next)).toEqual(["b", "mid", "a"]);
+  });
+});
+
+describe("isFollowed", () => {
+  const e = ev("a", "2026-07-07T10:00:00Z");
+
+  it("keeps events from companies on the watchlist", () => {
+    expect(isFollowed(e, new Set(["a"]))).toBe(true);
+  });
+
+  it("drops everything else, including before the watchlist has loaded", () => {
+    expect(isFollowed(e, new Set(["other"]))).toBe(false);
+    expect(isFollowed(e, new Set())).toBe(false);
+    expect(isFollowed(e, null)).toBe(false);
+  });
+});
+
+describe("matchesSearch", () => {
+  const e = {
+    ...ev("a", "2026-07-07T10:00:00Z"),
+    ticker: "MU",
+    company_name: "Micron Technology",
+    briefing: {
+      headline: "Micron raises guidance on HBM demand",
+      summary: "",
+      primary_event_type: "Earnings",
+      significance: "High" as const,
+      sentiment: "Positive" as const,
+      investor_takeaway: "",
+      catalysts: [],
+      deal_terms: {},
+    },
+  };
+
+  it("matches the ticker and the company name, case-insensitively", () => {
+    expect(matchesSearch(e, "mu")).toBe(true);
+    expect(matchesSearch(e, "micron")).toBe(true);
+  });
+
+  it("also matches words in the headline", () => {
+    expect(matchesSearch(e, "guidance")).toBe(true);
+    expect(matchesSearch(e, "bankruptcy")).toBe(false);
+  });
+
+  it("keeps everything when the box is empty", () => {
+    expect(matchesSearch(e, "")).toBe(true);
+    expect(matchesSearch(e, "   ")).toBe(true);
   });
 });

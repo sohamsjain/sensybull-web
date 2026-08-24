@@ -4,7 +4,11 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 
 import { useAuth } from "@/hooks/use-auth";
-import { useDashboard, type FeedFilter } from "@/app/(dashboard)/layout";
+import {
+  useDashboard,
+  type FeedFilter,
+  type FeedScope,
+} from "@/app/(dashboard)/layout";
 import { api } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
 import { Chip, ChipRow, SegmentedControl } from "@/components/ui/chip";
@@ -15,6 +19,12 @@ import { ThemeToggle } from "@/components/theme-toggle";
 const FILTERS: { value: FeedFilter; label: string }[] = [
   { value: "all", label: "All" },
   { value: "important", label: "Important" },
+];
+
+/** Whose updates you're reading. */
+const SCOPES: { value: FeedScope; label: string }[] = [
+  { value: "mine", label: "My companies" },
+  { value: "all", label: "Everything" },
 ];
 
 /** Fallback while GET /events/types loads (mirrors the API's canonical list). */
@@ -32,13 +42,22 @@ const DEFAULT_EVENT_TYPES = [
 ];
 
 /**
- * Feed header: what you're looking at (All / Important), a search box, and
- * the category filters. One bar, two rows, always in the same place.
+ * Feed header, two rows that always sit in the same place: whose updates
+ * you're reading plus search on top, then how to narrow them — All /
+ * Important, and the event categories.
  */
 export function FeedToolbar() {
   const { user } = useAuth();
-  const { filter, setFilter, eventType, setEventType, search, setSearch } =
-    useDashboard();
+  const {
+    scope,
+    setScope,
+    filter,
+    setFilter,
+    eventType,
+    setEventType,
+    search,
+    setSearch,
+  } = useDashboard();
 
   const [eventTypes, setEventTypes] = useState<string[]>(DEFAULT_EVENT_TYPES);
   useEffect(() => {
@@ -58,19 +77,22 @@ export function FeedToolbar() {
   return (
     <div className="shrink-0 border-b border-line-subtle bg-canvas">
       <div className="mx-auto flex h-12 w-full max-w-3xl items-center gap-2.5 px-4">
-        <SegmentedControl
-          options={FILTERS}
-          value={filter}
-          onChange={setFilter}
-          label="Show all updates or only important ones"
-        />
+        {/* Signed-in readers choose whose filings they're looking at */}
+        {user && (
+          <SegmentedControl
+            options={SCOPES}
+            value={scope ?? "all"}
+            onChange={setScope}
+            label="Show updates from the companies you follow, or from every company"
+          />
+        )}
 
         <SearchInput
           id="feed-search"
           value={search}
           onValueChange={setSearch}
-          placeholder="Search company…"
-          className="max-w-xs flex-1"
+          placeholder="Search company or headline…"
+          className="min-w-0 max-w-xs flex-1"
           hint={<Kbd className="hidden md:inline-flex">/</Kbd>}
         />
 
@@ -85,31 +107,40 @@ export function FeedToolbar() {
         )}
       </div>
 
-      <ChipRow
-        className="mx-auto w-full max-w-3xl px-4 pb-2"
-        role="tablist"
-        aria-label="Filter by event type"
-      >
-        <Chip
-          role="tab"
-          aria-selected={eventType === null}
-          selected={eventType === null}
-          onClick={() => setEventType(null)}
+      <div className="mx-auto flex w-full max-w-3xl items-center gap-2.5 px-4 pb-2">
+        <SegmentedControl
+          options={FILTERS}
+          value={filter}
+          onChange={setFilter}
+          label="Show all updates or only important ones"
+        />
+        <span className="h-5 w-px shrink-0 bg-line-subtle" />
+        <ChipRow
+          className="min-w-0 flex-1"
+          role="tablist"
+          aria-label="Filter by event type"
         >
-          All types
-        </Chip>
-        {eventTypes.map((type) => (
           <Chip
-            key={type}
             role="tab"
-            aria-selected={eventType === type}
-            selected={eventType === type}
-            onClick={() => setEventType(eventType === type ? null : type)}
+            aria-selected={eventType === null}
+            selected={eventType === null}
+            onClick={() => setEventType(null)}
           >
-            {type}
+            All types
           </Chip>
-        ))}
-      </ChipRow>
+          {eventTypes.map((type) => (
+            <Chip
+              key={type}
+              role="tab"
+              aria-selected={eventType === type}
+              selected={eventType === type}
+              onClick={() => setEventType(eventType === type ? null : type)}
+            >
+              {type}
+            </Chip>
+          ))}
+        </ChipRow>
+      </div>
     </div>
   );
 }
