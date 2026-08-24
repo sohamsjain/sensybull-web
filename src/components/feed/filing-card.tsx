@@ -1,11 +1,16 @@
 "use client";
 
 import { useState } from "react";
+
 import type { FilingEvent } from "@/types/events";
 import { useDashboard } from "@/app/(dashboard)/layout";
 import { timeAgo, fullDateTime } from "@/lib/utils";
 import { isImportant } from "@/lib/event-actions";
 import { filedPhrase } from "@/lib/forms";
+import { ImportantMarker, MetaLabel } from "@/components/ui/badge";
+import { ChevronDownIcon, PlusIcon } from "@/components/ui/icons";
+import { cn } from "@/lib/utils";
+
 import { DealTerms } from "./deal-terms";
 import { CatalystsTable } from "./catalysts-table";
 import { CompanyLogo } from "./company-logo";
@@ -26,11 +31,11 @@ interface FilingCardProps {
 }
 
 /**
- * One update in the feed. Collapsed it's just who + when + the headline;
- * a click opens the summary, key dates, and the action buttons.
+ * One update in the feed. Collapsed it's who, when, and the headline; a
+ * click opens the summary, key dates, and the actions.
  *
- * Rendered as a flat row (no card box) — the list separates updates with
- * a simple divider, like Substack or Twitter's timeline.
+ * A flat row rather than a card: the list separates updates with a hairline,
+ * so a screenful of events reads as one stream instead of a stack of boxes.
  */
 export function FilingCard({
   event,
@@ -42,14 +47,8 @@ export function FilingCard({
   onToggleExpanded,
   selected = false,
 }: FilingCardProps) {
-  const {
-    ticker,
-    company_name,
-    company_id,
-    briefing,
-    filing_date,
-    received_at,
-  } = event;
+  const { ticker, company_name, company_id, briefing, filing_date, received_at } =
+    event;
 
   const important = isImportant(event);
   const { openCompany } = useDashboard();
@@ -72,175 +71,143 @@ export function FilingCard({
   const eventTimestamp = received_at || filing_date;
 
   return (
-    <div
-      className={`
-        group/card relative
-        transition-colors
-        hover:bg-slate-50 dark:hover:bg-white/[0.02]
-        ${selected ? "bg-indigo-500/[0.06] dark:bg-indigo-400/[0.08]" : ""}
-        cursor-pointer
-      `}
+    <article
       onClick={toggleExpanded}
+      className={cn(
+        "group grid cursor-pointer grid-cols-[2.5rem_1fr] gap-x-3 px-4 py-3 transition-colors",
+        selected ? "bg-brand-soft" : "hover:bg-surface-hover/60"
+      )}
     >
-      <div className="px-4 sm:px-5 py-4">
-        {/* ---- Header: Logo + company + time ---- */}
-        <div className="flex gap-3.5">
-          <CompanyLogo ticker={ticker} name={company_name} />
+      <CompanyLogo ticker={ticker} name={company_name} />
 
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between gap-2 mb-1">
-              <div className="flex items-center gap-2 min-w-0">
-                {company_id ? (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openCompany({
-                        id: company_id,
-                        name: company_name,
-                        ticker,
-                        cik: event.cik || null,
-                      });
-                    }}
-                    className="flex items-center gap-2 min-w-0 group/company"
-                    title={`View ${company_name}`}
-                  >
-                    {ticker && (
-                      <span className="font-mono font-bold text-[15px] text-slate-900 dark:text-white tracking-tight group-hover/company:text-indigo-600 dark:group-hover/company:text-indigo-400 transition-colors">
-                        {ticker}
-                      </span>
-                    )}
-                    <span className="text-slate-400 dark:text-slate-500 text-sm truncate group-hover/company:text-slate-600 dark:group-hover/company:text-slate-300 transition-colors">
-                      {company_name}
-                    </span>
-                  </button>
-                ) : (
-                  <>
-                    {ticker && (
-                      <span className="font-mono font-bold text-[15px] text-slate-900 dark:text-white tracking-tight">
-                        {ticker}
-                      </span>
-                    )}
-                    <span className="text-slate-400 dark:text-slate-500 text-sm truncate">
-                      {company_name}
-                    </span>
-                  </>
-                )}
-              </div>
-
-              <div className="flex items-center gap-2 shrink-0">
-                {isLoggedIn && !isWatchlisted && company_id && onAddToWatchlist && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onAddToWatchlist(company_id);
-                    }}
-                    disabled={addingToWatchlist}
-                    className="
-                      flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium
-                      bg-indigo-500/10 text-indigo-600 dark:text-indigo-400
-                      hover:bg-indigo-500/20 hover:text-indigo-700 dark:hover:text-indigo-300
-                      disabled:opacity-50
-                      transition-colors
-                    "
-                    title="Add to watchlist"
-                  >
-                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="shrink-0">
-                      <path d="M6 2.5v7M2.5 6h7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                    </svg>
-                    <span className="hidden sm:inline">Watch</span>
-                  </button>
-                )}
-                <span
-                  className="text-slate-400 dark:text-slate-500 text-xs tabular-nums whitespace-nowrap"
-                  title={fullDateTime(eventTimestamp)}
-                >
-                  {timeAgo(eventTimestamp)}
-                </span>
-              </div>
-            </div>
-
-            {/* Meta line: category + Important marker */}
-            {(important ||
-              (briefing?.primary_event_type &&
-                briefing.primary_event_type !== "Other")) && (
-              <div className="flex items-center gap-2.5 flex-wrap">
-                {important && (
-                  <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-red-600 dark:text-red-400">
-                    <span className="w-1.5 h-1.5 rounded-full bg-red-500 dark:bg-red-400" />
-                    Important
+      <div className="min-w-0">
+        {/* Identity + time */}
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex min-w-0 items-baseline gap-2">
+            {company_id ? (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openCompany({
+                    id: company_id,
+                    name: company_name,
+                    ticker,
+                    cik: event.cik || null,
+                  });
+                }}
+                className="group/company flex min-w-0 items-baseline gap-2 text-left"
+                title={`View ${company_name}`}
+              >
+                {ticker && (
+                  <span className="shrink-0 font-mono text-label font-semibold text-ink transition-colors group-hover/company:text-brand-ink">
+                    {ticker}
                   </span>
                 )}
-                {briefing?.primary_event_type &&
-                  briefing.primary_event_type !== "Other" && (
-                    <span className="text-slate-500 dark:text-slate-400 text-[10px] font-semibold uppercase tracking-wider">
-                      {briefing.primary_event_type}
-                    </span>
-                  )}
-              </div>
+                <span className="truncate text-meta text-ink-faint">
+                  {company_name}
+                </span>
+              </button>
+            ) : (
+              <>
+                {ticker && (
+                  <span className="shrink-0 font-mono text-label font-semibold text-ink">
+                    {ticker}
+                  </span>
+                )}
+                <span className="truncate text-meta text-ink-faint">
+                  {company_name}
+                </span>
+              </>
             )}
+          </div>
+
+          <div className="flex shrink-0 items-center gap-2">
+            {isLoggedIn && !isWatchlisted && company_id && onAddToWatchlist && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAddToWatchlist(company_id);
+                }}
+                disabled={addingToWatchlist}
+                className="inline-flex items-center gap-1 rounded-sm px-1.5 py-0.5 text-micro font-medium text-brand-ink transition-colors hover:bg-brand-soft disabled:opacity-50"
+                title="Add to watchlist"
+              >
+                <PlusIcon className="size-3" />
+                <span className="hidden sm:inline">Track</span>
+              </button>
+            )}
+            <span
+              className="text-micro whitespace-nowrap tabular-nums text-ink-faint"
+              title={fullDateTime(eventTimestamp)}
+            >
+              {timeAgo(eventTimestamp)}
+            </span>
           </div>
         </div>
 
-        {/* ---- Headline ---- */}
-        <div className="mt-3 pl-[3.375rem]">
-          {briefing ? (
-            <h3 className="text-[15px] sm:text-base font-normal text-slate-800 dark:text-slate-100 leading-snug">
-              {briefing.headline}
-            </h3>
-          ) : (
-            <h3 className="text-[15px] sm:text-base font-normal text-slate-800 dark:text-slate-100 leading-snug">
-              {company_name} {filedPhrase(event.signal_type)}.
-            </h3>
-          )}
-
-          {/* ---- Details, only when opened ---- */}
-          {expanded && (
-            <>
-              {briefing?.summary && (
-                <p className="mt-2 text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                  {briefing.summary}
-                </p>
+        {/* Category + Important marker */}
+        {(important ||
+          (briefing?.primary_event_type &&
+            briefing.primary_event_type !== "Other")) && (
+          <div className="mt-0.5 flex flex-wrap items-center gap-2.5">
+            {important && <ImportantMarker />}
+            {briefing?.primary_event_type &&
+              briefing.primary_event_type !== "Other" && (
+                <MetaLabel>{briefing.primary_event_type}</MetaLabel>
               )}
+          </div>
+        )}
 
-              {briefing?.mode === "facts_only" && (
-                <p className="mt-2 text-xs text-slate-400 dark:text-slate-500 leading-relaxed">
-                  An AI summary isn&apos;t available for this filing — read
-                  the source document below.
-                </p>
+        {/* Headline */}
+        <h3 className="mt-1 text-body-lg leading-snug text-ink">
+          {briefing
+            ? briefing.headline
+            : `${company_name} ${filedPhrase(event.signal_type)}.`}
+        </h3>
+
+        {/* Details, only when opened */}
+        {expanded && (
+          <>
+            {briefing?.summary && (
+              <p className="mt-1.5 text-label leading-relaxed text-ink-muted">
+                {briefing.summary}
+              </p>
+            )}
+
+            {briefing?.mode === "facts_only" && (
+              <p className="mt-1.5 text-meta leading-relaxed text-ink-faint">
+                An AI summary isn&apos;t available for this filing — read the
+                source document below.
+              </p>
+            )}
+
+            {hasDealTerms && <DealTerms terms={briefing!.deal_terms} />}
+
+            {catalysts.length > 0 && <CatalystsTable catalysts={catalysts} />}
+
+            {event.price_reactions && (
+              <PriceReactionStrip
+                reactions={event.price_reactions}
+                className="mt-2.5"
+              />
+            )}
+
+            <UpdateActions event={event} />
+          </>
+        )}
+
+        {hasExpandedContent && (
+          <div className="mt-1.5 flex select-none items-center gap-1 text-micro text-ink-faint transition-colors group-hover:text-ink-muted">
+            <ChevronDownIcon
+              className={cn(
+                "size-3 transition-transform duration-150",
+                expanded && "rotate-180"
               )}
-
-              {hasDealTerms && <DealTerms terms={briefing!.deal_terms} />}
-
-              {catalysts.length > 0 && <CatalystsTable catalysts={catalysts} />}
-
-              {event.price_reactions && (
-                <PriceReactionStrip
-                  reactions={event.price_reactions}
-                  className="mt-3"
-                />
-              )}
-
-              <UpdateActions event={event} />
-            </>
-          )}
-
-          {/* ---- Expand affordance ---- */}
-          {hasExpandedContent && (
-            <div className="mt-2 flex items-center gap-1 text-[11px] text-slate-400 dark:text-slate-600 group-hover/card:text-slate-500 dark:group-hover/card:text-slate-400 transition-colors select-none">
-              <svg
-                width="10"
-                height="10"
-                viewBox="0 0 10 10"
-                fill="none"
-                className={`transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
-              >
-                <path d="M2 3.5 5 6.5 8 3.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              {expanded ? "Show less" : "Read more"}
-            </div>
-          )}
-        </div>
+            />
+            {expanded ? "Show less" : "Read more"}
+          </div>
+        )}
       </div>
-    </div>
+    </article>
   );
 }

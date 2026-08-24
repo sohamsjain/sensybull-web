@@ -35,20 +35,23 @@ function clampInt(
   return Math.min(Math.max(value, min), max);
 }
 
+// Literal colours on purpose: this HTML is served standalone into someone
+// else's page, where our design tokens don't exist. Values mirror the
+// canvas / line / ink / surface-hover / brand tokens in globals.css.
 const PALETTES = {
   light: {
     bg: "#ffffff",
-    border: "#cbd5e1",
-    text: "#0f172a",
-    hover: "#f1f5f9",
-    accent: "#4f46e5",
+    border: "#dcdee3",
+    text: "#2f333c",
+    hover: "#f3f4f6",
+    accent: "#5546c8",
   },
   dark: {
-    bg: "#12141b",
+    bg: "#191c22",
     border: "rgba(255,255,255,0.14)",
-    text: "#f8fafc",
-    hover: "#1a1d25",
-    accent: "#818cf8",
+    text: "#e9eaee",
+    hover: "#1f222a",
+    accent: "#a99bf5",
   },
 } as const;
 

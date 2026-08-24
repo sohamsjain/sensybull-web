@@ -5,6 +5,8 @@ import Link from "next/link";
 import type { FilingEvent } from "@/types/events";
 import { api } from "@/lib/api-client";
 import { FilingCard } from "@/components/feed/filing-card";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Skeleton } from "@/components/ui/skeleton";
 
 /** Shareable permalink for a single filing event (public). */
 export default function EventPermalinkPage({
@@ -36,27 +38,26 @@ export default function EventPermalinkPage({
 
   return (
     <div className="h-full overflow-y-auto">
-      <div className="max-w-3xl mx-auto px-4 py-8">
+      <div className="mx-auto max-w-3xl px-4 py-8">
         {state === "loading" ? (
-          <div className="h-48 rounded-xl bg-slate-100 dark:bg-white/[0.04] animate-pulse" />
+          <Skeleton className="h-40" />
         ) : state === "missing" || !event ? (
-          <div className="text-center mt-16">
-            <p className="text-slate-600 dark:text-slate-300 text-sm font-medium mb-1">
-              Event not found
-            </p>
-            <p className="text-slate-400 dark:text-slate-500 text-xs">
-              This update doesn&apos;t exist or was removed.
-            </p>
-          </div>
+          <EmptyState
+            className="pt-12"
+            title="Event not found"
+            description="This update doesn't exist, or it was removed."
+          />
         ) : (
-          <FilingCard event={event} expanded />
+          <div className="rounded-md border border-line-subtle bg-surface">
+            <FilingCard event={event} expanded />
+          </div>
         )}
-        <p className="text-center mt-6">
+        <p className="mt-6 text-center">
           <Link
             href="/feed"
-            className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline underline-offset-2"
+            className="text-meta text-brand-ink underline-offset-2 hover:underline"
           >
-            ← Open the live feed
+            Open the live feed
           </Link>
         </p>
       </div>

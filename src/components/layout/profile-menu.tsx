@@ -40,10 +40,10 @@ export function ProfileMenu({ side = "right" }: { side?: "right" | "top" }) {
         alt={user.name}
         referrerPolicy="no-referrer"
         onError={() => setImgFailed(true)}
-        className="w-8 h-8 rounded-full object-cover"
+        className="size-7 rounded-full object-cover"
       />
     ) : (
-      <span className="w-8 h-8 rounded-full bg-indigo-500/15 text-indigo-700 dark:bg-indigo-500/30 dark:text-indigo-300 flex items-center justify-center text-[11px] font-semibold select-none">
+      <span className="flex size-7 select-none items-center justify-center rounded-full bg-brand-soft text-micro font-semibold text-brand-ink">
         {initials}
       </span>
     );
@@ -51,7 +51,7 @@ export function ProfileMenu({ side = "right" }: { side?: "right" | "top" }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        className="flex items-center justify-center w-10 h-10 rounded-full transition-shadow hover:ring-2 hover:ring-indigo-500/40"
+        className="flex size-9 items-center justify-center rounded-md transition-colors hover:bg-surface-hover"
         aria-label={`Account: ${user.name}`}
         title={user.name}
       >
@@ -59,10 +59,10 @@ export function ProfileMenu({ side = "right" }: { side?: "right" | "top" }) {
       </DropdownMenuTrigger>
       <DropdownMenuContent side={side} align="end" className="min-w-52">
         <div className="px-1.5 py-1.5">
-          <p className="text-sm font-medium text-slate-900 dark:text-slate-100 truncate">
+          <p className="truncate text-label font-medium text-ink">
             {user.name}
           </p>
-          <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+          <p className="truncate text-meta text-ink-faint">
             {user.email}
           </p>
         </div>
@@ -76,7 +76,7 @@ export function ProfileMenu({ side = "right" }: { side?: "right" | "top" }) {
           {resolvedTheme === "dark" ? "Light theme" : "Dark theme"}
         </DropdownMenuItem>
         <DropdownMenuItem className="md:hidden" onClick={cycle}>
-          Font size: {scale.label}
+          Text size: {scale.label}
         </DropdownMenuItem>
         <DropdownMenuSeparator className="md:hidden" />
         <DropdownMenuItem onClick={logout}>Log out</DropdownMenuItem>

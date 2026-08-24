@@ -3,14 +3,14 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
+
 import { useAuth } from "@/hooks/use-auth";
 import { api } from "@/lib/api-client";
 import type { CompanySearchResult, CompanySearchResponse } from "@/types/api";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { EnterIcon, SearchIcon } from "@/components/ui/icons";
+import { Kbd } from "@/components/ui/kbd";
+import { GroupLabel } from "@/components/ui/section";
 
 interface PaletteAction {
   id: string;
@@ -19,7 +19,18 @@ interface PaletteAction {
   run: () => void;
 }
 
-/** ⌘K company jump + quick actions. Mounted once in the dashboard layout. */
+/** Lets the rail (or anything else) raise the palette without prop drilling. */
+let openListener: (() => void) | null = null;
+
+export function openCommandPalette(): void {
+  openListener?.();
+}
+
+/**
+ * ⌘K search: companies first, then the things you can do. Search is the
+ * fastest route through the product, so it opens over whatever you were
+ * reading and closes the moment you've chosen.
+ */
 export function CommandPalette() {
   const router = useRouter();
   const { user } = useAuth();
@@ -40,6 +51,14 @@ export function CommandPalette() {
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
+
+  // Pointer route into the same palette (the rail's search button)
+  useEffect(() => {
+    openListener = () => setOpen(true);
+    return () => {
+      openListener = null;
+    };
   }, []);
 
   // Reset state whenever the palette opens (adjust-during-render pattern)
@@ -119,12 +138,14 @@ export function CommandPalette() {
         key: `co-${r.id}`,
         label: r.name,
         hint: r.ticker,
+        group: "Companies" as const,
         company: r,
       })),
       ...actions.map((a) => ({
         key: `act-${a.id}`,
         label: a.label,
         hint: a.hint,
+        group: "Actions" as const,
         action: a,
       })),
     ],
@@ -160,53 +181,75 @@ export function CommandPalette() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent
         showCloseButton={false}
-        className="p-0 gap-0 top-[20%] translate-y-0 sm:max-w-lg bg-white dark:bg-[#14161c] border-slate-200 dark:border-white/[0.08] overflow-hidden"
+        className="top-[18%] translate-y-0 gap-0 overflow-hidden border border-line bg-surface-raised p-0 sm:max-w-lg"
       >
-        <DialogTitle className="sr-only">Command palette</DialogTitle>
-        <input
-          ref={inputRef}
-          value={query}
-          onChange={(e) => {
-            setQuery(e.target.value);
-            setSelected(0);
-          }}
-          onKeyDown={onInputKeyDown}
-          placeholder={
-            user ? "Search companies or actions…" : "Search actions…"
-          }
-          className="w-full px-4 py-3.5 text-sm bg-transparent outline-none text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 border-b border-slate-200 dark:border-white/[0.06]"
-        />
-        <div className="max-h-80 overflow-y-auto py-1.5">
+        <DialogTitle className="sr-only">Search</DialogTitle>
+        <div className="flex items-center gap-2.5 border-b border-line-subtle px-3.5">
+          <SearchIcon className="size-4 shrink-0 text-ink-faint" aria-hidden />
+          <input
+            ref={inputRef}
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setSelected(0);
+            }}
+            onKeyDown={onInputKeyDown}
+            placeholder={
+              user ? "Search companies or actions…" : "Search actions…"
+            }
+            className="w-full bg-transparent py-3 text-body text-ink outline-none placeholder:text-ink-faint"
+          />
+        </div>
+
+        <div className="max-h-80 overflow-y-auto py-1">
           {rows.length === 0 ? (
-            <p className="px-4 py-6 text-center text-xs text-slate-400 dark:text-slate-500">
+            <p className="px-4 py-6 text-center text-meta text-ink-faint">
               No matches.
             </p>
           ) : (
-            rows.map((row, i) => (
-              <button
-                key={row.key}
-                onClick={() => runRow(row)}
-                onMouseEnter={() => setSelected(i)}
-                className={`w-full flex items-center justify-between gap-3 px-4 py-2 text-left text-sm transition-colors ${
-                  i === selected
-                    ? "bg-indigo-500/10 text-slate-900 dark:bg-indigo-500/15 dark:text-white"
-                    : "text-slate-600 dark:text-slate-300"
-                }`}
-              >
-                <span className="truncate">{row.label}</span>
-                {row.hint && (
-                  <span className="font-mono text-[11px] text-slate-400 dark:text-slate-500 shrink-0">
-                    {row.hint}
-                  </span>
-                )}
-              </button>
-            ))
+            rows.map((row, i) => {
+              const startsGroup = i === 0 || rows[i - 1].group !== row.group;
+              return (
+                <div key={row.key}>
+                  {startsGroup && (
+                    <GroupLabel className="px-3.5 pt-2">{row.group}</GroupLabel>
+                  )}
+                  <button
+                    onClick={() => runRow(row)}
+                    onMouseEnter={() => setSelected(i)}
+                    className={`flex w-full items-center justify-between gap-3 px-3.5 py-1.5 text-left text-label transition-colors ${
+                      i === selected
+                        ? "bg-surface-hover text-ink"
+                        : "text-ink-muted"
+                    }`}
+                  >
+                    <span className="truncate">{row.label}</span>
+                    {row.hint && (
+                      <span className="shrink-0 font-mono text-micro text-ink-faint">
+                        {row.hint}
+                      </span>
+                    )}
+                  </button>
+                </div>
+              );
+            })
           )}
         </div>
-        <div className="px-4 py-2 border-t border-slate-200 dark:border-white/[0.06] text-[10.5px] text-slate-400 dark:text-slate-500 flex gap-3">
-          <span>↑↓ navigate</span>
-          <span>↵ open</span>
-          <span>esc close</span>
+
+        <div className="flex items-center gap-3 border-t border-line-subtle px-3.5 py-2 text-micro text-ink-faint">
+          <span className="flex items-center gap-1">
+            <Kbd>↑</Kbd>
+            <Kbd>↓</Kbd> navigate
+          </span>
+          <span className="flex items-center gap-1">
+            <Kbd>
+              <EnterIcon className="size-2.5" />
+            </Kbd>{" "}
+            open
+          </span>
+          <span className="flex items-center gap-1">
+            <Kbd>esc</Kbd> close
+          </span>
         </div>
       </DialogContent>
     </Dialog>

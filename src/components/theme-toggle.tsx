@@ -1,23 +1,34 @@
 "use client";
 
 import { useTheme } from "next-themes";
-import { Sun, Moon } from "lucide-react";
 
-export function ThemeToggle({ className = "" }: { className?: string }) {
+import { IconButton } from "@/components/ui/icon-button";
+import { MoonIcon, SunIcon } from "@/components/ui/icons";
+
+/**
+ * Both icons are rendered and swapped with the `dark:` variant rather than
+ * by reading the resolved theme: `resolvedTheme` is undefined on the server,
+ * so branching on it would render the wrong glyph and fail hydration.
+ */
+export function ThemeToggle({
+  className = "",
+  size = "lg",
+}: {
+  className?: string;
+  size?: "sm" | "md" | "lg";
+}) {
   const { resolvedTheme, setTheme } = useTheme();
 
   return (
-    <button
+    <IconButton
+      size={size}
       onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-      className={`flex items-center justify-center rounded-xl transition-colors text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 ${className}`}
-      title={resolvedTheme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+      title="Toggle theme"
       aria-label="Toggle theme"
+      className={className}
     >
-      {resolvedTheme === "dark" ? (
-        <Sun className="w-5 h-5" />
-      ) : (
-        <Moon className="w-5 h-5" />
-      )}
-    </button>
+      <SunIcon className="hidden dark:block" />
+      <MoonIcon className="block dark:hidden" />
+    </IconButton>
   );
 }

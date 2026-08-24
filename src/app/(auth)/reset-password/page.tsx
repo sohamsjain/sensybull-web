@@ -34,10 +34,10 @@ function ResetPasswordContent() {
   if (!token) {
     return (
       <div className="text-center">
-        <p className="text-red-400 text-sm">Invalid reset link.</p>
+        <p className="text-label text-danger">Invalid reset link.</p>
         <Link
           href="/forgot-password"
-          className="text-indigo-400 hover:text-indigo-300 text-sm mt-2 inline-block"
+          className="mt-2 inline-block text-label text-brand-ink hover:underline"
         >
           Request a new one
         </Link>
@@ -48,10 +48,10 @@ function ResetPasswordContent() {
   if (success) {
     return (
       <div className="text-center space-y-3">
-        <p className="text-slate-700 dark:text-slate-200 text-sm">Password reset successfully.</p>
+        <p className="text-label text-ink-muted">Password reset successfully.</p>
         <Link
           href="/login"
-          className="text-indigo-400 hover:text-indigo-300 text-sm"
+          className="text-label text-brand-ink hover:underline"
         >
           Sign in
         </Link>
@@ -61,7 +61,7 @@ function ResetPasswordContent() {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-slate-900 dark:text-white font-semibold text-lg">New Password</h2>
+      <h2 className="text-title font-medium text-ink">New Password</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <Input
           type="password"
@@ -70,13 +70,13 @@ function ResetPasswordContent() {
           onChange={(e) => setPassword(e.target.value)}
           required
           minLength={6}
-          className="bg-white dark:bg-[#0b0d12] border-slate-300 dark:border-white/[0.1] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus-visible:border-slate-500 dark:focus-visible:border-indigo-500/40 focus-visible:ring-0"
+          className="h-10"
         />
-        {error && <p className="text-red-400 text-xs">{error}</p>}
+        {error && <p className="text-meta text-danger">{error}</p>}
         <Button
           type="submit"
           disabled={loading}
-          className="w-full bg-indigo-600 hover:bg-indigo-500"
+          className="w-full"
         >
           {loading ? "..." : "Reset Password"}
         </Button>
@@ -88,7 +88,7 @@ function ResetPasswordContent() {
 export default function ResetPasswordPage() {
   return (
     <Suspense
-      fallback={<p className="text-slate-500 dark:text-slate-400 text-sm text-center">Loading...</p>}
+      fallback={<p className="text-center text-label text-ink-faint">Loading...</p>}
     >
       <ResetPasswordContent />
     </Suspense>

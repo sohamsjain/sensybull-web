@@ -20,14 +20,14 @@
 
 ## Project Structure
 - `src/types/` — API and event type definitions
-- `src/lib/` — API client (auto-refresh on 401), Socket.IO wrapper, utilities; `event-actions.ts` (isImportant, AI-chat copy prompt, share/permalink helpers); `deal-terms.ts` (label/value/order rules for `briefing.deal_terms` — Title Case values, snake_case keys; mirrors the API's `app/utils/deal_terms.py`, keep in sync. Both the Deal Terms panel and the AI-chat prompt read terms through `dealTermEntries()`)
+- `src/lib/` — API client (auto-refresh on 401), Socket.IO wrapper, utilities (`utils.ts` also configures `cn()`); `chart-theme.ts` (hex mirror of the design tokens for the canvas chart); `event-actions.ts` (isImportant, AI-chat copy prompt, share/permalink helpers); `deal-terms.ts` (label/value/order rules for `briefing.deal_terms` — Title Case values, snake_case keys; mirrors the API's `app/utils/deal_terms.py`, keep in sync. Both the Deal Terms panel and the AI-chat prompt read terms through `dealTermEntries()`)
 - `src/hooks/` — useAuth, useSocket, useEvents (REST+Socket merge), useWatchlists, useWatchlistInbox (inbox + live unread + bulk actions), useWatchlistSelection (multi-select mode; range logic in `src/lib/selection.ts`), useCompanyEvents (per-company history), usePaneWidth (resizable pane), useBars (chart data), useQuote (header price; polls 60s, pauses on hidden tabs)
 - `src/context/` — AuthProvider (login/register/google/logout), SocketProvider (session-wide `/feed` socket + `useSocket`)
-- `src/components/ui/` — shadcn/ui primitives
+- `src/components/ui/` — design-system primitives on top of shadcn/base-ui: `button`, `input`, `search-input`, `chip` (Chip/ChipRow/SegmentedControl), `icon-button`, `badge` (Badge/CountBadge/ImportantMarker/StatusDot/MetaLabel), `section` (Section/GroupLabel/Card), `data-table`, `empty-state`, `skeleton`, `switch`, `tooltip`, `kbd`, `icons` (the single icon set), plus dialog/sheet/dropdown-menu/app-toaster
 - `src/components/feed/` — FilingCard (flat row, no box), FilingList (divider-separated), FeedToolbar (All/Important + search + event-type chips), UpdateActions (Read the filing / Copy for AI chat / Share — shown only on expanded updates), CatalystsTable ("Key dates"), DealTerms, PriceReactionStrip, CompanyLogo
-- `src/components/watchlist/` — WatchlistPanel, WatchlistItem, WatchlistBulkBar, Conversation, FilingMessage, CompanyAvatar
+- `src/components/watchlist/` — WatchlistPanel, WatchlistItem (two-line scannable row), WatchlistBulkBar, Conversation (company filing history), FilingMessage (a flat research entry, not a chat bubble), CompanyAvatar (the one company mark — `feed/company-logo.tsx` wraps it)
 - `src/components/company/` — CompanySheet, PriceChart, StockQuote (price + day change in the conversation header; formatters in `src/lib/quote.ts`)
-- `src/components/layout/` — NavRail, BottomTabs
+- `src/components/layout/` — NavRail (persistent desktop rail + ⌘K search entry), BottomTabs (mobile), ProfileMenu, FontSizeToggle; both navs render the shared `nav-items.ts` list
 - `src/components/auth/` — Login/register/forgot-password forms
 - `src/app/(auth)/` — Auth pages (centered layout, no sidebar)
 - `src/app/(dashboard)/` — Dashboard pages (nav rail + main)
@@ -54,7 +54,9 @@
 - Files: kebab-case. Exports: PascalCase for components, camelCase for hooks/utils
 - All dashboard/auth components are client components (`"use client"`)
 - Filter state (All/Important + event type + search) lives in `(dashboard)/layout.tsx` via React context (URL params `f`, `t`, `q`)
-- Dual theme (class-based dark mode). Accent: indigo, reserved for interactive elements; selected states are solid indigo with white text/icon — selection contrast must be obvious at a glance. Decorative color is avoided: category/form tags are plain muted text, red is reserved for the Important marker and negative price data, emerald appears only on positive price data. Dark surfaces: #0b0d12 base, #12141b/#14161c cards, #1a1d25 hover
+- **Design system: see `docs/DESIGN_SYSTEM.md` — read it before touching UI.** Every colour, font size and radius comes from the tokens in `src/app/globals.css` (`bg-canvas`, `bg-surface-hover`, `border-line-subtle`, `text-ink-muted`, `text-label`, `rounded-md`, …). Never write a palette class (`slate-*`, `indigo-*`) or a raw hex in a component; the only exceptions are the canvas/OG/embed surfaces noted in that doc. Icons come from `src/components/ui/icons.tsx` — never from `lucide-react` directly, never hand-rolled SVG
+- Dual theme (class-based dark mode). Accent: indigo, reserved for interactive elements; selected states are solid accent with `text-brand-on` — selection contrast must be obvious at a glance. Decorative color is avoided: category/form tags are plain muted text (`MetaLabel`), `danger` is reserved for the Important marker and negative price data, `success` appears only on positive price data
+- New `--text-*` / `--color-*` tokens must also be added to the lists in `src/lib/utils.ts`, or `cn()` silently drops the size when a colour class follows it (`src/lib/__tests__/cn.test.ts` covers this)
 - The UI presents a single watchlist (adds go to the user's first list via `src/lib/default-watchlist.ts`); the API still supports multiple lists
 - Brand assets: `public/logo.png` is the bull mark on a transparent background, black ink — surfaces flip it to white with Tailwind's `invert`/`dark:invert`, which leaves the alpha alone. `public/logo-tile.png` is the opaque counterpart (dark tile, white bull) for surfaces that paint their own background: the OG/Twitter card image and the Web Push notification icon in `public/sw.js`. `src/app/favicon.ico` (16→256 frames) and `src/app/apple-icon.png` are the same tile, wired up by Next's file conventions — the mark is ~1.9:1, so it reads as a soft silhouette in a 16px tab. Never give the mark a baked-in background
 - Unit tests: `npm test` (vitest, `src/**/*.test.ts`)

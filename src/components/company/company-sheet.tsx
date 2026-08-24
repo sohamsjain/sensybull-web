@@ -19,6 +19,10 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import { ImportantMarker } from "@/components/ui/badge";
+import { CheckIcon } from "@/components/ui/icons";
+import { Section } from "@/components/ui/section";
+import { Skeleton } from "@/components/ui/skeleton";
 import { ShareDialog } from "@/components/share/share-dialog";
 
 export interface CompanyRef {
@@ -131,20 +135,20 @@ export function CompanySheet({
     <Sheet open={!!company} onOpenChange={(open) => !open && onClose()}>
       <SheetContent
         side="right"
-        className="w-full sm:max-w-md bg-white dark:bg-[#0f1116] border-slate-200 dark:border-white/[0.06] p-0 gap-0 overflow-y-auto"
+        className="w-full gap-0 overflow-y-auto border-l border-line bg-canvas p-0 sm:max-w-md"
       >
         {company && (
           <>
-            <SheetHeader className="px-5 pt-5 pb-4 border-b border-slate-200 dark:border-white/[0.06]">
+            <SheetHeader className="border-b border-line-subtle px-5 pt-5 pb-4">
               <div className="flex items-center gap-3">
                 <CompanyAvatar ticker={company.ticker} name={company.name} />
                 <div className="min-w-0">
-                  <SheetTitle className="text-slate-900 dark:text-white text-base font-semibold leading-tight truncate">
+                  <SheetTitle className="truncate text-title leading-tight font-medium text-ink">
                     {company.name}
                   </SheetTitle>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  <p className="mt-0.5 text-meta text-ink-faint">
                     {company.ticker && (
-                      <span className="font-mono font-semibold">
+                      <span className="font-mono font-semibold text-ink-muted">
                         {company.ticker}
                       </span>
                     )}
@@ -166,7 +170,7 @@ export function CompanySheet({
                           href={edgarUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-indigo-600 dark:text-indigo-400 hover:underline underline-offset-2"
+                          className="text-brand-ink underline-offset-2 hover:underline"
                         >
                           EDGAR
                         </a>
@@ -176,20 +180,16 @@ export function CompanySheet({
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 mt-3">
+              <div className="mt-3 flex items-center gap-1.5">
                 {user && (
                   <>
                     <Link href={`/watchlist?c=${company.id}`} onClick={onClose}>
-                      <Button
-                        size="sm"
-                        className="bg-indigo-600 hover:bg-indigo-500 text-white"
-                      >
-                        View filings
-                      </Button>
+                      <Button size="sm">View filings</Button>
                     </Link>
                     {isWatchlisted ? (
-                      <span className="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 dark:bg-white/[0.06] text-slate-500 dark:text-slate-400">
-                        In watchlist ✓
+                      <span className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-meta text-ink-faint">
+                        <CheckIcon className="size-3.5" />
+                        In watchlist
                       </span>
                     ) : (
                       <Button
@@ -197,9 +197,8 @@ export function CompanySheet({
                         variant="outline"
                         disabled={adding}
                         onClick={handleWatch}
-                        className="border-indigo-500/30 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-500/10"
                       >
-                        {adding ? "Adding..." : "+ Watch"}
+                        {adding ? "Adding…" : "Track"}
                       </Button>
                     )}
                   </>
@@ -207,9 +206,8 @@ export function CompanySheet({
                 {company.ticker && (
                   <Button
                     size="sm"
-                    variant="outline"
+                    variant="ghost"
                     onClick={() => setSharing(true)}
-                    className="border-slate-300 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/[0.06]"
                   >
                     Share
                   </Button>
@@ -217,87 +215,67 @@ export function CompanySheet({
               </div>
             </SheetHeader>
 
-            <div className="px-5 py-4 space-y-5">
+            <div className="space-y-6 px-5 py-4">
               {/* Price chart with filing markers */}
               {user && company.ticker && (
-                <section>
-                  <h3 className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-2">
-                    <span className="w-1 h-3.5 rounded-full bg-slate-300 dark:bg-white/[0.15]" />
-                    Price
-                  </h3>
+                <Section title="Price">
                   <PriceChart companyId={company.id} events={events} />
-                </section>
+                </Section>
               )}
 
               {/* Upcoming catalysts */}
               {upcoming.length > 0 && (
-                <section>
-                  <h3 className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-2">
-                    <span className="w-1 h-3.5 rounded-full bg-slate-300 dark:bg-white/[0.15]" />
-                    Upcoming catalysts
-                  </h3>
-                  <ul className="space-y-1.5">
-                    {upcoming.map((c, i) => (
-                      <li key={i} className="text-[13px] leading-snug">
-                        <span className="font-mono tabular-nums text-[11px] text-slate-900 dark:text-slate-100 mr-2">
-                          {formatCatalystDate(c.date)}
-                        </span>
-                        <span className="text-slate-700 dark:text-slate-200">
-                          {c.event}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </section>
+                <Section title="Upcoming catalysts">
+                  <table className="w-full border-collapse">
+                    <tbody>
+                      {upcoming.map((c, i) => (
+                        <tr key={i} className="align-baseline">
+                          <td className="w-24 py-0.5 pr-3 font-mono text-micro tabular-nums whitespace-nowrap text-ink">
+                            {formatCatalystDate(c.date)}
+                          </td>
+                          <td className="py-0.5 text-label leading-snug text-ink-muted">
+                            {c.event}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </Section>
               )}
 
               {/* Filing history */}
-              <section>
-                <h3 className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-2">
-                  <span className="w-1 h-3.5 rounded-full bg-indigo-400/60" />
-                  Filing history
-                </h3>
+              <Section title="Filing history">
                 {historyState === "loading" ? (
-                  <div className="space-y-2 animate-pulse">
+                  <div className="space-y-2">
                     {[...Array(4)].map((_, i) => (
-                      <div
-                        key={i}
-                        className="h-10 rounded-lg bg-slate-100 dark:bg-white/[0.04]"
-                      />
+                      <Skeleton key={i} className="h-10" />
                     ))}
                   </div>
                 ) : historyState === "gated" ? (
-                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                  <p className="text-meta leading-relaxed text-ink-faint">
                     {user
-                      ? "Decoded filing history unlocks for watchlisted companies — add it above, or browse the raw filings on EDGAR."
-                      : "Sign in and add this company to a watchlist to see its decoded filing history."}
+                      ? "Decoded filing history unlocks for companies on your watchlist — track it above, or browse the raw filings on EDGAR."
+                      : "Sign in and track this company to see its decoded filing history."}
                   </p>
                 ) : events.length === 0 ? (
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                  <p className="text-meta text-ink-faint">
                     No filings decoded yet — new ones land within minutes of
                     hitting EDGAR.
                   </p>
                 ) : (
-                  <ol className="space-y-1">
+                  <ol className="-mx-2 divide-y divide-line-subtle">
                     {events.map((e) => (
                       <li
                         key={e.id}
-                        className="rounded-lg px-2.5 py-2 -mx-1 hover:bg-slate-100/70 dark:hover:bg-white/[0.03] transition-colors"
+                        className="px-2 py-2 transition-colors hover:bg-surface-hover"
                       >
-                        <div className="flex items-center justify-between gap-2 mb-0.5">
-                          {isImportant(e) ? (
-                            <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-red-600 dark:text-red-400">
-                              <span className="w-1.5 h-1.5 rounded-full bg-red-500 dark:bg-red-400" />
-                              Important
-                            </span>
-                          ) : (
-                            <span />
-                          )}
-                          <span className="text-[11px] text-slate-400 dark:text-slate-500 tabular-nums shrink-0">
+                        <div className="mb-0.5 flex items-center justify-between gap-2">
+                          {isImportant(e) ? <ImportantMarker /> : <span />}
+                          <span className="shrink-0 text-micro tabular-nums text-ink-faint">
                             {timeAgo(e.received_at || e.filing_date)}
                           </span>
                         </div>
-                        <p className="text-[13px] text-slate-700 dark:text-slate-200 leading-snug">
+                        <p className="text-label leading-snug text-ink-muted">
                           {e.briefing?.headline ||
                             filedPhrase(e.signal_type).replace(/^\w/, (c) =>
                               c.toUpperCase()
@@ -307,7 +285,7 @@ export function CompanySheet({
                     ))}
                   </ol>
                 )}
-              </section>
+              </Section>
             </div>
           </>
         )}

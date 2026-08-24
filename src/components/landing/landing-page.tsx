@@ -2,39 +2,34 @@
 
 import Link from "next/link";
 
+import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/theme-toggle";
+
 function Navbar() {
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#0a0a0f]/90 backdrop-blur-sm">
-      <div className="mx-auto max-w-5xl px-6 h-14 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2.5">
+    <nav className="fixed inset-x-0 top-0 z-50 border-b border-line-subtle bg-canvas/90 backdrop-blur">
+      <div className="mx-auto flex h-13 max-w-4xl items-center justify-between px-6">
+        <Link href="/" className="flex items-center gap-2">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/logo.png"
-            alt=""
-            className="w-6 h-6 invert"
-          />
-          <span className="text-[15px] font-medium text-white/90">
-            Sensybull
-          </span>
+          <img src="/logo.png" alt="" className="size-5 opacity-80 dark:invert" />
+          <span className="text-label font-medium text-ink">Sensybull</span>
         </Link>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <Link
             href="/feed"
-            className="hidden sm:inline-flex text-sm text-white/40 hover:text-white/70 transition-colors px-3 py-1.5"
+            className="hidden px-2 text-label text-ink-muted transition-colors hover:text-ink sm:inline-flex"
           >
-            Live Feed
+            Live feed
           </Link>
           <Link
             href="/login"
-            className="text-sm text-white/50 hover:text-white/80 transition-colors px-3 py-1.5"
+            className="px-2 text-label text-ink-muted transition-colors hover:text-ink"
           >
-            Sign In
+            Sign in
           </Link>
-          <Link
-            href="/register"
-            className="text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-500 transition-colors px-4 py-1.5 rounded-md"
-          >
-            Get Started
+          <ThemeToggle size="md" />
+          <Link href="/register">
+            <Button size="sm">Get started</Button>
           </Link>
         </div>
       </div>
@@ -44,30 +39,24 @@ function Navbar() {
 
 function HeroSection() {
   return (
-    <section className="pt-40 pb-24">
-      <div className="mx-auto max-w-3xl px-6 text-center">
-        <h1 className="text-5xl sm:text-6xl font-bold tracking-tight text-white/90 leading-[1.1] mb-6">
+    <section className="pt-32 pb-20">
+      <div className="mx-auto max-w-2xl px-6 text-center">
+        <h1 className="text-display-lg font-semibold text-ink">
           SEC filings, decoded.
         </h1>
-
-        <p className="text-xl text-white/50 max-w-lg mx-auto leading-relaxed mb-10">
-          8-Ks, activist stakes, tender offers, insider buys — every material
-          filing turned into a plain-English briefing, seconds after it hits
-          EDGAR. Free to use.
+        <p className="mx-auto mt-5 max-w-lg text-title leading-relaxed text-ink-muted">
+          Every material 8-K and company press release turned into a
+          plain-English briefing, seconds after it&apos;s published. Free to
+          use.
         </p>
-
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-          <Link
-            href="/register"
-            className="inline-flex items-center gap-2 px-7 py-3 rounded-md bg-indigo-600 hover:bg-indigo-500 text-white text-base font-semibold transition-colors"
-          >
-            Start tracking
+        <div className="mt-8 flex flex-col items-center justify-center gap-2 sm:flex-row">
+          <Link href="/register">
+            <Button size="lg">Start tracking</Button>
           </Link>
-          <Link
-            href="/feed"
-            className="inline-flex items-center gap-2 px-7 py-3 rounded-md border border-white/[0.08] hover:border-white/[0.15] text-white/50 hover:text-white/70 text-base font-medium transition-colors"
-          >
-            View live feed
+          <Link href="/feed">
+            <Button size="lg" variant="outline">
+              View the live feed
+            </Button>
           </Link>
         </div>
       </div>
@@ -75,36 +64,38 @@ function HeroSection() {
   );
 }
 
+const VALUE_PROPS = [
+  {
+    title: "Know before the crowd.",
+    body: "The moment a company files with the SEC, you get the briefing. Not hours later — seconds.",
+  },
+  {
+    title: "Every filing, in plain English.",
+    body: "Dense legalese distilled to what matters: the headline, and the summary when you want more.",
+  },
+  {
+    title: "Your companies, always watched.",
+    body: "Build a watchlist, get alerts, and read every filing in the company's own thread — so you never lose the context.",
+  },
+];
+
 function ValueProps() {
-  const props = [
-    {
-      title: "Know before the crowd.",
-      body: "The moment a company files with the SEC, you get the briefing. Not hours later. Seconds.",
-    },
-    {
-      title: "Every filing, in plain English.",
-      body: "Dense legalese distilled to what matters — the headline, and the summary when you want more.",
-    },
-    {
-      title: "Your companies. Always watched.",
-      body: "Build your watchlist. Get alerts. Every filing lands in your company's thread, so you never lose context.",
-    },
-  ];
   return (
-    <section className="py-24 border-t border-white/[0.04]">
-      <div className="mx-auto max-w-2xl px-6 space-y-12">
-        {props.map(({ title, body }, i) => (
-          <div key={title} className={i > 0 ? "border-t border-white/[0.04] pt-12" : ""}>
-            <p className="text-xl font-bold text-white/90 mb-2">{title}</p>
-            <p className="text-base text-white/50 leading-relaxed">{body}</p>
-          </div>
-        ))}
-        <div className="pt-2 text-center">
-          <Link
-            href="/register"
-            className="inline-flex items-center gap-2 px-7 py-3 rounded-md bg-indigo-600 hover:bg-indigo-500 text-white text-base font-semibold transition-colors"
-          >
-            Start tracking — it&apos;s free
+    <section className="border-t border-line-subtle py-16">
+      <div className="mx-auto max-w-2xl px-6">
+        <dl className="divide-y divide-line-subtle">
+          {VALUE_PROPS.map(({ title, body }) => (
+            <div key={title} className="py-6 first:pt-0 last:pb-0">
+              <dt className="text-title font-medium text-ink">{title}</dt>
+              <dd className="mt-1.5 text-body leading-relaxed text-ink-muted">
+                {body}
+              </dd>
+            </div>
+          ))}
+        </dl>
+        <div className="mt-10 text-center">
+          <Link href="/register">
+            <Button size="lg">Start tracking — it&apos;s free</Button>
           </Link>
         </div>
       </div>
@@ -114,43 +105,37 @@ function ValueProps() {
 
 function Footer() {
   return (
-    <footer className="border-t border-white/[0.06]">
-      <div className="mx-auto max-w-5xl px-6 py-10">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
-          <Link href="/" className="flex items-center gap-2.5">
+    <footer className="border-t border-line-subtle">
+      <div className="mx-auto max-w-4xl px-6 py-8">
+        <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
+          <Link href="/" className="flex items-center gap-2">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/logo.png"
               alt=""
-              className="w-5 h-5 invert opacity-60"
+              className="size-4 opacity-60 dark:invert"
             />
-            <span className="text-sm text-white/50">Sensybull</span>
+            <span className="text-meta text-ink-faint">Sensybull</span>
           </Link>
-          <div className="flex items-center gap-6 text-sm text-white/30">
-            <Link
-              href="/terms"
-              className="hover:text-white/60 transition-colors"
-            >
+          <div className="flex items-center gap-5 text-meta text-ink-faint">
+            <Link href="/terms" className="transition-colors hover:text-ink">
               Terms
             </Link>
-            <Link
-              href="/privacy"
-              className="hover:text-white/60 transition-colors"
-            >
+            <Link href="/privacy" className="transition-colors hover:text-ink">
               Privacy
             </Link>
             <Link
               href="/disclaimer"
-              className="hover:text-white/60 transition-colors"
+              className="transition-colors hover:text-ink"
             >
               Disclaimer
             </Link>
           </div>
         </div>
-        <div className="mt-8 pt-6 border-t border-white/[0.04] text-center text-xs text-white/20">
+        <p className="mt-6 border-t border-line-subtle pt-5 text-center text-micro text-ink-dim">
           &copy; {new Date().getFullYear()} Sensybull, LLC. All rights
           reserved.
-        </div>
+        </p>
       </div>
     </footer>
   );
@@ -158,7 +143,7 @@ function Footer() {
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-white antialiased">
+    <div className="min-h-screen bg-canvas text-ink">
       <Navbar />
       <main>
         <HeroSection />

@@ -46,15 +46,13 @@ function CopyRow({ label, value }: { label: string; value: string }) {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-1">
-        <span className="text-[11px] font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
-          {label}
-        </span>
+      <div className="mb-1 flex items-center justify-between">
+        <span className="eyebrow">{label}</span>
         <button
           onClick={copy}
-          className="text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:underline underline-offset-2"
+          className="text-meta font-medium text-brand-ink underline-offset-2 hover:underline"
         >
-          {copied ? "Copied ✓" : "Copy"}
+          {copied ? "Copied" : "Copy"}
         </button>
       </div>
       <code
@@ -64,7 +62,7 @@ function CopyRow({ label, value }: { label: string; value: string }) {
           window.getSelection()?.removeAllRanges();
           window.getSelection()?.addRange(range);
         }}
-        className="block w-full rounded-lg bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.06] px-2.5 py-2 text-[12px] leading-relaxed text-slate-700 dark:text-slate-300 break-all cursor-text"
+        className="block w-full cursor-text rounded-md border border-line-subtle bg-canvas-sunken px-2.5 py-2 font-mono text-meta leading-relaxed break-all text-ink-muted"
       >
         {value}
       </code>
@@ -78,17 +76,17 @@ export function ShareDialog({ company, onClose }: ShareDialogProps) {
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-md bg-white dark:bg-[#12141b] border-slate-200 dark:border-white/[0.08]">
+      <DialogContent className="border border-line bg-surface-raised sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-slate-900 dark:text-white">
+          <DialogTitle className="text-title font-medium text-ink">
             Share {name}
           </DialogTitle>
-          <DialogDescription className="text-slate-500 dark:text-slate-400">
+          <DialogDescription className="text-label text-ink-faint">
             Anyone who opens this link can add {ticker} to their watchlist in
             one click.
           </DialogDescription>
         </DialogHeader>
-        <div className="space-y-4 mt-1">
+        <div className="mt-1 space-y-3.5">
           <CopyRow label="Copy link" value={addUrl(ticker)} />
           <CopyRow label="Copy HTML" value={shareHtml(ticker, name)} />
           <CopyRow label="Copy Markdown" value={shareMarkdown(ticker, name)} />

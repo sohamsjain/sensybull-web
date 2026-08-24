@@ -10,14 +10,9 @@ import { usePaneWidth } from "@/hooks/use-pane-width";
 import { WatchlistPanel } from "@/components/watchlist/watchlist-panel";
 import { Conversation } from "@/components/watchlist/conversation";
 import { Button } from "@/components/ui/button";
-
-function Key({ children }: { children: React.ReactNode }) {
-  return (
-    <kbd className="px-1.5 py-0.5 bg-white border border-slate-300 shadow-sm text-slate-600 dark:bg-slate-800 dark:border-slate-700 dark:shadow-none dark:text-slate-400 rounded text-[10px] font-mono leading-none">
-      {children}
-    </kbd>
-  );
-}
+import { EmptyState } from "@/components/ui/empty-state";
+import { ExpandPaneIcon } from "@/components/ui/icons";
+import { Kbd } from "@/components/ui/kbd";
 
 export default function WatchlistPage() {
   const { user, loading: authLoading } = useAuth();
@@ -145,20 +140,16 @@ export default function WatchlistPage() {
 
   if (!authLoading && !user) {
     return (
-      <div className="h-full flex items-center justify-center px-6">
-        <div className="text-center max-w-sm">
-          <h2 className="text-slate-900 dark:text-white text-lg font-semibold mb-2">
-            Your watchlist, decoded
-          </h2>
-          <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-4">
-            Follow the companies you care about. New filings and press
-            releases arrive in plain English — with unread counts, so you
-            never miss the one that matters.
-          </p>
-          <Link href="/login">
-            <Button className="bg-indigo-600 hover:bg-indigo-500">Sign in to start</Button>
-          </Link>
-        </div>
+      <div className="flex h-full items-center justify-center px-6">
+        <EmptyState
+          title="Your watchlist, decoded"
+          description="Follow the companies you care about. New filings and press releases arrive in plain English — with unread counts, so you never miss the one that matters."
+          action={
+            <Link href="/login">
+              <Button>Sign in to start</Button>
+            </Link>
+          }
+        />
       </div>
     );
   }
@@ -169,7 +160,7 @@ export default function WatchlistPage() {
       <div
         className={`${
           activeCompanyId ? "hidden md:flex" : "flex"
-        } ${pane.collapsed ? "md:!hidden" : ""} w-full md:w-[var(--pane-w)] bg-white dark:bg-transparent flex-col shrink-0`}
+        } ${pane.collapsed ? "md:!hidden" : ""} w-full shrink-0 flex-col border-r border-line-subtle md:w-[var(--pane-w)]`}
         style={{ "--pane-w": `${pane.width}px` } as React.CSSProperties}
       >
         <WatchlistPanel
@@ -193,10 +184,10 @@ export default function WatchlistPage() {
           role="separator"
           aria-orientation="vertical"
           title="Drag to resize · double-click to reset"
-          className="hidden md:flex w-1.5 shrink-0 cursor-col-resize items-stretch justify-center group touch-none"
+          className="group hidden w-1.5 shrink-0 cursor-col-resize touch-none items-stretch justify-center md:flex"
           {...pane.handleProps}
         >
-          <div className="w-px bg-slate-200 dark:bg-white/[0.06] group-hover:bg-slate-400 dark:group-hover:bg-white/[0.2] transition-colors" />
+          <div className="w-px bg-transparent transition-colors group-hover:bg-brand/50" />
         </div>
       )}
 
@@ -204,13 +195,11 @@ export default function WatchlistPage() {
       {pane.collapsed && (
         <button
           onClick={pane.expand}
-          className="hidden md:flex items-center justify-center w-6 shrink-0 border-r border-slate-200 dark:border-white/[0.06] text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/[0.04] transition-colors"
+          className="hidden w-7 shrink-0 items-center justify-center border-r border-line-subtle text-ink-faint transition-colors hover:bg-surface-hover hover:text-ink md:flex"
           title="Show the watchlist"
           aria-label="Show the watchlist"
         >
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-            <path d="M4.5 2.5 8 6l-3.5 3.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
+          <ExpandPaneIcon className="size-4" />
         </button>
       )}
 
@@ -236,26 +225,24 @@ export default function WatchlistPage() {
             />
           </div>
         ) : (
-          <div className="chat-wallpaper flex-1 flex items-center justify-center">
-            <div className="text-center max-w-sm px-6">
-              <p className="text-slate-800 dark:text-slate-200 text-base font-medium mb-1.5">
-                Your watchlist
+          <div className="flex flex-1 items-center justify-center bg-canvas-sunken">
+            <div className="max-w-sm px-6 text-center">
+              <p className="text-title font-medium text-ink">Your watchlist</p>
+              <p className="mt-1.5 text-label leading-relaxed text-ink-faint">
+                Pick a company to read its filing history in plain English.
+                Every briefing links back to the original document on SEC
+                EDGAR, and the chart view shows how the stock moved around
+                each filing.
               </p>
-              <p className="text-slate-500 text-[13px] leading-relaxed">
-                Pick a company on the left to see its filing history in plain
-                English. Every briefing links back to the original document on
-                SEC EDGAR, and the chart button up top shows how the stock
-                moved around each filing.
-              </p>
-              <p className="text-slate-500 dark:text-slate-600 text-xs mt-5 flex items-center justify-center gap-2">
-                <Key>↑</Key>
-                <Key>↓</Key>
+              <p className="mt-6 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-micro text-ink-faint">
+                <Kbd>↑</Kbd>
+                <Kbd>↓</Kbd>
                 <span>switch companies</span>
-                <span className="text-slate-300 dark:text-slate-700">·</span>
-                <Key>/</Key>
+                <span className="text-ink-dim">·</span>
+                <Kbd>/</Kbd>
                 <span>search</span>
-                <span className="text-slate-300 dark:text-slate-700">·</span>
-                <Key>esc</Key>
+                <span className="text-ink-dim">·</span>
+                <Kbd>esc</Kbd>
                 <span>close</span>
               </p>
             </div>

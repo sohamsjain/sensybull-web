@@ -2,16 +2,19 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+
 import { useAuth } from "@/hooks/use-auth";
 import { useDashboard, type FeedFilter } from "@/app/(dashboard)/layout";
 import { api } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Chip, ChipRow, SegmentedControl } from "@/components/ui/chip";
+import { Kbd } from "@/components/ui/kbd";
+import { SearchInput } from "@/components/ui/search-input";
 import { ThemeToggle } from "@/components/theme-toggle";
 
-const FILTERS: { key: FeedFilter; label: string }[] = [
-  { key: "all", label: "All" },
-  { key: "important", label: "Important" },
+const FILTERS: { value: FeedFilter; label: string }[] = [
+  { value: "all", label: "All" },
+  { value: "important", label: "Important" },
 ];
 
 /** Fallback while GET /events/types loads (mirrors the API's canonical list). */
@@ -29,8 +32,8 @@ const DEFAULT_EVENT_TYPES = [
 ];
 
 /**
- * Feed header: the All/Important toggle, a search box, and a scrollable
- * row of event-type chips ("All types", Acquisition, Earnings, ...).
+ * Feed header: what you're looking at (All / Important), a search box, and
+ * the category filters. One bar, two rows, always in the same place.
  */
 export function FeedToolbar() {
   const { user } = useAuth();
@@ -53,88 +56,60 @@ export function FeedToolbar() {
   }, []);
 
   return (
-    <div className="border-b border-slate-200 dark:border-white/[0.06] shrink-0 bg-white dark:bg-[#0b0d12]">
-      <div className="h-12 flex items-center px-4 gap-3">
-        {/* All / Important — one click, unmistakable selected state */}
-        <div
-          className="flex p-0.5 rounded-lg bg-slate-100 dark:bg-white/[0.06]"
-          role="tablist"
-          aria-label="Show all updates or only important ones"
-        >
-          {FILTERS.map(({ key, label }) => (
-            <button
-              key={key}
-              role="tab"
-              aria-selected={filter === key}
-              onClick={() => setFilter(key)}
-              className={`px-3.5 py-1 rounded-md text-[13px] font-semibold transition-colors ${
-                filter === key
-                  ? "bg-indigo-600 text-white shadow-sm"
-                  : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+    <div className="shrink-0 border-b border-line-subtle bg-canvas">
+      <div className="mx-auto flex h-12 w-full max-w-3xl items-center gap-2.5 px-4">
+        <SegmentedControl
+          options={FILTERS}
+          value={filter}
+          onChange={setFilter}
+          label="Show all updates or only important ones"
+        />
 
-        {/* Search */}
-        <Input
+        <SearchInput
           id="feed-search"
-          type="text"
-          placeholder="Search company..."
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 max-w-xs bg-slate-100 dark:bg-[#14161c] border-slate-200 dark:border-white/[0.06] text-sm text-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus-visible:border-indigo-500/60 focus-visible:ring-0"
+          onValueChange={setSearch}
+          placeholder="Search company…"
+          className="max-w-xs flex-1"
+          hint={<Kbd className="hidden md:inline-flex">/</Kbd>}
         />
 
         {/* Guests have no nav rail; give them theme + sign-in here */}
         {!user && (
-          <div className="ml-auto flex items-center gap-2">
-            <ThemeToggle className="w-8 h-8" />
+          <div className="ml-auto flex items-center gap-1.5">
+            <ThemeToggle size="md" />
             <Link href="/login">
-              <Button size="sm" className="bg-indigo-600 hover:bg-indigo-500 text-white">
-                Sign In
-              </Button>
+              <Button size="sm">Sign in</Button>
             </Link>
           </div>
         )}
       </div>
 
-      {/* Event-type chips — horizontally scrollable, Substack-style */}
-      <div
-        className="flex items-center gap-1.5 px-4 pb-2.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      <ChipRow
+        className="mx-auto w-full max-w-3xl px-4 pb-2"
         role="tablist"
         aria-label="Filter by event type"
       >
-        <button
+        <Chip
           role="tab"
           aria-selected={eventType === null}
+          selected={eventType === null}
           onClick={() => setEventType(null)}
-          className={`shrink-0 px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-            eventType === null
-              ? "bg-indigo-600 text-white"
-              : "bg-slate-100 dark:bg-white/[0.06] text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-          }`}
         >
           All types
-        </button>
+        </Chip>
         {eventTypes.map((type) => (
-          <button
+          <Chip
             key={type}
             role="tab"
             aria-selected={eventType === type}
+            selected={eventType === type}
             onClick={() => setEventType(eventType === type ? null : type)}
-            className={`shrink-0 px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-              eventType === type
-                ? "bg-indigo-600 text-white"
-                : "bg-slate-100 dark:bg-white/[0.06] text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-            }`}
           >
             {type}
-          </button>
+          </Chip>
         ))}
-      </div>
+      </ChipRow>
     </div>
   );
 }

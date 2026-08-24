@@ -1,22 +1,35 @@
 "use client";
 
 import { useState, useRef, useLayoutEffect, useMemo } from "react";
+
 import type { WatchlistEntry } from "@/types/api";
 import type { FilingEvent } from "@/types/events";
 import { dayLabel, formatCatalystDate } from "@/lib/utils";
 import { useDashboard } from "@/app/(dashboard)/layout";
 import { usePinnedCompanies } from "@/hooks/use-pinned-companies";
 import { useQuote } from "@/hooks/use-quote";
-import { CompanyAvatar } from "./company-avatar";
-import { FilingMessage } from "./filing-message";
 import { PriceChart } from "@/components/company/price-chart";
 import { StockQuote } from "@/components/company/stock-quote";
+import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
+import { IconButton } from "@/components/ui/icon-button";
+import {
+  ChartIcon,
+  ChevronLeftIcon,
+  MoreIcon,
+  MutedIcon,
+  TimelineIcon,
+} from "@/components/ui/icons";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+
+import { CompanyAvatar } from "./company-avatar";
+import { FilingMessage } from "./filing-message";
 
 interface ConversationProps {
   entry: WatchlistEntry;
@@ -29,69 +42,22 @@ interface ConversationProps {
   onRemove: () => void;
 }
 
-function BackIcon() {
+/** Day divider between entries: a rule with a date on it, nothing more. */
+function DayDivider({ label }: { label: string }) {
   return (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-    </svg>
+    <div className="flex items-center gap-3 px-4 py-2">
+      <span className="h-px flex-1 bg-line-subtle" />
+      <span className="eyebrow">{label}</span>
+      <span className="h-px flex-1 bg-line-subtle" />
+    </div>
   );
 }
 
-function MutedBellIcon() {
-  return (
-    <svg
-      className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-      aria-label="Alerts muted"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M9.143 17.082a24 24 0 003.844.148m-3.844-.148a23.856 23.856 0 01-5.455-1.31 8.964 8.964 0 002.3-5.542m3.155 6.852a3 3 0 005.667 1.97m1.965-2.277L21 21m-4.225-4.225a23.81 23.81 0 003.536-1.003A8.967 8.967 0 0118 9.75V9A6 6 0 006.53 6.53m10.245 10.245L6.53 6.53M3 3l3.53 3.53"
-      />
-    </svg>
-  );
-}
-
-function MoreIcon() {
-  return (
-    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-      <circle cx="12" cy="5" r="1.75" />
-      <circle cx="12" cy="12" r="1.75" />
-      <circle cx="12" cy="19" r="1.75" />
-    </svg>
-  );
-}
-
-function ChartIcon() {
-  return (
-    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={1.8}
-        d="M3 4v14a2 2 0 002 2h16M8 15V9m4 6V6m4 9v-4"
-      />
-    </svg>
-  );
-}
-
-function MessagesIcon() {
-  return (
-    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={1.8}
-        d="M4 6h16M4 10h16M4 14h10M4 18h7"
-      />
-    </svg>
-  );
-}
-
+/**
+ * A company's filing history — the reading surface of the product. The
+ * header carries identity and live price; everything below is the record,
+ * oldest to newest, with the newest in view.
+ */
 export function Conversation({
   entry,
   events,
@@ -181,23 +147,22 @@ export function Conversation({
     : null;
 
   return (
-    <div className="flex flex-col h-full min-w-0">
+    <div className="flex h-full min-w-0 flex-col">
       {/* Header */}
-      <div className="flex items-center gap-3 px-3 py-2 border-b border-slate-200 dark:border-white/[0.06] bg-white dark:bg-[#0b0d12] shrink-0">
-        <button
+      <header className="flex h-12 shrink-0 items-center gap-2.5 border-b border-line-subtle bg-canvas px-3">
+        <IconButton
+          size="md"
           onClick={onBack}
-          className="md:hidden text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white shrink-0"
+          className="md:hidden"
           aria-label="Back to watchlist"
         >
-          <BackIcon />
-        </button>
-        <CompanyAvatar
-          ticker={company.ticker}
-          name={company.name}
-          size="sm"
-        />
+          <ChevronLeftIcon />
+        </IconButton>
+
+        <CompanyAvatar ticker={company.ticker} name={company.name} size="sm" />
+
         <div className="min-w-0 flex-1">
-          <div className="flex items-baseline gap-2 min-w-0">
+          <div className="flex min-w-0 items-baseline gap-2">
             <button
               onClick={() =>
                 openCompany({
@@ -210,7 +175,7 @@ export function Conversation({
               className="block min-w-0 text-left"
               title={`View ${company.name}`}
             >
-              <p className="text-slate-900 dark:text-white/90 text-sm font-medium truncate leading-tight hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+              <p className="truncate text-label leading-tight font-medium text-ink transition-colors hover:text-brand-ink">
                 {company.name}
               </p>
             </button>
@@ -219,10 +184,8 @@ export function Conversation({
               <StockQuote quote={quote} loading={quoteState === "loading"} />
             )}
           </div>
-          <p className="text-slate-400 dark:text-slate-500 text-xs truncate">
-            {company.ticker && (
-              <span className="font-mono">{company.ticker}</span>
-            )}
+          <p className="truncate text-micro text-ink-faint">
+            {company.ticker && <span className="font-mono">{company.ticker}</span>}
             {edgarCompanyUrl && (
               <>
                 {company.ticker && " · "}
@@ -230,7 +193,7 @@ export function Conversation({
                   href={edgarCompanyUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-slate-700 dark:hover:text-slate-300 underline underline-offset-2"
+                  className="underline underline-offset-2 transition-colors hover:text-ink-muted"
                 >
                   SEC filing history
                 </a>
@@ -238,48 +201,52 @@ export function Conversation({
             )}
           </p>
         </div>
-        {muted && <MutedBellIcon />}
-        {company.ticker && (
-          <button
-            onClick={() => setView((v) => (v === "chart" ? "messages" : "chart"))}
-            className={`p-1.5 rounded transition-colors ${
-              view === "chart"
-                ? "bg-indigo-600 text-white"
-                : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-            }`}
-            aria-label={view === "chart" ? "Back to messages" : "Show price chart"}
-            title={view === "chart" ? "Back to messages" : "Show price chart"}
-          >
-            {view === "chart" ? <MessagesIcon /> : <ChartIcon />}
-          </button>
+
+        {muted && (
+          <MutedIcon
+            className="size-3.5 shrink-0 text-ink-faint"
+            aria-label="Alerts muted"
+          />
         )}
+
+        {company.ticker && (
+          <IconButton
+            active={view === "chart"}
+            onClick={() => setView((v) => (v === "chart" ? "messages" : "chart"))}
+            aria-label={view === "chart" ? "Back to filings" : "Show price chart"}
+            title={view === "chart" ? "Back to filings" : "Show price chart"}
+          >
+            {view === "chart" ? <TimelineIcon /> : <ChartIcon />}
+          </IconButton>
+        )}
+
         {confirmRemove ? (
-          <span className="flex items-center gap-1.5 text-xs shrink-0">
-            <span className="text-slate-500 dark:text-slate-400 hidden sm:inline">
+          <span className="flex shrink-0 items-center gap-1.5">
+            <span className="hidden text-meta text-ink-muted sm:inline">
               Remove from watchlist?
             </span>
-            <button
+            <Button
+              size="xs"
+              variant="destructive"
               onClick={() => {
                 setConfirmRemove(false);
                 onRemove();
               }}
-              className="text-red-400 hover:text-red-300 font-medium"
             >
               Remove
-            </button>
-            <button
+            </Button>
+            <Button
+              size="xs"
+              variant="ghost"
               onClick={() => setConfirmRemove(false)}
-              className="text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
             >
               Cancel
-            </button>
+            </Button>
           </span>
         ) : (
           <DropdownMenu>
             <DropdownMenuTrigger
-              className="p-1.5 rounded transition-colors text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-              aria-label="Company options"
-              title="Company options"
+              render={<IconButton aria-label="Company options" title="Company options" />}
             >
               <MoreIcon />
             </DropdownMenuTrigger>
@@ -299,89 +266,80 @@ export function Conversation({
             </DropdownMenuContent>
           </DropdownMenu>
         )}
-      </div>
+      </header>
 
-      {/* Pinned upcoming catalysts */}
+      {/* Upcoming catalysts */}
       {pinnedCatalysts.length > 0 && (
-        <div className="px-3 py-1.5 bg-slate-100/80 dark:bg-[#14161c]/80 border-b border-slate-200 dark:border-white/[0.06] shrink-0">
-          {pinnedCatalysts.map((c, i) => (
-            <p key={i} className="text-xs text-slate-600 dark:text-slate-300 truncate">
-              <span className="text-slate-900 dark:text-slate-100 font-medium">
-                {formatCatalystDate(c.date)}
-              </span>
-              {" — "}
-              {c.event}
-            </p>
-          ))}
+        <div className="shrink-0 border-b border-line-subtle bg-canvas-sunken px-4 py-1.5">
+          <div className="mx-auto w-full max-w-3xl">
+            {pinnedCatalysts.map((c, i) => (
+              <p key={i} className="truncate text-meta text-ink-muted">
+                <span className="font-mono tabular-nums text-ink">
+                  {formatCatalystDate(c.date)}
+                </span>
+                {" — "}
+                {c.event}
+              </p>
+            ))}
+          </div>
         </div>
       )}
 
       {/* Full-pane price chart, toggled from the header */}
       {view === "chart" && (
-        <div className="flex-1 min-h-0 px-4 py-3 bg-white dark:bg-transparent">
+        <div className="min-h-0 flex-1 px-4 py-3">
           <PriceChart companyId={company.id} events={events} fill />
         </div>
       )}
 
-      {/* Messages */}
+      {/* Filing history */}
       <div
         ref={scrollRef}
-        className={`chat-wallpaper flex-1 overflow-y-auto px-4 py-3 space-y-2 ${
-          view === "chart" ? "hidden" : ""
-        }`}
+        className={`flex-1 overflow-y-auto ${view === "chart" ? "hidden" : ""}`}
       >
-        {hasMore && (
-          <div className="text-center">
-            <button
-              onClick={handleLoadEarlier}
-              disabled={loading}
-              className="text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 bg-white ring-1 ring-slate-200/80 dark:ring-0 dark:bg-[#14161c] px-3 py-1 rounded-full disabled:opacity-50"
-            >
-              {loading ? "Loading..." : "Load earlier filings"}
-            </button>
-          </div>
-        )}
-
-        {loading && events.length === 0 ? (
-          <div className="space-y-3 animate-pulse pt-2">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="max-w-[75%] h-24 bg-slate-200/70 dark:bg-[#14161c] rounded-lg" />
-            ))}
-          </div>
-        ) : ordered.length === 0 ? (
-          <div className="h-full flex items-center justify-center">
-            <div className="text-center max-w-xs">
-              <p className="text-slate-600 dark:text-slate-300 text-sm font-medium mb-1">
-                No filings yet
-              </p>
-              <p className="text-slate-400 dark:text-slate-500 text-xs leading-relaxed">
-                The moment {company.name} files with the SEC, the decoded
-                briefing lands here — usually within minutes of hitting EDGAR.
-              </p>
+        <div className="mx-auto w-full max-w-3xl">
+          {hasMore && (
+            <div className="flex justify-center py-2">
+              <Button
+                size="xs"
+                variant="ghost"
+                onClick={handleLoadEarlier}
+                disabled={loading}
+              >
+                {loading ? "Loading…" : "Load earlier filings"}
+              </Button>
             </div>
-          </div>
-        ) : (
-          ordered.map((event, i) => {
-            const ts = event.received_at || event.filing_date || "";
-            const prevTs = i > 0
-              ? ordered[i - 1].received_at || ordered[i - 1].filing_date || ""
-              : null;
-            const showDay =
-              !prevTs || (ts && dayLabel(ts) !== dayLabel(prevTs));
-            return (
-              <div key={event.id}>
-                {showDay && ts && (
-                  <div className="flex justify-center my-3">
-                    <span className="text-[11px] text-slate-600 dark:text-slate-300 bg-white/95 ring-1 ring-slate-200/80 dark:ring-0 dark:bg-[#14161c]/90 px-3 py-1 rounded-md shadow-sm shadow-slate-300/30 dark:shadow-black/20">
-                      {dayLabel(ts)}
-                    </span>
-                  </div>
-                )}
-                <FilingMessage event={event} />
-              </div>
-            );
-          })
-        )}
+          )}
+
+          {loading && events.length === 0 ? (
+            <div className="space-y-3 px-4 py-4">
+              {[...Array(3)].map((_, i) => (
+                <Skeleton key={i} className="h-16" />
+              ))}
+            </div>
+          ) : ordered.length === 0 ? (
+            <EmptyState
+              className="pt-16"
+              title="No filings yet"
+              description={`The moment ${company.name} files with the SEC, the decoded briefing lands here — usually within minutes of hitting EDGAR.`}
+            />
+          ) : (
+            ordered.map((event, i) => {
+              const ts = event.received_at || event.filing_date || "";
+              const prevTs =
+                i > 0
+                  ? ordered[i - 1].received_at || ordered[i - 1].filing_date || ""
+                  : null;
+              const showDay = !prevTs || (ts && dayLabel(ts) !== dayLabel(prevTs));
+              return (
+                <div key={event.id}>
+                  {showDay && ts && <DayDivider label={dayLabel(ts)} />}
+                  <FilingMessage event={event} />
+                </div>
+              );
+            })
+          )}
+        </div>
       </div>
     </div>
   );

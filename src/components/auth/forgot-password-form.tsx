@@ -31,13 +31,13 @@ export function ForgotPasswordForm() {
   if (success) {
     return (
       <div className="text-center space-y-4">
-        <p className="text-white/70 text-base">
+        <p className="text-label text-ink-muted">
           If an account with that email exists, we&apos;ve sent a password reset
           link.
         </p>
         <Link
           href="/login"
-          className="text-indigo-400 hover:text-indigo-300 text-base font-medium"
+          className="text-label font-medium text-brand-ink hover:underline"
         >
           Back to sign in
         </Link>
@@ -47,11 +47,11 @@ export function ForgotPasswordForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      <p className="text-white/50 text-base text-center">
+      <p className="text-center text-label text-ink-faint">
         Enter your email and we&apos;ll send you a reset link.
       </p>
       <div>
-        <label className="block text-sm font-semibold text-white/80 mb-2">
+        <label className="mb-1.5 block text-label font-medium text-ink-muted">
           Email
         </label>
         <Input
@@ -59,21 +59,21 @@ export function ForgotPasswordForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="h-12 bg-[#1a1a2e] border-transparent text-base text-white placeholder:text-white/30 focus-visible:border-indigo-500/50 focus-visible:ring-0"
+          className="h-10"
         />
       </div>
-      {error && <p className="text-red-400 text-sm">{error}</p>}
+      {error && <p className="text-label text-danger">{error}</p>}
       <Button
         type="submit"
         disabled={loading}
-        className="w-full h-12 text-base font-semibold bg-indigo-600 hover:bg-indigo-500"
+        className="h-10 w-full"
       >
         {loading ? "Sending..." : "Send Reset Link"}
       </Button>
-      <p className="text-center text-base text-white/50">
+      <p className="text-center text-label text-ink-faint">
         <Link
           href="/login"
-          className="text-indigo-400 hover:text-indigo-300 font-medium"
+          className="font-medium text-brand-ink hover:underline"
         >
           Back to sign in
         </Link>

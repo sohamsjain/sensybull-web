@@ -2,13 +2,22 @@
 
 import { useAlertNotifications } from "@/hooks/use-alerts";
 import { timeAgo } from "@/lib/utils";
+import { Badge, ImportantMarker } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Table, TD, TH, THead, TR } from "@/components/ui/data-table";
+import { Skeleton } from "@/components/ui/skeleton";
 
-const STATUS_STYLES: Record<string, string> = {
-  sent: "bg-green-500/15 text-green-400",
-  pending: "bg-amber-500/15 text-amber-400",
-  failed: "bg-red-500/15 text-red-400",
-};
+const STATUS_TONE = {
+  sent: "success",
+  pending: "warning",
+  failed: "danger",
+} as const;
 
+/**
+ * What was sent, where, and whether it arrived. Genuinely tabular data, so
+ * it is a table: aligned columns, a sticky header, and one row per delivery.
+ */
 export function NotificationList() {
   const { notifications, total, page, loading, goToPage } =
     useAlertNotifications();
@@ -17,106 +26,101 @@ export function NotificationList() {
 
   if (loading && notifications.length === 0) {
     return (
-      <div className="bg-slate-100 dark:bg-[#14161c] border border-slate-200 dark:border-white/[0.06] rounded-lg p-6">
-        <div className="animate-pulse space-y-3">
-          {[...Array(5)].map((_, i) => (
-            <div key={i} className="h-16 bg-slate-200 dark:bg-white/[0.06] rounded" />
-          ))}
-        </div>
+      <div className="space-y-2">
+        {[...Array(5)].map((_, i) => (
+          <Skeleton key={i} className="h-9" />
+        ))}
       </div>
     );
   }
 
   if (notifications.length === 0) {
     return (
-      <div className="bg-slate-100 dark:bg-[#14161c] border border-slate-200 dark:border-white/[0.06] rounded-lg p-8 text-center">
-        <p className="text-slate-500 dark:text-slate-400 text-sm">No notifications yet.</p>
-        <p className="text-slate-400 dark:text-slate-500 text-xs mt-1">
-          Notifications will appear here when filing events trigger your alerts.
-        </p>
-      </div>
+      <EmptyState
+        align="start"
+        className="px-0 py-6"
+        title="No notifications yet"
+        description="Deliveries appear here once a filing from a company you follow matches your alert settings."
+      />
     );
   }
 
   return (
-    <div className="bg-slate-100 dark:bg-[#14161c] border border-slate-200 dark:border-white/[0.06] rounded-lg overflow-hidden">
-      <div className="divide-y divide-slate-200 dark:divide-white/[0.06]">
-        {notifications.map((n) => {
-          const important = n.filing_event.max_tier === 1;
-
-          return (
-            <div
-              key={n.id}
-              className="px-4 py-3 hover:bg-slate-750 transition-colors"
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-slate-900 dark:text-white text-sm font-medium">
+    <div>
+      <Table>
+        <THead>
+          <tr>
+            <TH>Company</TH>
+            <TH>Channel</TH>
+            <TH>Status</TH>
+            <TH numeric>Sent</TH>
+          </tr>
+        </THead>
+        <tbody>
+          {notifications.map((n) => {
+            const important = n.filing_event.max_tier === 1;
+            const tone =
+              STATUS_TONE[n.status as keyof typeof STATUS_TONE] ?? "warning";
+            return (
+              <TR key={n.id}>
+                <TD className="text-ink">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-label font-semibold">
                       {n.filing_event.ticker}
                     </span>
-                    {important && (
-                      <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold text-red-600/80 dark:text-red-400/80">
-                        IMPORTANT
-                      </span>
-                    )}
-                    <span
-                      className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${
-                        STATUS_STYLES[n.status] || STATUS_STYLES.pending
-                      }`}
-                    >
-                      {n.status}
-                    </span>
+                    {important && <ImportantMarker />}
                   </div>
-                  <p className="text-slate-500 dark:text-slate-400 text-xs truncate">
+                  <p className="mt-0.5 truncate text-meta text-ink-faint">
                     {n.filing_event.company_name}
                     {n.filing_event.event_types?.length > 0 &&
                       ` — ${n.filing_event.event_types.join(", ")}`}
                   </p>
                   {n.error_message && (
-                    <p className="text-red-400/70 text-xs mt-1">
+                    <p className="mt-0.5 text-meta text-danger">
                       {n.error_message}
                     </p>
                   )}
-                </div>
-                <div className="text-right shrink-0">
-                  <span className="text-slate-400 dark:text-slate-500 text-xs capitalize">
-                    {n.channel}
-                  </span>
-                  <p className="text-slate-400 dark:text-slate-600 text-xs mt-0.5">
-                    {timeAgo(n.sent_at || n.created_at)}
-                  </p>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+                </TD>
+                <TD className="capitalize">{n.channel}</TD>
+                <TD>
+                  <Badge tone={tone} className="capitalize">
+                    {n.status}
+                  </Badge>
+                </TD>
+                <TD numeric className="whitespace-nowrap text-ink-faint">
+                  {timeAgo(n.sent_at || n.created_at)}
+                </TD>
+              </TR>
+            );
+          })}
+        </tbody>
+      </Table>
 
-      {/* Pagination */}
       {totalPages > 1 && (
-        <div className="px-4 py-3 border-t border-slate-200 dark:border-white/[0.06] flex items-center justify-between">
-          <span className="text-slate-400 dark:text-slate-500 text-xs">
+        <div className="flex items-center justify-between pt-3">
+          <span className="text-meta text-ink-faint tabular-nums">
             {total} notification{total !== 1 ? "s" : ""}
           </span>
-          <div className="flex gap-1">
-            <button
+          <div className="flex items-center gap-1">
+            <Button
+              size="xs"
+              variant="ghost"
               onClick={() => goToPage(page - 1)}
               disabled={page <= 1 || loading}
-              className="px-2.5 py-1 rounded text-xs text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/[0.06] disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              Prev
-            </button>
-            <span className="px-2 py-1 text-xs text-slate-400 dark:text-slate-500">
+              Previous
+            </Button>
+            <span className="px-1 text-meta text-ink-faint tabular-nums">
               {page} / {totalPages}
             </span>
-            <button
+            <Button
+              size="xs"
+              variant="ghost"
               onClick={() => goToPage(page + 1)}
               disabled={page >= totalPages || loading}
-              className="px-2.5 py-1 rounded text-xs text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/[0.06] disabled:opacity-40 disabled:cursor-not-allowed"
             >
               Next
-            </button>
+            </Button>
           </div>
         </div>
       )}

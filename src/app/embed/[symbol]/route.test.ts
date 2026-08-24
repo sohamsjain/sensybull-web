@@ -47,7 +47,8 @@ describe("GET /embed/:symbol", () => {
   it("honors theme=dark", async () => {
     const res = await get("/embed/MU?theme=dark", "MU");
     const html = await res.text();
-    expect(html).toContain("#12141b");
+    // The dark surface colour from the design tokens (see PALETTES)
+    expect(html).toContain("#191c22");
     expect(html).not.toContain("prefers-color-scheme");
   });
 });

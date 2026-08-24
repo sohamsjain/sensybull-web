@@ -34,7 +34,7 @@ export function RegisterForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       <div>
-        <label className="block text-sm font-semibold text-white/80 mb-2">
+        <label className="mb-1.5 block text-label font-medium text-ink-muted">
           Name
         </label>
         <Input
@@ -42,11 +42,11 @@ export function RegisterForm() {
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
-          className="h-12 bg-[#1a1a2e] border-transparent text-base text-white placeholder:text-white/30 focus-visible:border-indigo-500/50 focus-visible:ring-0"
+          className="h-10"
         />
       </div>
       <div>
-        <label className="block text-sm font-semibold text-white/80 mb-2">
+        <label className="mb-1.5 block text-label font-medium text-ink-muted">
           Email
         </label>
         <Input
@@ -54,11 +54,11 @@ export function RegisterForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="h-12 bg-[#1a1a2e] border-transparent text-base text-white placeholder:text-white/30 focus-visible:border-indigo-500/50 focus-visible:ring-0"
+          className="h-10"
         />
       </div>
       <div>
-        <label className="block text-sm font-semibold text-white/80 mb-2">
+        <label className="mb-1.5 block text-label font-medium text-ink-muted">
           Password
         </label>
         <Input
@@ -68,20 +68,20 @@ export function RegisterForm() {
           onChange={(e) => setPassword(e.target.value)}
           required
           minLength={6}
-          className="h-12 bg-[#1a1a2e] border-transparent text-base text-white placeholder:text-white/30 focus-visible:border-indigo-500/50 focus-visible:ring-0"
+          className="h-10"
         />
       </div>
-      {error && <p className="text-red-400 text-sm">{error}</p>}
+      {error && <p className="text-label text-danger">{error}</p>}
       <Button
         type="submit"
         disabled={loading}
-        className="w-full h-12 text-base font-semibold bg-indigo-600 hover:bg-indigo-500"
+        className="h-10 w-full"
       >
         {loading ? "Creating account..." : "Create Account"}
       </Button>
-      <p className="text-center text-base text-white/50">
+      <p className="text-center text-label text-ink-faint">
         Already have an account?{" "}
-        <Link href="/login" className="text-indigo-400 hover:text-indigo-300 font-medium">
+        <Link href="/login" className="font-medium text-brand-ink hover:underline">
           Sign in
         </Link>
       </p>

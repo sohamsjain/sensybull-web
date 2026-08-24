@@ -5,7 +5,7 @@ import { AppleAuthButton } from "@/components/auth/apple-auth-button";
 export default function RegisterPage() {
   return (
     <div>
-      <h1 className="text-white/90 font-bold text-3xl text-center mb-8">
+      <h1 className="mb-6 text-center text-heading font-semibold text-ink">
         Create your account
       </h1>
       {/* One-click options first */}
@@ -14,9 +14,9 @@ export default function RegisterPage() {
         <AppleAuthButton />
       </div>
       <div className="my-6 flex items-center gap-3">
-        <div className="flex-1 h-px bg-white/10" />
-        <span className="text-white/30 text-sm">or use email</span>
-        <div className="flex-1 h-px bg-white/10" />
+        <div className="h-px flex-1 bg-line" />
+        <span className="text-meta text-ink-faint">or use email</span>
+        <div className="h-px flex-1 bg-line" />
       </div>
       <RegisterForm />
     </div>

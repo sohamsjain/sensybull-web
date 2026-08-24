@@ -5,6 +5,12 @@ import { useAlertPreferences, useAlertChannels } from "@/hooks/use-alerts";
 import { useChannelConfig } from "@/hooks/use-channel-config";
 import { pushSupported, enablePush, disablePush } from "@/lib/push";
 import { ChannelSetupForm } from "@/components/alerts/channel-setup-forms";
+import { Badge } from "@/components/ui/badge";
+import { SegmentedControl } from "@/components/ui/chip";
+import { Button } from "@/components/ui/button";
+import { Section } from "@/components/ui/section";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Switch } from "@/components/ui/switch";
 
 // Two plain choices mapped onto the API's tier threshold: important-only
 // alerts (tier 1) or every filing (tier 3).
@@ -89,24 +95,19 @@ function ChannelRow({
   if (!needsSetup) {
     // Simple channel (email, push) -- just a toggle row
     return (
-      <div className="bg-white dark:bg-[#0b0d12] border border-slate-200 dark:border-white/[0.06] rounded-lg">
-        <label className="flex items-center justify-between px-4 py-2.5 cursor-pointer hover:border-slate-400 dark:hover:border-white/[0.12]">
-          <div>
-            <span className="text-sm text-slate-600 dark:text-slate-300">
-              {meta.label}
-            </span>
-            <span className="block text-xs text-slate-400 dark:text-slate-500 mt-0.5">
-              {meta.description}
-            </span>
-          </div>
-          <input
-            type="checkbox"
-            checked={enabled}
-            onChange={() => onToggle(channel)}
-            disabled={saving || (channel === "push" && pushBusy)}
-            className="rounded border-slate-300 dark:border-white/[0.1] bg-slate-100 dark:bg-[#14161c] text-indigo-500 focus:ring-0 focus:ring-offset-0 w-4 h-4"
-          />
-        </label>
+      <div className="flex items-center justify-between gap-3 border-b border-line-subtle py-2.5 last:border-0">
+        <div className="min-w-0">
+          <span className="text-label text-ink">{meta.label}</span>
+          <span className="mt-0.5 block text-meta text-ink-faint">
+            {meta.description}
+          </span>
+        </div>
+        <Switch
+          checked={enabled}
+          onCheckedChange={() => onToggle(channel)}
+          disabled={saving || (channel === "push" && pushBusy)}
+          aria-label={meta.label}
+        />
       </div>
     );
   }
@@ -180,58 +181,49 @@ function SetupChannelRow({
   }, [enabled, onToggle, channel, refetch, setExpanded]);
 
   return (
-    <div className="bg-white dark:bg-[#0b0d12] border border-slate-200 dark:border-white/[0.06] rounded-lg">
-      <div className="flex items-center justify-between px-4 py-2.5">
-        <div className="flex-1 min-w-0">
+    <div className="border-b border-line-subtle py-2.5 last:border-0">
+      <div className="flex items-center justify-between gap-3">
+        <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <span className="text-sm text-slate-600 dark:text-slate-300">
-              {meta.label}
-            </span>
-            {isConnected && (
-              <span className="text-xs text-emerald-700 bg-emerald-500/10 dark:text-emerald-400 px-2 py-0.5 rounded-full">
-                Connected
-              </span>
-            )}
+            <span className="text-label text-ink">{meta.label}</span>
+            {isConnected && <Badge tone="success">Connected</Badge>}
             {loading && (
-              <span className="text-xs text-slate-500">Loading...</span>
+              <span className="text-meta text-ink-faint">Loading…</span>
             )}
           </div>
-          <span className="block text-xs text-slate-400 dark:text-slate-500 mt-0.5">
+          <span className="mt-0.5 block text-meta text-ink-faint">
             {meta.description}
           </span>
           {setupPrompt && !isConnected && (
-            <span className="block text-xs text-amber-400 mt-1">
+            <span className="mt-1 block text-meta text-warning">
               Set up this channel before enabling it.
             </span>
           )}
         </div>
-        <div className="flex items-center gap-2 ml-3 shrink-0">
-          {isConnected ? (
-            <button
-              onClick={() => setExpanded(!expanded)}
-              className="text-xs text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 px-2 py-1 rounded transition-colors"
-            >
-              {expanded ? "Hide" : "Manage"}
-            </button>
-          ) : (
-            <button
-              onClick={() => setExpanded(!expanded)}
-              className="text-xs text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 px-2 py-1 rounded border border-indigo-500/20 hover:border-indigo-500/40 transition-colors"
-            >
-              {expanded ? "Cancel" : "Set up"}
-            </button>
-          )}
-          <input
-            type="checkbox"
+        <div className="flex shrink-0 items-center gap-1.5">
+          <Button
+            size="xs"
+            variant={isConnected ? "ghost" : "outline"}
+            onClick={() => setExpanded(!expanded)}
+          >
+            {isConnected
+              ? expanded
+                ? "Hide"
+                : "Manage"
+              : expanded
+                ? "Cancel"
+                : "Set up"}
+          </Button>
+          <Switch
             checked={enabled}
-            onChange={handleToggle}
+            onCheckedChange={handleToggle}
             disabled={saving}
-            className="rounded border-slate-300 dark:border-white/[0.1] bg-slate-100 dark:bg-[#14161c] text-indigo-500 focus:ring-0 focus:ring-offset-0 w-4 h-4"
+            aria-label={meta.label}
           />
         </div>
       </div>
       {expanded && (
-        <div className="px-4 pb-3 border-t border-white/[0.04]">
+        <div className="mt-2.5 border-t border-line-subtle pt-2.5">
           <ChannelSetupForm
             channelName={channel}
             onConnected={handleConnected}
@@ -282,12 +274,10 @@ export function AlertPreferencesPanel() {
 
   if (loading) {
     return (
-      <div className="bg-slate-100 dark:bg-[#14161c] border border-slate-200 dark:border-white/[0.06] rounded-lg p-6">
-        <div className="animate-pulse space-y-4">
-          <div className="h-4 bg-slate-200 dark:bg-white/[0.06] rounded w-1/3" />
-          <div className="h-8 bg-slate-200 dark:bg-white/[0.06] rounded w-full" />
-          <div className="h-8 bg-slate-200 dark:bg-white/[0.06] rounded w-full" />
-        </div>
+      <div className="space-y-3">
+        <Skeleton className="h-4 w-1/3" />
+        <Skeleton className="h-8 w-full" />
+        <Skeleton className="h-8 w-full" />
       </div>
     );
   }
@@ -302,74 +292,50 @@ export function AlertPreferencesPanel() {
   ).filter((ch) => ch !== "push" || pushSupported());
 
   return (
-    <div className="bg-slate-100 dark:bg-[#14161c] border border-slate-200 dark:border-white/[0.06] rounded-lg p-6 space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6">
+      <div className="flex items-start justify-between gap-4 border-b border-line-subtle pb-4">
         <div>
-          <h3 className="text-slate-900 dark:text-white font-medium">
-            Alert Notifications
-          </h3>
-          <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
-            Get notified when new filing events match your criteria.
+          <h2 className="text-title font-medium text-ink">Alerts</h2>
+          <p className="mt-0.5 text-label text-ink-faint">
+            Get notified when a new filing matches what you follow.
           </p>
         </div>
-        <button
-          onClick={() => update({ enabled: !preferences.enabled })}
+        <Switch
+          checked={preferences.enabled}
+          onCheckedChange={(enabled) => update({ enabled })}
           disabled={saving}
-          className={`relative w-11 h-6 rounded-full transition-colors ${
-            preferences.enabled
-              ? "bg-indigo-600"
-              : "bg-slate-300 dark:bg-white/[0.1]"
-          }`}
-        >
-          <span
-            className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
-              preferences.enabled ? "translate-x-5" : ""
-            }`}
-          />
-        </button>
+          aria-label="Enable alerts"
+          className="mt-1"
+        />
       </div>
 
       {preferences.enabled && (
         <>
           {/* Tier selection */}
-          <div>
-            <label className="text-slate-600 dark:text-slate-300 text-sm font-medium block mb-2">
-              Alert sensitivity
-            </label>
-            <div className="space-y-2">
-              {SENSITIVITY_OPTIONS.map(({ tier, label, hint }) => {
-                // Any threshold above 1 means "everything" in the two-option UI
-                const selected =
-                  tier === 1
-                    ? preferences.max_tier === 1
-                    : preferences.max_tier > 1;
-                return (
-                  <button
-                    key={tier}
-                    onClick={() => update({ max_tier: tier })}
-                    disabled={saving}
-                    className={`w-full text-left px-4 py-2.5 rounded-lg text-sm transition-colors border ${
-                      selected
-                        ? "bg-indigo-600 border-indigo-600 text-white"
-                        : "bg-white dark:bg-[#0b0d12] border-slate-200 dark:border-white/[0.06] text-slate-500 dark:text-slate-400 hover:border-slate-400 dark:hover:border-white/[0.12]"
-                    }`}
-                  >
-                    <span className="font-medium">{label}</span>
-                    <span className={`ml-2 ${selected ? "text-indigo-100" : "text-slate-400 dark:text-slate-500"}`}>
-                      &mdash; {hint}
-                    </span>
-                  </button>
-                );
-              })}
+          <Section title="Sensitivity">
+            <div className="flex items-center gap-3">
+              <SegmentedControl
+                label="How much to be alerted about"
+                value={preferences.max_tier === 1 ? "important" : "all"}
+                onChange={(value) =>
+                  update({ max_tier: value === "important" ? 1 : 3 })
+                }
+                options={[
+                  { value: "important", label: "Important only" },
+                  { value: "all", label: "Everything" },
+                ]}
+              />
+              <p className="text-meta text-ink-faint">
+                {preferences.max_tier === 1
+                  ? SENSITIVITY_OPTIONS[0].hint
+                  : SENSITIVITY_OPTIONS[1].hint}
+              </p>
             </div>
-          </div>
+          </Section>
 
           {/* Channel toggles */}
-          <div>
-            <label className="text-slate-600 dark:text-slate-300 text-sm font-medium block mb-2">
-              Notification channels
-            </label>
-            <div className="space-y-2">
+          <Section title="Channels">
+            <div>
               {channelList.map((channel) => (
                 <ChannelRow
                   key={channel}
@@ -382,9 +348,9 @@ export function AlertPreferencesPanel() {
               ))}
             </div>
             {pushError && (
-              <p className="text-red-400 text-xs mt-2">{pushError}</p>
+              <p className="mt-2 text-meta text-danger">{pushError}</p>
             )}
-          </div>
+          </Section>
         </>
       )}
     </div>

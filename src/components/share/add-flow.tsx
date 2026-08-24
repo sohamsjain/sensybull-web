@@ -168,11 +168,11 @@ export function AddFlow({ symbol, company: companyProp }: AddFlowProps) {
   const displayName = company?.name ?? symbol ?? "this company";
 
   return (
-    <div className="min-h-dvh flex items-center justify-center bg-slate-50 dark:bg-[#0b0d12] text-slate-800 dark:text-slate-100 p-4">
-      <div className="w-full max-w-sm rounded-2xl border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-[#12141b] shadow-sm px-6 py-8 text-center">
-        <div className="flex justify-center mb-4">
+    <div className="flex min-h-dvh items-center justify-center bg-canvas-sunken p-4 text-ink">
+      <div className="w-full max-w-sm rounded-lg border border-line-subtle bg-surface px-6 py-8 text-center shadow-popover">
+        <div className="mb-4 flex justify-center">
           {state === "invalid" ? (
-            <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-white/[0.06] flex items-center justify-center text-xl">
+            <div className="flex size-10 items-center justify-center rounded-md bg-surface-hover text-title text-ink-faint">
               ?
             </div>
           ) : (
@@ -182,29 +182,29 @@ export function AddFlow({ symbol, company: companyProp }: AddFlowProps) {
 
         {state === "loading" && (
           <>
-            <h1 className="text-base font-semibold">Adding {displayName}…</h1>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1.5">
+            <h1 className="text-title font-medium text-ink">Adding {displayName}…</h1>
+            <p className="mt-1.5 text-label text-ink-muted">
               Setting up material-update alerts for{" "}
               <span className="font-mono">{symbol}</span>.
             </p>
             <div className="mt-5 flex justify-center" role="status" aria-label="Adding company">
-              <span className="w-6 h-6 rounded-full border-2 border-indigo-500/30 border-t-indigo-500 animate-spin" />
+              <span className="size-5 animate-spin rounded-full border-2 border-brand/30 border-t-brand" />
             </div>
           </>
         )}
 
         {(state === "success" || state === "already") && (
           <>
-            <div className="text-emerald-600 dark:text-emerald-400 text-2xl mb-2">✓</div>
-            <h1 className="text-base font-semibold">
+            <div className="mb-2 text-title text-success">✓</div>
+            <h1 className="text-title font-medium text-ink">
               {state === "success"
                 ? `${displayName} added to your watchlist.`
                 : `You're already tracking ${displayName}.`}
             </h1>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1.5">
+            <p className="mt-1.5 text-label text-ink-muted">
               You&apos;ll receive material filings, earnings and company updates.
             </p>
-            <p className="text-xs text-slate-400 dark:text-slate-500 mt-4">
+            <p className="mt-4 text-meta text-ink-faint">
               Taking you to the company page…
             </p>
           </>
@@ -212,10 +212,10 @@ export function AddFlow({ symbol, company: companyProp }: AddFlowProps) {
 
         {state === "invalid" && (
           <>
-            <h1 className="text-base font-semibold">
+            <h1 className="text-title font-medium text-ink">
               We couldn&apos;t find this company.
             </h1>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1.5">
+            <p className="mt-1.5 text-label text-ink-muted">
               {symbol ? (
                 <>
                   No listed company matches{" "}
@@ -228,7 +228,7 @@ export function AddFlow({ symbol, company: companyProp }: AddFlowProps) {
             </p>
             <Link
               href="/feed"
-              className="inline-block mt-5 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:underline underline-offset-2"
+              className="mt-5 inline-block text-label font-medium text-brand-ink underline-offset-2 hover:underline"
             >
               Browse the live filing feed →
             </Link>
@@ -237,8 +237,8 @@ export function AddFlow({ symbol, company: companyProp }: AddFlowProps) {
 
         {state === "error" && (
           <>
-            <h1 className="text-base font-semibold">Couldn&apos;t add {displayName}</h1>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1.5">
+            <h1 className="text-title font-medium text-ink">Couldn&apos;t add {displayName}</h1>
+            <p className="mt-1.5 text-label text-ink-muted">
               {errorMessage ?? "Something went wrong."} Check your connection
               and try again.
             </p>
@@ -248,14 +248,14 @@ export function AddFlow({ symbol, company: companyProp }: AddFlowProps) {
                 setErrorMessage(null);
                 void execute();
               }}
-              className="mt-5 inline-flex items-center justify-center h-10 px-5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium transition-colors"
+              className="mt-5 inline-flex h-8 items-center justify-center rounded-md bg-brand px-3 text-label font-medium text-brand-on transition-colors hover:bg-brand-hover"
             >
               Try again
             </button>
           </>
         )}
 
-        <p className="mt-7 text-[11px] text-slate-400 dark:text-slate-500">
+        <p className="mt-7 text-micro text-ink-faint">
           Powered by{" "}
           <Link href="/" className="hover:underline underline-offset-2">
             Sensybull

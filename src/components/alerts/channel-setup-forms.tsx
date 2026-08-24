@@ -14,16 +14,16 @@ interface SetupFormProps {
 /* ------------------------------------------------------------------ */
 
 const inputClass =
-  "w-full px-3 py-2 text-sm rounded-lg bg-white border border-slate-200 text-slate-800 placeholder-slate-400 dark:bg-[#0b0d12] dark:border-white/[0.06] dark:text-slate-200 dark:placeholder-slate-500 focus:outline-none focus:border-indigo-500/50";
+  "w-full rounded-md border border-line-subtle bg-canvas-sunken px-2.5 py-1.5 text-label text-ink outline-none transition-colors placeholder:text-ink-faint focus:border-brand/60";
 
 const btnPrimaryClass =
-  "px-4 py-2 text-sm font-medium rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors";
+  "inline-flex h-7 items-center rounded-md bg-brand px-2.5 text-label font-medium text-brand-on transition-colors hover:bg-brand-hover disabled:cursor-not-allowed disabled:opacity-50";
 
 const btnDangerClass =
-  "px-4 py-2 text-sm font-medium rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors";
+  "inline-flex h-7 items-center rounded-md bg-danger-soft px-2.5 text-label font-medium text-danger transition-colors hover:bg-danger/20 disabled:cursor-not-allowed disabled:opacity-50";
 
-const helperClass = "text-xs text-slate-500 mt-1";
-const errorClass = "text-xs text-red-600 dark:text-red-400 mt-1";
+const helperClass = "mt-1 text-meta text-ink-faint";
+const errorClass = "mt-1 text-meta text-danger";
 
 /* ------------------------------------------------------------------ */
 /*  SMS                                                                */
@@ -54,11 +54,11 @@ export function ChannelSetupSms({ channelName, onConnected, onDisconnect }: Setu
   if (isConnected) {
     return (
       <div className="flex items-center gap-3 pt-2">
-        <span className="text-sm text-slate-500 dark:text-slate-400">
+        <span className="text-label text-ink-muted">
           {config.phone}
         </span>
         {verified && (
-          <span className="text-xs text-emerald-700 bg-emerald-500/10 dark:text-emerald-400 px-2 py-0.5 rounded-full">
+          <span className="rounded-xs bg-success-soft px-1.5 py-0.5 text-micro font-medium text-success">
             Verified
           </span>
         )}
@@ -119,9 +119,9 @@ export function ChannelSetupTelegram({ channelName, onConnected, onDisconnect }:
   if (isConnected) {
     return (
       <div className="flex items-center gap-3 pt-2">
-        <span className="text-sm text-slate-500 dark:text-slate-400">Telegram connected</span>
+        <span className="text-label text-ink-muted">Telegram connected</span>
         {verified && (
-          <span className="text-xs text-emerald-700 bg-emerald-500/10 dark:text-emerald-400 px-2 py-0.5 rounded-full">
+          <span className="rounded-xs bg-success-soft px-1.5 py-0.5 text-micro font-medium text-success">
             Verified
           </span>
         )}
@@ -136,19 +136,19 @@ export function ChannelSetupTelegram({ channelName, onConnected, onDisconnect }:
   if (linkData) {
     return (
       <div className="space-y-2 pt-2">
-        <p className="text-sm text-slate-600 dark:text-slate-300">
+        <p className="text-label text-ink-muted">
           Send this code to{" "}
           <a
             href={`https://t.me/${linkData.bot_username}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 underline"
+            className="text-brand-ink underline underline-offset-2"
           >
             @{linkData.bot_username}
           </a>{" "}
           on Telegram:
         </p>
-        <code className="block px-3 py-2 bg-slate-100 border border-slate-200 dark:bg-[#0b0d12] dark:border-white/[0.06] rounded-lg text-indigo-700 dark:text-indigo-300 text-sm font-mono tracking-widest">
+        <code className="block rounded-md border border-line-subtle bg-canvas-sunken px-3 py-2 font-mono text-label tracking-widest text-ink">
           {linkData.code}
         </code>
         <p className={helperClass}>
@@ -200,11 +200,11 @@ export function ChannelSetupDiscord({ channelName, onConnected, onDisconnect }: 
   if (isConnected) {
     return (
       <div className="flex items-center gap-3 pt-2">
-        <span className="text-sm text-slate-500 dark:text-slate-400 truncate max-w-xs">
+        <span className="text-label text-ink-muted truncate max-w-xs">
           {config.webhook_url}
         </span>
         {verified && (
-          <span className="text-xs text-emerald-700 bg-emerald-500/10 dark:text-emerald-400 px-2 py-0.5 rounded-full">
+          <span className="rounded-xs bg-success-soft px-1.5 py-0.5 text-micro font-medium text-success">
             Verified
           </span>
         )}
@@ -267,11 +267,11 @@ export function ChannelSetupSlack({ channelName, onConnected, onDisconnect }: Se
   if (isConnected) {
     return (
       <div className="flex items-center gap-3 pt-2">
-        <span className="text-sm text-slate-500 dark:text-slate-400 truncate max-w-xs">
+        <span className="text-label text-ink-muted truncate max-w-xs">
           {config.webhook_url}
         </span>
         {verified && (
-          <span className="text-xs text-emerald-700 bg-emerald-500/10 dark:text-emerald-400 px-2 py-0.5 rounded-full">
+          <span className="rounded-xs bg-success-soft px-1.5 py-0.5 text-micro font-medium text-success">
             Verified
           </span>
         )}
@@ -334,11 +334,11 @@ export function ChannelSetupWhatsapp({ channelName, onConnected, onDisconnect }:
   if (isConnected) {
     return (
       <div className="flex items-center gap-3 pt-2">
-        <span className="text-sm text-slate-500 dark:text-slate-400">
+        <span className="text-label text-ink-muted">
           {config.phone}
         </span>
         {verified && (
-          <span className="text-xs text-emerald-700 bg-emerald-500/10 dark:text-emerald-400 px-2 py-0.5 rounded-full">
+          <span className="rounded-xs bg-success-soft px-1.5 py-0.5 text-micro font-medium text-success">
             Verified
           </span>
         )}
@@ -403,11 +403,11 @@ export function ChannelSetupWebhook({ channelName, onConnected, onDisconnect }: 
   if (isConnected) {
     return (
       <div className="flex items-center gap-3 pt-2">
-        <span className="text-sm text-slate-500 dark:text-slate-400 truncate max-w-xs">
+        <span className="text-label text-ink-muted truncate max-w-xs">
           {config.url}
         </span>
         {verified && (
-          <span className="text-xs text-emerald-700 bg-emerald-500/10 dark:text-emerald-400 px-2 py-0.5 rounded-full">
+          <span className="rounded-xs bg-success-soft px-1.5 py-0.5 text-micro font-medium text-success">
             Verified
           </span>
         )}
