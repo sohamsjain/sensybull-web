@@ -4,6 +4,7 @@ import {
   formatChange,
   formatChangePct,
   formatQuotePrice,
+  formatVolume,
   quoteTooltip,
 } from "../quote";
 
@@ -81,5 +82,14 @@ describe("quoteTooltip", () => {
     );
     expect(text).not.toContain("today");
     expect(text).toContain("AAPL $214.32");
+  });
+});
+
+describe("formatVolume", () => {
+  it("compacts to the unit that keeps the number readable", () => {
+    expect(formatVolume(1_240_000_000)).toBe("1.24B");
+    expect(formatVolume(12_400_000)).toBe("12.4M");
+    expect(formatVolume(940_000)).toBe("940K");
+    expect(formatVolume(812)).toBe("812");
   });
 });

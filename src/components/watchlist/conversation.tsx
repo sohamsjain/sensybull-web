@@ -288,7 +288,12 @@ export function Conversation({
       {/* Full-pane price chart, toggled from the header */}
       {view === "chart" && (
         <div className="min-h-0 flex-1 px-4 py-3">
-          <PriceChart companyId={company.id} events={events} fill />
+          <PriceChart
+            companyId={company.id}
+            ticker={company.ticker}
+            events={events}
+            fill
+          />
         </div>
       )}
 

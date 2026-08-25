@@ -1,5 +1,36 @@
 # API Changes
 
+## 2026-08-25 (chart history paging)
+
+### `GET /companies/<id>/bars` takes an optional `end`
+
+The price chart now loads history as you pan left instead of being capped
+at whatever `lookback` was selected. Paging backwards needs a window that
+ends where the client's earliest bar begins.
+
+```
+GET /companies/<id>/bars?timeframe=1D&lookback=1Y&end=2025-06-02   (auth)
+200 { "ticker": "MU", "timeframe": "1D", "lookback": "1Y",
+      "start": "2024-06-02T00:00:00+00:00",
+      "end": "2025-06-02T00:00:00+00:00",
+      "bars": [ { "t": ..., "o": ..., "h": ..., "l": ..., "c": ..., "v": ... } ] }
+```
+
+- `end` accepts a date (`2025-06-02`, read as that day's 00:00 UTC, so the
+  page holds strictly earlier sessions) or an RFC-3339 timestamp. Anything
+  else is a 400; a future `end` is clamped to now. Omitted, the window ends
+  at "now" exactly as before.
+- `lookback` gained `2Y` and `5Y`; `start` and `end` are echoed back.
+- Caching: a window that ends in the past can never change, so those pages
+  cache for a day (`BARS_HISTORY_CACHE_SECONDS`); the live window stays at
+  5 minutes. Each page caches under its own key.
+- An empty `bars` array is how the client learns the company has no more
+  history — there is no separate `has_more` flag.
+
+Client: `useBars(companyId, lookback)` returns `loadOlder()`,
+`loadingOlder` and `exhausted` alongside `bars`; the chart calls
+`loadOlder()` when panning brings the left edge within 12 bars, and pages a
+year at a time whatever the opening window was.
 ## 2026-08-25 (supporting quotes: `briefing.evidence`)
 
 ### No endpoint change — new field inside every briefing payload

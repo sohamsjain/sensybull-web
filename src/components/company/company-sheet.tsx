@@ -219,7 +219,11 @@ export function CompanySheet({
               {/* Price chart with filing markers */}
               {user && company.ticker && (
                 <Section title="Price">
-                  <PriceChart companyId={company.id} events={events} />
+                  <PriceChart
+                    companyId={company.id}
+                    ticker={company.ticker}
+                    events={events}
+                  />
                 </Section>
               )}
 
