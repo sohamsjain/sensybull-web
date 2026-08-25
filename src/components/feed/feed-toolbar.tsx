@@ -4,7 +4,11 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 
 import { useAuth } from "@/hooks/use-auth";
-import { useDashboard, type FeedFilter } from "@/app/(dashboard)/layout";
+import {
+  useDashboard,
+  type FeedFilter,
+  type FeedScope,
+} from "@/app/(dashboard)/layout";
 import { api } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
 import { StatusDot } from "@/components/ui/badge";
@@ -16,6 +20,12 @@ import { ThemeToggle } from "@/components/theme-toggle";
 const FILTERS: { value: FeedFilter; label: string }[] = [
   { value: "all", label: "All" },
   { value: "important", label: "Important" },
+];
+
+/** Whose updates you're reading. */
+const SCOPES: { value: FeedScope; label: string }[] = [
+  { value: "mine", label: "My companies" },
+  { value: "all", label: "Everything" },
 ];
 
 /** Fallback while GET /events/types loads (mirrors the API's canonical list). */
@@ -33,16 +43,26 @@ const DEFAULT_EVENT_TYPES = [
 ];
 
 /**
- * Feed header: what you're looking at, a search box, and the categories.
+ * Feed header, two rows that always sit in the same place: whose updates
+ * you're reading plus search on top, then how to narrow them — All /
+ * Important, and the event categories.
  *
- * The chips wrap on desktop rather than scrolling off the edge — a pointer
- * has no way to swipe a hidden overflow, so half the taxonomy was
- * unreachable. Mobile keeps the single swipeable row.
+ * The stream's state lives here rather than in the reading column: it is
+ * chrome, and a "Live · 50 events" banner above the first update was a row
+ * of furniture between the reader and the news.
  */
 export function FeedToolbar({ connected }: { connected: boolean }) {
   const { user } = useAuth();
-  const { filter, setFilter, eventType, setEventType, search, setSearch } =
-    useDashboard();
+  const {
+    scope,
+    setScope,
+    filter,
+    setFilter,
+    eventType,
+    setEventType,
+    search,
+    setSearch,
+  } = useDashboard();
 
   const [eventTypes, setEventTypes] = useState<string[]>(DEFAULT_EVENT_TYPES);
   useEffect(() => {
@@ -60,28 +80,28 @@ export function FeedToolbar({ connected }: { connected: boolean }) {
   }, []);
 
   return (
-    <div className="shrink-0 border-b border-line-subtle bg-canvas px-4">
-      {/* Aligned with the reading column below, so the controls sit over the
-          content they filter rather than over the empty margin. */}
-      <div className="mx-auto flex h-12 w-full max-w-3xl items-center gap-2.5">
-        <SegmentedControl
-          options={FILTERS}
-          value={filter}
-          onChange={setFilter}
-          label="Show all updates or only important ones"
-        />
+    <div className="shrink-0 border-b border-line-subtle bg-canvas">
+      <div className="mx-auto flex h-12 w-full max-w-3xl items-center gap-2.5 px-4">
+        {/* Signed-in readers choose whose filings they're looking at */}
+        {user && (
+          <SegmentedControl
+            options={SCOPES}
+            value={scope ?? "all"}
+            onChange={setScope}
+            label="Show updates from the companies you follow, or from every company"
+          />
+        )}
 
         <SearchInput
           id="feed-search"
           value={search}
           onValueChange={setSearch}
           placeholder="Search company or headline…"
-          className="max-w-xs flex-1"
+          className="min-w-0 max-w-xs flex-1"
           hint={<Kbd className="hidden md:inline-flex">/</Kbd>}
         />
 
         <div className="ml-auto flex items-center gap-2.5">
-          {/* Stream state lives with the controls, not in the reading column */}
           <span
             className="hidden items-center gap-1.5 text-meta text-ink-faint sm:flex"
             aria-live="polite"
@@ -101,31 +121,42 @@ export function FeedToolbar({ connected }: { connected: boolean }) {
         </div>
       </div>
 
-      <ChipRow
-        className="mx-auto w-full max-w-3xl pb-2 md:flex-wrap md:overflow-visible md:[mask-image:none]"
-        role="tablist"
-        aria-label="Filter by event type"
-      >
-        <Chip
-          role="tab"
-          aria-selected={eventType === null}
-          selected={eventType === null}
-          onClick={() => setEventType(null)}
+      {/* items-start so All/Important stays on the first line of chips when
+          the categories wrap onto a second and third row */}
+      <div className="mx-auto flex w-full max-w-3xl items-start gap-2.5 px-4 pb-2">
+        <SegmentedControl
+          options={FILTERS}
+          value={filter}
+          onChange={setFilter}
+          label="Show all updates or only important ones"
+        />
+        <span className="mt-1 h-5 w-px shrink-0 bg-line-subtle" />
+        <ChipRow
+          className="min-w-0 flex-1 md:flex-wrap md:overflow-visible md:[mask-image:none]"
+          role="tablist"
+          aria-label="Filter by event type"
         >
-          All types
-        </Chip>
-        {eventTypes.map((type) => (
           <Chip
-            key={type}
             role="tab"
-            aria-selected={eventType === type}
-            selected={eventType === type}
-            onClick={() => setEventType(eventType === type ? null : type)}
+            aria-selected={eventType === null}
+            selected={eventType === null}
+            onClick={() => setEventType(null)}
           >
-            {type}
+            All types
           </Chip>
-        ))}
-      </ChipRow>
+          {eventTypes.map((type) => (
+            <Chip
+              key={type}
+              role="tab"
+              aria-selected={eventType === type}
+              selected={eventType === type}
+              onClick={() => setEventType(eventType === type ? null : type)}
+            >
+              {type}
+            </Chip>
+          ))}
+        </ChipRow>
+      </div>
     </div>
   );
 }

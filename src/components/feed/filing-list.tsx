@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import type { FilingEvent } from "@/types/events";
 import type { Quote } from "@/types/api";
+import { orderKeyFor, type FeedScope } from "@/hooks/use-events";
 import { dayLabel } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -15,6 +16,10 @@ import { FilingCard } from "./filing-card";
 interface FilingListProps {
   events: FilingEvent[];
   allCount: number;
+  /** Whose updates this list is showing. */
+  scope: FeedScope;
+  /** How many companies the reader follows; null until that's known. */
+  followedCount?: number | null;
   loading: boolean;
   hasMore: boolean;
   onLoadMore: () => void;
@@ -26,11 +31,30 @@ interface FilingListProps {
   isLoggedIn?: boolean;
 }
 
-const LAST_SEEN_KEY = "feed-last-seen";
+/**
+ * Where each stream's "last visit" mark lives. The two scopes are read at
+ * different rhythms — you can be caught up on your own companies and days
+ * behind on everything — so they remember separately.
+ */
+const LAST_SEEN_KEY: Record<FeedScope, string> = {
+  mine: "feed-last-seen-mine",
+  all: "feed-last-seen",
+};
+
+function readLastSeen(scope: FeedScope): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    return localStorage.getItem(LAST_SEEN_KEY[scope]);
+  } catch {
+    return null;
+  }
+}
 
 export function FilingList({
   events,
   allCount,
+  scope,
+  followedCount = null,
   loading,
   hasMore,
   onLoadMore,
@@ -43,13 +67,17 @@ export function FilingList({
   const scrollRef = useRef<HTMLDivElement>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
 
-  // Where the reader left off last session; written once per visit
-  const [lastSeen] = useState<string | null>(() =>
-    typeof window === "undefined" ? null : localStorage.getItem(LAST_SEEN_KEY)
-  );
+  // Where the reader left off last time they read this stream. Read during
+  // render (and re-read when they switch streams), stamped in an effect.
+  const [seen, setSeen] = useState(() => ({ scope, at: readLastSeen(scope) }));
+  if (seen.scope !== scope) setSeen({ scope, at: readLastSeen(scope) });
+  const lastSeen = seen.at;
+
   useEffect(() => {
-    localStorage.setItem(LAST_SEEN_KEY, new Date().toISOString());
-  }, []);
+    try {
+      localStorage.setItem(LAST_SEEN_KEY[scope], new Date().toISOString());
+    } catch {}
+  }, [scope]);
 
   // While the reader is scrolled down, hold new live events behind a pill
   // instead of yanking the list out from under them.
@@ -186,8 +214,11 @@ export function FilingList({
     return () => observer.disconnect();
   }, [canLoadMore]);
 
+  // Compared on the same key the list is sorted by, so the divider lands on
+  // a real boundary rather than somewhere mid-list.
+  const orderKey = orderKeyFor(scope);
   const isNewerThanLastSeen = (e: FilingEvent) => {
-    const ts = e.received_at || e.filing_date;
+    const ts = orderKey(e);
     return !!lastSeen && !!ts && ts > lastSeen;
   };
   const anyNewSinceLastVisit =
@@ -213,7 +244,7 @@ export function FilingList({
       >
         <div className="mx-auto w-full max-w-3xl">
           {/* Guest nudge */}
-          {!isLoggedIn && displayed.length > 0 && (
+          {!isLoggedIn && scope === "all" && displayed.length > 0 && (
             <div className="mx-4 mt-3 mb-2 flex items-center justify-between gap-3 rounded-md border border-line-subtle bg-surface px-3 py-2.5">
               <p className="text-meta leading-snug text-ink-muted">
                 Follow the companies you care about — sign in to build a
@@ -227,9 +258,10 @@ export function FilingList({
 
           {/* First-run nudge: signed in but following nobody yet */}
           {isLoggedIn &&
+            scope === "all" &&
             watchlistedCompanyIds?.size === 0 &&
             displayed.length > 0 && (
-              <p className="mx-4 mb-2 text-meta leading-snug text-ink-faint">
+              <p className="mx-4 mt-3 mb-2 text-meta leading-snug text-ink-faint">
                 This is everything, from every company. Filings from companies
                 you follow live in your{" "}
                 <Link
@@ -246,11 +278,11 @@ export function FilingList({
           {/* Event rows, grouped by day, separated by hairlines */}
           <div className="divide-y divide-line-subtle">
             {displayed.map((event, i) => {
-              const ts = event.received_at || event.filing_date || "";
+              // Grouped on the ordering key too, so a day header can't repeat
+              // when the two scopes sort by different timestamps.
+              const ts = orderKey(event) || "";
               const prev = i > 0 ? displayed[i - 1] : null;
-              const prevTs = prev
-                ? prev.received_at || prev.filing_date || ""
-                : null;
+              const prevTs = prev ? orderKey(prev) || "" : null;
               const showDay =
                 !!ts && (!prevTs || dayLabel(ts) !== dayLabel(prevTs));
               const showLastVisit =
@@ -324,7 +356,29 @@ export function FilingList({
               description={`Try switching to "All", clearing the category filter, or emptying the search box.`}
             />
           )}
-          {allCount === 0 && !loading && (
+          {allCount === 0 && !loading && scope === "mine" && (
+            <EmptyState
+              className="pt-16"
+              title={
+                followedCount === 0
+                  ? "You're not following anyone yet"
+                  : "Nothing from your companies yet"
+              }
+              description={
+                followedCount === 0
+                  ? "Follow a company and every filing and press release it publishes lands here, in plain English. Or switch to Everything to watch the whole market live."
+                  : "The companies you follow haven't filed anything recently. Switch to Everything to see the whole market."
+              }
+              action={
+                followedCount === 0 ? (
+                  <Link href="/watchlist">
+                    <Button size="sm">Add a company</Button>
+                  </Link>
+                ) : undefined
+              }
+            />
+          )}
+          {allCount === 0 && !loading && scope === "all" && (
             <EmptyState
               className="pt-16"
               title="No events yet"
