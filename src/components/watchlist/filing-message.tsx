@@ -5,8 +5,10 @@ import { useState } from "react";
 import type { FilingEvent } from "@/types/events";
 import { messageTime, fullDateTime } from "@/lib/utils";
 import { isImportant } from "@/lib/event-actions";
+import { evidenceEntries } from "@/lib/evidence";
 import { DealTerms } from "@/components/feed/deal-terms";
 import { CatalystsTable } from "@/components/feed/catalysts-table";
+import { EvidenceList } from "@/components/feed/evidence";
 import { PriceReactionStrip } from "@/components/feed/price-reaction-strip";
 import { UpdateActions } from "@/components/feed/update-actions";
 import { ImportantMarker, MetaLabel } from "@/components/ui/badge";
@@ -30,10 +32,12 @@ export function FilingMessage({ event }: { event: FilingEvent }) {
     event.catalysts?.length > 0 ? event.catalysts : briefing?.catalysts || [];
   const hasDealTerms =
     !!briefing?.deal_terms && Object.keys(briefing.deal_terms).length > 0;
+  const evidence = evidenceEntries(briefing);
 
   const hasDetails = !!(
     briefing?.summary ||
     hasDealTerms ||
+    evidence.length > 0 ||
     catalysts.length > 0 ||
     edgar_url
   );
@@ -103,6 +107,7 @@ export function FilingMessage({ event }: { event: FilingEvent }) {
               An AI summary isn&apos;t available for this filing.
             </p>
           )}
+          <EvidenceList entries={evidence} />
           {hasDealTerms && <DealTerms terms={briefing!.deal_terms} />}
           {catalysts.length > 0 && <CatalystsTable catalysts={catalysts} />}
           {event.price_reactions && (
