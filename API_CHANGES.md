@@ -1,5 +1,50 @@
 # API Changes
 
+## 2026-08-25 (supporting quotes: `briefing.evidence`)
+
+### No endpoint change — new field inside every briefing payload
+
+Briefings now carry the filing text that backs them. Every event payload
+that has a `briefing` (`GET /events/`, `/events/all`, `/events/all/:id`,
+`/events/company/:id`, and the `filing_event` / `filing_event_update`
+socket events) may include:
+
+```
+"briefing": {
+  ...,
+  "evidence": [{
+    "quote": "the Company entered into a definitive merger agreement with Acme Corp.",
+    "event_type": "Acquisition",
+    "source": "Item 1.01",
+    "doc_url": "https://www.sec.gov/Archives/edgar/data/.../a8k.htm",
+    "url": "https://www.sec.gov/Archives/edgar/data/.../a8k.htm#:~:text=the%20Company%20entered,Acme%20Corp.",
+    "highlighted": true
+  }]
+}
+```
+
+- `quote` is **verbatim source text**, not the model's transcription. Ingest
+  matches each cited quote against the filing with four-word shingles
+  (≥40% must appear verbatim) and stores the span it matched; a quote that
+  fails is dropped, so nothing unverified is ever served.
+- `url` is the document containing the quote plus a
+  [text fragment](https://developer.mozilla.org/docs/Web/URI/Fragment/Text_fragments) —
+  opening it scrolls to the passage and highlights it. Note this is the
+  **document** URL, unlike the event's `edgar_url`, which is the EDGAR
+  index page.
+- `highlighted` is false when no unambiguous fragment could be built; `url`
+  then just opens the document. On a browser without text-fragment support
+  (pre-131 Firefox, pre-16.1 Safari) any link degrades the same way.
+- The array is capped at 3 entries, and links are validated API-side: a URL
+  that is not `https` on an SEC host is stripped, keeping the quote.
+- **Absent** on facts-only briefings, on press releases, and on every event
+  stored before this shipped — read it through `evidenceEntries()` in
+  `src/lib/evidence.ts` rather than touching `briefing.evidence` directly.
+
+Client: `EvidenceList` (`src/components/feed/evidence.tsx`) renders it as a
+"From the filing" panel inside expanded updates, in both the feed card and
+the watchlist entry. The quotes also travel in the copy-for-AI-chat prompt.
+
 ## 2026-08-25 (batch quotes for the redesigned rows)
 
 ### New endpoint: `GET /companies/quotes?ids=a,b,c`

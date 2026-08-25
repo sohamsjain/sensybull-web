@@ -7,6 +7,7 @@ import type { Quote } from "@/types/api";
 import { useDashboard } from "@/app/(dashboard)/layout";
 import { timeAgo, fullDateTime } from "@/lib/utils";
 import { isImportant } from "@/lib/event-actions";
+import { evidenceEntries } from "@/lib/evidence";
 import { filedPhrase } from "@/lib/forms";
 import { StockQuote } from "@/components/company/stock-quote";
 import { ImportantMarker, MetaLabel } from "@/components/ui/badge";
@@ -15,6 +16,7 @@ import { cn } from "@/lib/utils";
 
 import { DealTerms } from "./deal-terms";
 import { CatalystsTable } from "./catalysts-table";
+import { EvidenceList } from "./evidence";
 import { CompanyLogo } from "./company-logo";
 import { PriceReactionStrip } from "./price-reaction-strip";
 import { UpdateActions } from "./update-actions";
@@ -66,9 +68,11 @@ export function FilingCard({
     event.catalysts?.length > 0 ? event.catalysts : briefing?.catalysts || [];
   const hasDealTerms =
     !!briefing?.deal_terms && Object.keys(briefing.deal_terms).length > 0;
+  const evidence = evidenceEntries(briefing);
   const hasExpandedContent = !!(
     briefing?.summary ||
     hasDealTerms ||
+    evidence.length > 0 ||
     catalysts.length > 0 ||
     event.edgar_url
   );
@@ -203,6 +207,10 @@ export function FilingCard({
                 source document below.
               </p>
             )}
+
+            {/* Proof before terms: the reader is told what happened, then
+                shown the sentence that says so. */}
+            <EvidenceList entries={evidence} />
 
             {hasDealTerms && <DealTerms terms={briefing!.deal_terms} />}
 

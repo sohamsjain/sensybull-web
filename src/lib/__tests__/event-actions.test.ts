@@ -83,3 +83,33 @@ describe("buildShareText", () => {
     );
   });
 });
+
+describe("buildAiPrompt evidence", () => {
+  const withEvidence = () =>
+    ev({
+      briefing: {
+        ...ev().briefing!,
+        evidence: [
+          {
+            quote: "Micron entered into a definitive agreement to acquire ChipWorks",
+            event_type: "Acquisition",
+            source: "Item 1.01",
+            doc_url: "https://www.sec.gov/Archives/edgar/data/723125/a8k.htm",
+            url: "https://www.sec.gov/Archives/edgar/data/723125/a8k.htm#:~:text=Micron",
+            highlighted: true,
+          },
+        ],
+      },
+    });
+
+  it("hands the chatbot the filing's own words, attributed", () => {
+    const prompt = buildAiPrompt(withEvidence());
+    expect(prompt).toContain(
+      '- "Micron entered into a definitive agreement to acquire ChipWorks" (Item 1.01)'
+    );
+  });
+
+  it("says nothing about quotes when there are none", () => {
+    expect(buildAiPrompt(ev())).not.toContain("Quoted from");
+  });
+});

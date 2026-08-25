@@ -1,3 +1,29 @@
+/**
+ * One quote from the source document, proving a claim in the briefing.
+ *
+ * The quote is verbatim source text: ingest matches the model's citation
+ * against the filing and stores the span it matched, not what the model
+ * typed (services/ingest/evidence.py). `url` opens that document scrolled
+ * to the passage with it highlighted, using a browser text fragment —
+ * `highlighted` is false when no unambiguous fragment could be built, or
+ * on a browser without text-fragment support the link still opens the
+ * right document at the top.
+ */
+export interface Evidence {
+  /** Verbatim text from the filing, whitespace-normalized. */
+  quote: string;
+  /** The briefing label this quote supports; "" when unattributed. */
+  event_type: string;
+  /** Where in the filing it sits: "Item 5.02", "EX-99.1", "the filing". */
+  source: string;
+  /** The document the quote came from — not the EDGAR index page. */
+  doc_url: string;
+  /** doc_url plus a text fragment when one exists; "" if unlinkable. */
+  url: string;
+  /** Whether `url` scrolls to and highlights the quote. */
+  highlighted: boolean;
+}
+
 export interface Briefing {
   headline: string;
   summary: string;
@@ -18,6 +44,12 @@ export interface Briefing {
    * Absent on the oldest events.
    */
   mode?: "llm" | "facts_only" | "llm_verified" | "structured";
+  /**
+   * Verified supporting quotes. Absent on facts_only briefings and on
+   * every event stored before evidence shipped — read it through
+   * `evidenceEntries()` in `src/lib/evidence.ts`.
+   */
+  evidence?: Evidence[];
 }
 
 export interface Catalyst {
