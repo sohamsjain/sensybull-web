@@ -57,6 +57,7 @@
   --color-canvas: var(--canvas);
   --color-canvas-sunken: var(--canvas-sunken);
   --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
   --color-surface-hover: var(--surface-hover);
   --color-surface-active: var(--surface-active);
 

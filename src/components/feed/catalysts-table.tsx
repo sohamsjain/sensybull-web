@@ -9,7 +9,7 @@ export function CatalystsTable({ catalysts }: { catalysts: Catalyst[] }) {
   if (catalysts.length === 0) return null;
 
   return (
-    <div className="mt-2.5 rounded-md border border-line-subtle bg-canvas-sunken p-3">
+    <div className="mt-2.5 rounded-md border border-line bg-canvas-sunken p-3">
       <p className="eyebrow mb-2">Key dates</p>
       <table className="w-full border-collapse">
         <tbody>

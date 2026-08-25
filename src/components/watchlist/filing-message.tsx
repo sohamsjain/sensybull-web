@@ -12,6 +12,7 @@ import { UpdateActions } from "@/components/feed/update-actions";
 import { ImportantMarker, MetaLabel } from "@/components/ui/badge";
 import { ChevronDownIcon } from "@/components/ui/icons";
 import { filedPhrase, formTag, formTagDuplicatesEventType } from "@/lib/forms";
+import { cn } from "@/lib/utils";
 
 /**
  * One filing event in a company's history.
@@ -46,7 +47,12 @@ export function FilingMessage({ event }: { event: FilingEvent }) {
   return (
     <article
       onClick={toggleExpanded}
-      className="group cursor-pointer border-b border-line-subtle px-4 py-3 transition-colors last:border-0 hover:bg-surface-hover/60"
+      className={cn(
+        "group cursor-pointer border-b border-line-subtle px-4 py-3 transition-colors last:border-0",
+        // An open entry keeps its own background: the panels inside it are
+        // the tinted things, and a hover fill would swallow them.
+        !expanded && "hover:bg-surface-hover/60"
+      )}
     >
       {/* Meta row: Important marker · category · form type · time */}
       <div className="mb-1 flex items-center gap-2.5">

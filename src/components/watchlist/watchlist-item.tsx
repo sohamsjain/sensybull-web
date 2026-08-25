@@ -1,6 +1,7 @@
 "use client";
 
-import type { WatchlistEntry } from "@/types/api";
+import type { Quote, WatchlistEntry } from "@/types/api";
+import { StockQuote } from "@/components/company/stock-quote";
 import { CountBadge } from "@/components/ui/badge";
 import { CheckIcon, MutedIcon, PinIcon } from "@/components/ui/icons";
 import { listTimestamp, fullDateTime } from "@/lib/utils";
@@ -9,12 +10,19 @@ import { cn } from "@/lib/utils";
 import { CompanyAvatar } from "./company-avatar";
 
 /** Selection box. Visual only — the whole row is the hit target. */
-function SelectionBox({ selected }: { selected: boolean }) {
+function SelectionBox({
+  selected,
+  className,
+}: {
+  selected: boolean;
+  className?: string;
+}) {
   return (
     <span
       aria-hidden="true"
       className={cn(
         "flex size-4 shrink-0 items-center justify-center rounded-xs border transition-colors",
+        className,
         selected
           ? "border-brand bg-brand text-brand-on"
           : "border-line-strong text-transparent"
@@ -26,13 +34,17 @@ function SelectionBox({ selected }: { selected: boolean }) {
 }
 
 /**
- * One company in the list. Everything a scan needs on two lines: who,
- * when, what happened last, and whether anything is unread — at a density
- * where fifty companies fit on a screen without becoming a wall.
+ * One company in the list.
+ *
+ * Three bands: who and when, where the stock is, and what happened. The
+ * headline gets two lines because deciding whether to open a company is
+ * mostly a question of whether that sentence is interesting — truncating it
+ * at one line makes the reader click to find out.
  */
 export function WatchlistItem({
   entry,
   active,
+  quote,
   pinned = false,
   selectable = false,
   selected = false,
@@ -41,6 +53,7 @@ export function WatchlistItem({
 }: {
   entry: WatchlistEntry;
   active: boolean;
+  quote?: Quote;
   pinned?: boolean;
   /** Selection mode: show a checkbox and toggle instead of opening. */
   selectable?: boolean;
@@ -65,17 +78,18 @@ export function WatchlistItem({
       data-company-id={company.id}
       {...checkboxProps}
       className={cn(
-        "flex w-full items-center gap-2.5 border-l-2 px-3 py-2 text-left transition-colors outline-none",
+        "flex w-full items-start gap-2.5 border-l-2 px-3 py-2.5 text-left transition-colors outline-none",
         highlighted
           ? "border-l-brand bg-brand-soft"
           : "border-l-transparent hover:bg-surface-hover"
       )}
     >
-      {selectable && <SelectionBox selected={selected} />}
+      {selectable && <SelectionBox selected={selected} className="mt-0.5" />}
 
       <CompanyAvatar ticker={company.ticker} name={company.name} size="sm" />
 
-      <div className="-mb-2 min-w-0 flex-1 border-b border-line-subtle pb-2">
+      <div className="-mb-2.5 min-w-0 flex-1 border-b border-line-subtle pb-2.5">
+        {/* Who, and when it last moved */}
         <div className="flex items-baseline justify-between gap-2">
           <span className="flex min-w-0 items-baseline gap-1.5">
             {company.ticker && (
@@ -108,19 +122,13 @@ export function WatchlistItem({
           </span>
         </div>
 
-        <div className="mt-0.5 flex items-center justify-between gap-2">
-          <span
-            className={cn(
-              "truncate text-meta",
-              hasUnread
-                ? "text-ink-muted"
-                : last_event
-                  ? "text-ink-faint"
-                  : "text-ink-dim italic"
-            )}
-          >
-            {last_event ? last_event.headline : "No filings yet"}
-          </span>
+        {/* Where the stock is, and how much is unread */}
+        <div className="mt-1 flex items-center justify-between gap-2">
+          {quote ? (
+            <StockQuote quote={quote} size="sm" />
+          ) : (
+            <span className="text-micro text-ink-dim">&nbsp;</span>
+          )}
           <span className="flex shrink-0 items-center gap-1.5">
             {pinned && (
               <PinIcon className="size-3 text-ink-faint" aria-label="Pinned" />
@@ -131,6 +139,20 @@ export function WatchlistItem({
             <CountBadge count={unread_count} muted={muted} />
           </span>
         </div>
+
+        {/* What happened — two lines, so the reader can decide from the list */}
+        <p
+          className={cn(
+            "mt-1 line-clamp-2 text-meta",
+            hasUnread
+              ? "text-ink-muted"
+              : last_event
+                ? "text-ink-faint"
+                : "text-ink-dim italic"
+          )}
+        >
+          {last_event ? last_event.headline : "No filings yet"}
+        </p>
       </div>
     </button>
   );

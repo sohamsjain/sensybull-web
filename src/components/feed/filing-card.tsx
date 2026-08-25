@@ -3,10 +3,12 @@
 import { useState } from "react";
 
 import type { FilingEvent } from "@/types/events";
+import type { Quote } from "@/types/api";
 import { useDashboard } from "@/app/(dashboard)/layout";
 import { timeAgo, fullDateTime } from "@/lib/utils";
 import { isImportant } from "@/lib/event-actions";
 import { filedPhrase } from "@/lib/forms";
+import { StockQuote } from "@/components/company/stock-quote";
 import { ImportantMarker, MetaLabel } from "@/components/ui/badge";
 import { ChevronDownIcon, PlusIcon } from "@/components/ui/icons";
 import { cn } from "@/lib/utils";
@@ -19,6 +21,8 @@ import { UpdateActions } from "./update-actions";
 
 interface FilingCardProps {
   event: FilingEvent;
+  /** Last price + day change for the filer, when we have one. */
+  quote?: Quote;
   isWatchlisted?: boolean;
   onAddToWatchlist?: (companyId: string) => void;
   addingToWatchlist?: boolean;
@@ -31,14 +35,15 @@ interface FilingCardProps {
 }
 
 /**
- * One update in the feed. Collapsed it's who, when, and the headline; a
- * click opens the summary, key dates, and the actions.
+ * One update in the feed. Collapsed it's who, where the stock is, when, and
+ * the headline; a click opens the summary, key dates, and the actions.
  *
  * A flat row rather than a card: the list separates updates with a hairline,
  * so a screenful of events reads as one stream instead of a stack of boxes.
  */
 export function FilingCard({
   event,
+  quote,
   isWatchlisted,
   onAddToWatchlist,
   addingToWatchlist,
@@ -68,6 +73,12 @@ export function FilingCard({
     event.edgar_url
   );
 
+  const category =
+    briefing?.primary_event_type && briefing.primary_event_type !== "Other"
+      ? briefing.primary_event_type
+      : null;
+  const canTrack =
+    isLoggedIn && !isWatchlisted && !!company_id && !!onAddToWatchlist;
   const eventTimestamp = received_at || filing_date;
 
   return (
@@ -75,14 +86,17 @@ export function FilingCard({
       onClick={toggleExpanded}
       className={cn(
         "group grid cursor-pointer grid-cols-[2.5rem_1fr] gap-x-3 px-4 py-3 transition-colors",
-        selected ? "bg-brand-soft" : "hover:bg-surface-hover/60"
+        selected && "bg-brand-soft",
+        // An open update keeps its own background: the panels inside it are
+        // the tinted things, and a hover fill would swallow them.
+        !selected && !expanded && "hover:bg-surface-hover/60"
       )}
     >
       <CompanyLogo ticker={ticker} name={company_name} />
 
       <div className="min-w-0">
-        {/* Identity + time */}
-        <div className="flex items-center justify-between gap-2">
+        {/* Identity · price · time */}
+        <div className="flex items-baseline justify-between gap-3">
           <div className="flex min-w-0 items-baseline gap-2">
             {company_id ? (
               <button
@@ -103,7 +117,12 @@ export function FilingCard({
                     {ticker}
                   </span>
                 )}
-                <span className="truncate text-meta text-ink-faint">
+                <span
+                  className={cn(
+                    "truncate text-meta text-ink-faint",
+                    ticker && "hidden sm:inline"
+                  )}
+                >
                   {company_name}
                 </span>
               </button>
@@ -114,30 +133,23 @@ export function FilingCard({
                     {ticker}
                   </span>
                 )}
-                <span className="truncate text-meta text-ink-faint">
+                <span
+                  className={cn(
+                    "truncate text-meta text-ink-faint",
+                    ticker && "hidden sm:inline"
+                  )}
+                >
                   {company_name}
                 </span>
               </>
             )}
           </div>
 
-          <div className="flex shrink-0 items-center gap-2">
-            {isLoggedIn && !isWatchlisted && company_id && onAddToWatchlist && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onAddToWatchlist(company_id);
-                }}
-                disabled={addingToWatchlist}
-                className="inline-flex items-center gap-1 rounded-sm px-1.5 py-0.5 text-micro font-medium text-brand-ink transition-colors hover:bg-brand-soft disabled:opacity-50"
-                title="Add to watchlist"
-              >
-                <PlusIcon className="size-3" />
-                <span className="hidden sm:inline">Track</span>
-              </button>
-            )}
+          <div className="flex shrink-0 items-baseline gap-3">
+            <StockQuote quote={quote} size="sm" />
+            {/* Fixed width so prices line up in a column down the feed */}
             <span
-              className="text-micro whitespace-nowrap tabular-nums text-ink-faint"
+              className="w-14 text-right text-micro whitespace-nowrap tabular-nums text-ink-faint"
               title={fullDateTime(eventTimestamp)}
             >
               {timeAgo(eventTimestamp)}
@@ -145,16 +157,27 @@ export function FilingCard({
           </div>
         </div>
 
-        {/* Category + Important marker */}
-        {(important ||
-          (briefing?.primary_event_type &&
-            briefing.primary_event_type !== "Other")) && (
-          <div className="mt-0.5 flex flex-wrap items-center gap-2.5">
-            {important && <ImportantMarker />}
-            {briefing?.primary_event_type &&
-              briefing.primary_event_type !== "Other" && (
-                <MetaLabel>{briefing.primary_event_type}</MetaLabel>
-              )}
+        {/* Category, priority, and the one action worth offering unopened */}
+        {(important || category || canTrack) && (
+          <div className="mt-0.5 flex items-center justify-between gap-3">
+            <div className="flex min-w-0 flex-wrap items-center gap-2.5">
+              {important && <ImportantMarker />}
+              {category && <MetaLabel>{category}</MetaLabel>}
+            </div>
+            {canTrack && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAddToWatchlist!(company_id!);
+                }}
+                disabled={addingToWatchlist}
+                className="inline-flex shrink-0 items-center gap-1 rounded-sm px-1.5 py-0.5 text-micro font-medium text-brand-ink transition-colors hover:bg-brand-soft disabled:opacity-50"
+                title={`Track ${ticker || company_name}`}
+              >
+                <PlusIcon className="size-3" />
+                Track
+              </button>
+            )}
           </div>
         )}
 

@@ -3,8 +3,10 @@
 import { useCallback, useRef, useState, useSyncExternalStore } from "react";
 import { createLocalPref } from "@/lib/local-pref";
 
-const DEFAULT_WIDTH = 320;
-const MIN_WIDTH = 240;
+// Wide enough for a ticker, a price, and two lines of headline before the
+// reader has to touch the drag handle.
+const DEFAULT_WIDTH = 360;
+const MIN_WIDTH = 260;
 const MAX_WIDTH = 480;
 // Dragging narrower than this snaps the pane closed
 const COLLAPSE_AT = 180;

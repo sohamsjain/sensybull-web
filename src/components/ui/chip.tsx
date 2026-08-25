@@ -44,7 +44,7 @@ export function ChipRow({
   return (
     <div
       className={cn(
-        "flex items-center gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+        "flex items-center gap-1 gap-y-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
         // Fades the last chip out at the edge so the row reads as scrollable
         "[mask-image:linear-gradient(to_right,black_calc(100%-2rem),transparent)]",
         className

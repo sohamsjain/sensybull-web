@@ -132,10 +132,18 @@ tracked, `ink-faint`.
 
 ## Lists and density
 
-A list row states: entity, what happened, when, and status. Two lines, ~52px,
-hairline between rows, indented past the mark like WhatsApp Web. Rows are not
-cards. The selected row gets `bg-brand-soft` plus a 2px accent bar on its
-leading edge.
+A list row states: entity, where the stock is, what happened, when, and
+status. Hairline between rows, indented past the mark like WhatsApp Web.
+Rows are not cards. The selected row gets `bg-brand-soft` plus a 2px accent
+bar on its leading edge.
+
+The headline gets **two lines**, not one: deciding whether to open something
+is mostly deciding whether that sentence is interesting, and a row that
+truncates it makes the reader click to find out.
+
+Numbers align in a column. Where a price sits next to a timestamp, the
+timestamp is given a fixed width so prices form a straight edge down the
+list rather than drifting with "8m ago" vs "3h ago".
 
 ## Interaction
 
@@ -165,5 +173,8 @@ Before shipping a change, on both themes and at 390px / 1440px:
 - Rows align on a consistent grid; hairlines are `line-subtle`.
 - Selected states are unmistakable; hover states are quiet.
 - Wide content scrolls inside its own container — the page never scrolls
-  sideways.
+  sideways. A pointer cannot swipe a hidden overflow: anything that scrolls
+  horizontally on desktop must either wrap or show its own control.
+- Popovers, tooltips and toasts sit on `surface-raised` — an overlay that
+  lets the page show through is a bug, not a style.
 - Nothing new is wrapped in a card just because it is a group of information.

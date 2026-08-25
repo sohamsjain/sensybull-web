@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useDashboard, type FeedFilter } from "@/app/(dashboard)/layout";
 import { api } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
+import { StatusDot } from "@/components/ui/badge";
 import { Chip, ChipRow, SegmentedControl } from "@/components/ui/chip";
 import { Kbd } from "@/components/ui/kbd";
 import { SearchInput } from "@/components/ui/search-input";
@@ -32,10 +33,13 @@ const DEFAULT_EVENT_TYPES = [
 ];
 
 /**
- * Feed header: what you're looking at (All / Important), a search box, and
- * the category filters. One bar, two rows, always in the same place.
+ * Feed header: what you're looking at, a search box, and the categories.
+ *
+ * The chips wrap on desktop rather than scrolling off the edge — a pointer
+ * has no way to swipe a hidden overflow, so half the taxonomy was
+ * unreachable. Mobile keeps the single swipeable row.
  */
-export function FeedToolbar() {
+export function FeedToolbar({ connected }: { connected: boolean }) {
   const { user } = useAuth();
   const { filter, setFilter, eventType, setEventType, search, setSearch } =
     useDashboard();
@@ -56,8 +60,10 @@ export function FeedToolbar() {
   }, []);
 
   return (
-    <div className="shrink-0 border-b border-line-subtle bg-canvas">
-      <div className="mx-auto flex h-12 w-full max-w-3xl items-center gap-2.5 px-4">
+    <div className="shrink-0 border-b border-line-subtle bg-canvas px-4">
+      {/* Aligned with the reading column below, so the controls sit over the
+          content they filter rather than over the empty margin. */}
+      <div className="mx-auto flex h-12 w-full max-w-3xl items-center gap-2.5">
         <SegmentedControl
           options={FILTERS}
           value={filter}
@@ -69,24 +75,34 @@ export function FeedToolbar() {
           id="feed-search"
           value={search}
           onValueChange={setSearch}
-          placeholder="Search company…"
+          placeholder="Search company or headline…"
           className="max-w-xs flex-1"
           hint={<Kbd className="hidden md:inline-flex">/</Kbd>}
         />
 
-        {/* Guests have no nav rail; give them theme + sign-in here */}
-        {!user && (
-          <div className="ml-auto flex items-center gap-1.5">
-            <ThemeToggle size="md" />
-            <Link href="/login">
-              <Button size="sm">Sign in</Button>
-            </Link>
-          </div>
-        )}
+        <div className="ml-auto flex items-center gap-2.5">
+          {/* Stream state lives with the controls, not in the reading column */}
+          <span
+            className="hidden items-center gap-1.5 text-meta text-ink-faint sm:flex"
+            aria-live="polite"
+          >
+            <StatusDot live={connected} />
+            {connected ? "Live" : "Connecting…"}
+          </span>
+          {/* Guests have no nav rail; give them theme + sign-in here */}
+          {!user && (
+            <>
+              <ThemeToggle size="md" />
+              <Link href="/login">
+                <Button size="sm">Sign in</Button>
+              </Link>
+            </>
+          )}
+        </div>
       </div>
 
       <ChipRow
-        className="mx-auto w-full max-w-3xl px-4 pb-2"
+        className="mx-auto w-full max-w-3xl pb-2 md:flex-wrap md:overflow-visible md:[mask-image:none]"
         role="tablist"
         aria-label="Filter by event type"
       >
