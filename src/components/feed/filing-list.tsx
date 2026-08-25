@@ -4,10 +4,10 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 
 import type { FilingEvent } from "@/types/events";
+import type { Quote } from "@/types/api";
 import { orderKeyFor, type FeedScope } from "@/hooks/use-events";
 import { dayLabel } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { StatusDot } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ArrowUpIcon } from "@/components/ui/icons";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -22,8 +22,9 @@ interface FilingListProps {
   followedCount?: number | null;
   loading: boolean;
   hasMore: boolean;
-  connected: boolean;
   onLoadMore: () => void;
+  /** Last price per company id, for the price on each row. */
+  quotes?: Record<string, Quote>;
   watchlistedCompanyIds?: Set<string>;
   onAddToWatchlist?: (companyId: string) => void;
   addingCompanyId?: string | null;
@@ -56,14 +57,15 @@ export function FilingList({
   followedCount = null,
   loading,
   hasMore,
-  connected,
   onLoadMore,
+  quotes,
   watchlistedCompanyIds,
   onAddToWatchlist,
   addingCompanyId,
   isLoggedIn,
 }: FilingListProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
   // Where the reader left off last time they read this stream. Read during
   // render (and re-read when they switch streams), stamped in an effect.
@@ -186,6 +188,32 @@ export function FilingList({
       ?.scrollIntoView({ block: "nearest" });
   }, [selectedIdx]);
 
+  // Load the next page as the reader approaches the end of this one. The
+  // callback is read through a ref so the observer survives re-renders and
+  // isn't torn down and rebuilt on every new event.
+  const loadMoreRef = useRef(onLoadMore);
+  useEffect(() => {
+    loadMoreRef.current = onLoadMore;
+  }, [onLoadMore]);
+  const canLoadMore = hasMore && !loading;
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel || !canLoadMore) return;
+    const observer: IntersectionObserver = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        // Fire once per page: the effect re-arms when loading settles, so a
+        // burst of intersections can't skip a page by racing the guard.
+        observer.disconnect();
+        loadMoreRef.current();
+      },
+      // Start fetching a screen early so the list rarely stops moving
+      { root: scrollRef.current, rootMargin: "600px 0px" }
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [canLoadMore]);
+
   // Compared on the same key the list is sorted by, so the divider lands on
   // a real boundary rather than somewhere mid-list.
   const orderKey = orderKeyFor(scope);
@@ -215,29 +243,9 @@ export function FilingList({
         className="h-full overflow-y-auto"
       >
         <div className="mx-auto w-full max-w-3xl">
-          {/* Stream status */}
-          <div className="flex items-center gap-2 px-4 py-2.5 text-meta text-ink-faint">
-            <StatusDot live={connected} />
-            <span>{connected ? "Live" : "Connecting…"}</span>
-            <span className="text-ink-dim">·</span>
-            <span className="tabular-nums">
-              {displayed.length} event{displayed.length !== 1 ? "s" : ""}
-            </span>
-            {scope === "mine" && !!followedCount && (
-              <>
-                <span className="text-ink-dim">·</span>
-                <span>
-                  from your{" "}
-                  <span className="tabular-nums">{followedCount}</span>{" "}
-                  {followedCount === 1 ? "company" : "companies"}
-                </span>
-              </>
-            )}
-          </div>
-
           {/* Guest nudge */}
           {!isLoggedIn && scope === "all" && displayed.length > 0 && (
-            <div className="mx-4 mb-2 flex items-center justify-between gap-3 rounded-md border border-line-subtle bg-surface px-3 py-2.5">
+            <div className="mx-4 mt-3 mb-2 flex items-center justify-between gap-3 rounded-md border border-line-subtle bg-surface px-3 py-2.5">
               <p className="text-meta leading-snug text-ink-muted">
                 Follow the companies you care about — sign in to build a
                 watchlist and get every filing explained in plain English.
@@ -253,7 +261,7 @@ export function FilingList({
             scope === "all" &&
             watchlistedCompanyIds?.size === 0 &&
             displayed.length > 0 && (
-              <p className="mx-4 mb-2 text-meta leading-snug text-ink-faint">
+              <p className="mx-4 mt-3 mb-2 text-meta leading-snug text-ink-faint">
                 This is everything, from every company. Filings from companies
                 you follow live in your{" "}
                 <Link
@@ -268,13 +276,13 @@ export function FilingList({
             )}
 
           {/* Event rows, grouped by day, separated by hairlines */}
-          <div className="divide-y divide-line-subtle border-t border-line-subtle">
+          <div className="divide-y divide-line-subtle">
             {displayed.map((event, i) => {
-              const ts = event.received_at || event.filing_date || "";
+              // Grouped on the ordering key too, so a day header can't repeat
+              // when the two scopes sort by different timestamps.
+              const ts = orderKey(event) || "";
               const prev = i > 0 ? displayed[i - 1] : null;
-              const prevTs = prev
-                ? prev.received_at || prev.filing_date || ""
-                : null;
+              const prevTs = prev ? orderKey(prev) || "" : null;
               const showDay =
                 !!ts && (!prevTs || dayLabel(ts) !== dayLabel(prevTs));
               const showLastVisit =
@@ -303,6 +311,9 @@ export function FilingList({
                   )}
                   <FilingCard
                     event={event}
+                    quote={
+                      event.company_id ? quotes?.[event.company_id] : undefined
+                    }
                     expanded={expandedIds.has(event.id)}
                     onToggleExpanded={() => toggleExpanded(event.id)}
                     selected={i === selectedIdx}
@@ -320,12 +331,20 @@ export function FilingList({
             })}
           </div>
 
-          {/* Load more */}
+          {/* Earlier events load themselves as the reader gets near them */}
           {hasMore && (
-            <div className="flex justify-center py-4">
-              <Button variant="ghost" size="sm" onClick={onLoadMore} disabled={loading}>
-                {loading ? "Loading…" : "Load more"}
-              </Button>
+            <div ref={sentinelRef} className="flex justify-center py-6">
+              {loading ? (
+                <span className="text-meta text-ink-faint">
+                  Loading earlier events…
+                </span>
+              ) : (
+                // A visible control for anyone the observer can't help
+                // (reduced data modes, assistive tech, a stalled fetch)
+                <Button variant="ghost" size="sm" onClick={onLoadMore}>
+                  Load earlier events
+                </Button>
+              )}
             </div>
           )}
 

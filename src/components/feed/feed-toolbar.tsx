@@ -11,6 +11,7 @@ import {
 } from "@/app/(dashboard)/layout";
 import { api } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
+import { StatusDot } from "@/components/ui/badge";
 import { Chip, ChipRow, SegmentedControl } from "@/components/ui/chip";
 import { Kbd } from "@/components/ui/kbd";
 import { SearchInput } from "@/components/ui/search-input";
@@ -45,8 +46,12 @@ const DEFAULT_EVENT_TYPES = [
  * Feed header, two rows that always sit in the same place: whose updates
  * you're reading plus search on top, then how to narrow them — All /
  * Important, and the event categories.
+ *
+ * The stream's state lives here rather than in the reading column: it is
+ * chrome, and a "Live · 50 events" banner above the first update was a row
+ * of furniture between the reader and the news.
  */
-export function FeedToolbar() {
+export function FeedToolbar({ connected }: { connected: boolean }) {
   const { user } = useAuth();
   const {
     scope,
@@ -96,27 +101,38 @@ export function FeedToolbar() {
           hint={<Kbd className="hidden md:inline-flex">/</Kbd>}
         />
 
-        {/* Guests have no nav rail; give them theme + sign-in here */}
-        {!user && (
-          <div className="ml-auto flex items-center gap-1.5">
-            <ThemeToggle size="md" />
-            <Link href="/login">
-              <Button size="sm">Sign in</Button>
-            </Link>
-          </div>
-        )}
+        <div className="ml-auto flex items-center gap-2.5">
+          <span
+            className="hidden items-center gap-1.5 text-meta text-ink-faint sm:flex"
+            aria-live="polite"
+          >
+            <StatusDot live={connected} />
+            {connected ? "Live" : "Connecting…"}
+          </span>
+          {/* Guests have no nav rail; give them theme + sign-in here */}
+          {!user && (
+            <>
+              <ThemeToggle size="md" />
+              <Link href="/login">
+                <Button size="sm">Sign in</Button>
+              </Link>
+            </>
+          )}
+        </div>
       </div>
 
-      <div className="mx-auto flex w-full max-w-3xl items-center gap-2.5 px-4 pb-2">
+      {/* items-start so All/Important stays on the first line of chips when
+          the categories wrap onto a second and third row */}
+      <div className="mx-auto flex w-full max-w-3xl items-start gap-2.5 px-4 pb-2">
         <SegmentedControl
           options={FILTERS}
           value={filter}
           onChange={setFilter}
           label="Show all updates or only important ones"
         />
-        <span className="h-5 w-px shrink-0 bg-line-subtle" />
+        <span className="mt-1 h-5 w-px shrink-0 bg-line-subtle" />
         <ChipRow
-          className="min-w-0 flex-1"
+          className="min-w-0 flex-1 md:flex-wrap md:overflow-visible md:[mask-image:none]"
           role="tablist"
           aria-label="Filter by event type"
         >

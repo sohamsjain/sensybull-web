@@ -4,9 +4,10 @@ import { SearchIcon, CloseIcon } from "@/components/ui/icons";
 import { cn } from "@/lib/utils";
 
 /**
- * Search is a primary way through this product, so it looks like a place to
- * type rather than a decorated control: a sunken well, a leading glyph, and
- * a clear affordance once there is something to clear.
+ * Search is a primary way through this product, so the field reads as a
+ * place to type: a plain surface with a crisp hairline, a leading glyph,
+ * and the accent only on focus. (A sunken well disappeared against paper
+ * in light mode — the border is what defines the field.)
  */
 export function SearchInput({
   value,
@@ -25,8 +26,8 @@ export function SearchInput({
   return (
     <div
       className={cn(
-        "flex h-8 min-w-0 items-center gap-2 rounded-md border border-line-subtle bg-canvas-sunken px-2.5",
-        "transition-colors focus-within:border-brand/60",
+        "flex h-8 min-w-0 items-center gap-2 rounded-md border border-line bg-surface px-2.5",
+        "transition-colors focus-within:border-brand",
         className
       )}
     >

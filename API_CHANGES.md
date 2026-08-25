@@ -1,5 +1,35 @@
 # API Changes
 
+## 2026-08-25 (batch quotes for the redesigned rows)
+
+### New endpoint: `GET /companies/quotes?ids=a,b,c`
+
+The feed and the watchlist now show a last price and day change on every
+row. Asking `GET /companies/<id>/quote` per row meant one request (and one
+Alpaca snapshot call) per company on screen.
+
+```
+GET /companies/quotes?ids=<uuid>,<uuid>,...     (auth)
+200 { "quotes": { "<company_id>": {
+        "ticker": "MU", "price": 118.42, "prev_close": 114.2,
+        "change": 4.22, "change_pct": 3.7,
+        "as_of": "2026-08-25T13:40:02Z", "stale": false
+      } } }
+```
+
+- Same payload as the single-company route (they share one builder), and
+  the same `quote:<TICKER>` Redis cache, so the two never disagree.
+- Up to 120 ids per request; every cache miss folds into one upstream call.
+- A company with no ticker, no snapshot and no synced price is **absent
+  from the map** rather than an error — on a row of prices, a missing one
+  is not a failure. (The single-company route still 503s.)
+- Falls back to the daily-synced price with `stale: true`, as before.
+
+Client: `useQuotes(companyIds, enabled)` in `src/hooks/use-quotes.ts` —
+polls every 60s while the tab is visible, merges results so rows scrolled
+out of view keep their last price. Signed-out readers get an empty map;
+the public feed simply shows no prices.
+
 ## 2026-08-19 (briefing model chain replaced — Groq retired Llama 3.x)
 
 ### No endpoint change — payload content fix

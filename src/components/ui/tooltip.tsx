@@ -30,7 +30,7 @@ export function Tip({
         <TooltipPrimitive.Positioner side={side} sideOffset={6} className="z-50">
           <TooltipPrimitive.Popup
             className={cn(
-              "rounded-sm border border-line-subtle bg-surface-raised px-2 py-1 text-micro text-ink shadow-popover",
+              "rounded-sm border border-line bg-surface-raised px-2 py-1 text-micro whitespace-nowrap text-ink shadow-popover",
               "data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0",
               className
             )}

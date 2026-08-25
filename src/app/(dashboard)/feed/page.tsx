@@ -5,6 +5,7 @@ import { useDashboard } from "../layout";
 import { useEvents } from "@/hooks/use-events";
 import { useWatchlists } from "@/hooks/use-watchlists";
 import { useAuth } from "@/hooks/use-auth";
+import { useQuotes } from "@/hooks/use-quotes";
 import { addToDefaultWatchlist } from "@/lib/default-watchlist";
 import { FilingList } from "@/components/feed/filing-list";
 import { FeedToolbar } from "@/components/feed/feed-toolbar";
@@ -38,6 +39,16 @@ export default function FeedPage() {
     followedCompanyIds: watchlistedCompanyIds,
   });
 
+  // One request for every visible filer's price (signed-in only — the quote
+  // endpoint needs a session, so the public feed simply shows no prices)
+  const quotes = useQuotes(
+    useMemo(
+      () => events.map((e) => e.company_id).filter((id): id is string => !!id),
+      [events]
+    ),
+    !!user
+  );
+
   const handleAddToWatchlist = useCallback(
     async (companyId: string) => {
       setAddingCompanyId(companyId);
@@ -52,7 +63,7 @@ export default function FeedPage() {
 
   return (
     <div className="h-full flex flex-col min-w-0">
-      <FeedToolbar />
+      <FeedToolbar connected={connected} />
       <div className="flex-1 min-w-0 overflow-hidden">
         <FilingList
           events={events}
@@ -61,8 +72,8 @@ export default function FeedPage() {
           followedCount={watchlistedCompanyIds?.size ?? null}
           loading={loading}
           hasMore={hasMore}
-          connected={connected}
           onLoadMore={loadMore}
+          quotes={quotes}
           watchlistedCompanyIds={watchlistedCompanyIds ?? undefined}
           onAddToWatchlist={handleAddToWatchlist}
           addingCompanyId={addingCompanyId}

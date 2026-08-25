@@ -10,9 +10,9 @@ export function DealTerms({ terms }: { terms: Record<string, string> }) {
   if (entries.length === 0) return null;
 
   return (
-    <div className="mt-2.5 rounded-md border border-line-subtle bg-canvas-sunken p-3">
+    <div className="mt-2.5 rounded-md border border-line bg-canvas-sunken p-3">
       <p className="eyebrow mb-2">Deal terms</p>
-      <dl className="grid grid-cols-2 gap-x-4 gap-y-2.5">
+      <dl className="grid grid-cols-1 gap-x-4 gap-y-2.5 sm:grid-cols-2">
         {entries.map(({ key, label, value }) => (
           <div key={key} className="min-w-0">
             <dt className="truncate text-micro text-ink-faint">{label}</dt>

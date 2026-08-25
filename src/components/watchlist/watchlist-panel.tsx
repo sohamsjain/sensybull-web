@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import type { WatchlistEntry, CompanySearchResult, CompanySearchResponse } from "@/types/api";
 import { api } from "@/lib/api-client";
 import { usePinnedCompanies } from "@/hooks/use-pinned-companies";
+import { useQuotes } from "@/hooks/use-quotes";
 import { useWatchlistSelection } from "@/hooks/use-watchlist-selection";
 import { toast } from "@/components/ui/app-toaster";
 import { StatusDot } from "@/components/ui/badge";
@@ -56,6 +57,11 @@ export function WatchlistPanel({
   const [unreadOnly, setUnreadOnly] = useState(false);
   const [busy, setBusy] = useState<BulkAction | null>(null);
   const { pinned } = usePinnedCompanies();
+
+  // One request for the whole list's prices, refreshed on a 60s poll
+  const quotes = useQuotes(
+    useMemo(() => entries.map((c) => c.company.id), [entries])
+  );
 
   // One search box, two scopes: filters your watchlist locally and runs a
   // typeahead over the whole SEC company universe in parallel.
@@ -345,6 +351,7 @@ export function WatchlistPanel({
                 key={entry.company.id}
                 entry={entry}
                 active={entry.company.id === activeCompanyId}
+                quote={quotes[entry.company.id]}
                 pinned={pinned.has(entry.company.id)}
                 selectable={selecting}
                 selected={selection.selected.has(entry.company.id)}
