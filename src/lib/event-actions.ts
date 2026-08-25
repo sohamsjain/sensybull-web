@@ -1,6 +1,7 @@
 import type { FilingEvent } from "@/types/events";
 import { SITE_URL } from "@/lib/share";
 import { dealTermEntries } from "@/lib/deal-terms";
+import { evidenceEntries } from "@/lib/evidence";
 import { fullDateTime } from "@/lib/utils";
 import { filedPhrase } from "@/lib/forms";
 
@@ -71,6 +72,21 @@ export function buildAiPrompt(event: FilingEvent): string {
     );
     for (const c of catalysts) {
       lines.push(`- ${c.date ?? "Date TBD"}: ${c.event}`);
+    }
+  }
+
+  // Verbatim source text, so the chatbot reasons from the filing's own
+  // words rather than only from our summary of them.
+  const evidence = evidenceEntries(briefing);
+  if (evidence.length > 0) {
+    lines.push(
+      ``,
+      isPr
+        ? `Quoted from the press release:`
+        : `Quoted from the filing:`
+    );
+    for (const entry of evidence) {
+      lines.push(`- "${entry.quote}" (${entry.source || "the filing"})`);
     }
   }
 
