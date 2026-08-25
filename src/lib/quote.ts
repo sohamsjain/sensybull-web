@@ -25,6 +25,14 @@ export function formatChange(change: number): string {
   return `${change > 0 ? "+" : change < 0 ? "-" : ""}${abs.toFixed(decimals)}`;
 }
 
+/** Compact share volume: 1.24B, 12.4M, 940K. */
+export function formatVolume(volume: number): string {
+  if (volume >= 1_000_000_000) return `${(volume / 1_000_000_000).toFixed(2)}B`;
+  if (volume >= 1_000_000) return `${(volume / 1_000_000).toFixed(1)}M`;
+  if (volume >= 1_000) return `${Math.round(volume / 1_000)}K`;
+  return `${volume}`;
+}
+
 /** Hover text: what the number is and how fresh it is. */
 export function quoteTooltip(quote: Quote): string {
   const parts = [`${quote.ticker} ${formatQuotePrice(quote.price)}`];

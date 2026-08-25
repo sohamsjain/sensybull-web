@@ -12,6 +12,7 @@
 import {
   ALargeSmall,
   AlignLeft,
+  ArrowDown,
   ArrowUp,
   Bell,
   BellOff,
@@ -53,6 +54,7 @@ export type IconProps = LucideProps;
 export {
   ALargeSmall as FontSizeIcon,
   AlignLeft as TimelineIcon,
+  ArrowDown as ArrowDownIcon,
   ArrowUp as ArrowUpIcon,
   Bell as BellIcon,
   BellOff as MutedIcon,
