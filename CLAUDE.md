@@ -3,7 +3,7 @@
 ## Tech Stack
 - Next.js 15 (App Router), TypeScript, Tailwind CSS v4, shadcn/ui
 - Socket.IO client for real-time filing events
-- JWT auth (access + refresh tokens in localStorage)
+- JWT auth: a short-lived access token in localStorage, the refresh token in an httpOnly cookie (CSRF double-submit via the readable `csrf_refresh_token` cookie). `src/lib/api-client.ts` owns the session — it renews the access token proactively before `exp`, single-flights concurrent refreshes, and ends a session only on a 401/403/422 from `/auth/refresh` (never on a network error, 429 or 5xx). Sign-in longevity is therefore capped by the backend's `JWT_REFRESH_DAYS` and the refresh cookie's own max-age, not by anything in the client
 
 ## API
 - Base URL: `NEXT_PUBLIC_API_URL` (default: `https://api.sensybull.com/api/v1`)

@@ -10,9 +10,11 @@ import {
 } from "react";
 import {
   api,
+  apiRaw,
   setTokens,
   clearTokens,
-  getTokens,
+  hasSession,
+  restoreSession,
   logout as apiLogout,
 } from "@/lib/api-client";
 import type { User, AuthResponse } from "@/types/api";
@@ -31,21 +33,36 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+/** How often a visible tab checks whether its access token needs renewing. */
+const KEEPALIVE_MS = 10 * 60 * 1000;
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchUser = useCallback(async () => {
-    const { access } = getTokens();
-    if (!access) {
+    // No session marker means a genuine guest — don't spend a refresh on them.
+    if (!hasSession()) {
       setLoading(false);
       return;
     }
+    // The access token is short-lived; the refresh cookie is not. An absent or
+    // stale access token on boot is the normal case after time away, so mint a
+    // new one from the cookie before deciding anything about the user.
+    await restoreSession();
     try {
-      const data = await api<{ user: User }>("/auth/me");
-      setUser(data.user);
+      const res = await apiRaw("/auth/me");
+      if (res.ok) {
+        const data = (await res.json()) as { user: User };
+        setUser(data.user);
+      } else if (res.status === 401 || res.status === 403) {
+        // The server has actually rejected us — this is a real sign-out.
+        clearTokens();
+      }
+      // Anything else (429, 5xx) is transient: stay signed out for this load
+      // but keep the session so the next one picks it back up.
     } catch {
-      clearTokens();
+      // Offline. Same reasoning — never destroy a session over a failed fetch.
     }
     setLoading(false);
   }, []);
@@ -53,6 +70,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     fetchUser();
   }, [fetchUser]);
+
+  // Keep the session warm. `restoreSession()` is a no-op while the access
+  // token is still good, so this only reaches the network when the token is
+  // about to expire — which is what keeps a tab left open overnight, and the
+  // socket it holds, authenticated in the morning.
+  useEffect(() => {
+    if (!user) return;
+
+    const tick = () => {
+      if (document.visibilityState === "visible") void restoreSession();
+    };
+    const timer = setInterval(tick, KEEPALIVE_MS);
+    document.addEventListener("visibilitychange", tick);
+
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener("visibilitychange", tick);
+    };
+  }, [user]);
 
   const login = async (email: string, password: string) => {
     const data = await api<AuthResponse>("/auth/login", {
