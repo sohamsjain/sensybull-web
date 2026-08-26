@@ -22,6 +22,7 @@ import {
   setPendingAction,
 } from "@/lib/pending-action";
 import { trackShareEvent } from "@/lib/share-analytics";
+import { displayCompanyName } from "@/lib/company-name";
 import { toast } from "@/components/ui/app-toaster";
 import { useAuth } from "@/hooks/use-auth";
 import { CompanyAvatar } from "@/components/watchlist/company-avatar";
@@ -89,17 +90,20 @@ export function AddFlow({ symbol, company: companyProp }: AddFlowProps) {
         method: "POST",
         body: JSON.stringify({ symbol, attribution }),
       });
-      setCompany({ name: data.company.name, ticker: data.company.ticker });
+      setCompany({
+        name: displayCompanyName(data.company.name),
+        ticker: data.company.ticker,
+      });
       const added = data.status === "added";
       setState(added ? "success" : "already");
       toast(
         added
           ? {
-              title: `Added ${data.company.name} to your watchlist.`,
+              title: `Added ${displayCompanyName(data.company.name)} to your watchlist.`,
               description: "You'll now receive material updates.",
               tone: "success",
             }
-          : { title: `You're already tracking ${data.company.name}.` }
+          : { title: `You're already tracking ${displayCompanyName(data.company.name)}.` }
       );
       setTimeout(() => {
         router.replace(`/watchlist?c=${data.company.id}`);
@@ -154,7 +158,10 @@ export function AddFlow({ symbol, company: companyProp }: AddFlowProps) {
         if (res.ok) {
           const info = (await res.json()) as ShareInfo;
           if (!cancelled)
-            setCompany({ name: info.company.name, ticker: info.symbol });
+            setCompany({
+              name: displayCompanyName(info.company.name),
+              ticker: info.symbol,
+            });
         } else if (res.status === 404 || res.status === 400) {
           if (!cancelled) setState("invalid");
         }

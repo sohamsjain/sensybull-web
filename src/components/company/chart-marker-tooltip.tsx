@@ -5,6 +5,7 @@ import { isImportant } from "@/lib/event-actions";
 import { filedPhrase, formTag, formTagDuplicatesEventType } from "@/lib/forms";
 import { formatChangePct } from "@/lib/quote";
 import { cn } from "@/lib/utils";
+import { displayCompanyName } from "@/lib/company-name";
 import { ImportantMarker, MetaLabel } from "@/components/ui/badge";
 import {
   ArrowDownIcon,
@@ -114,7 +115,7 @@ export function ChartMarkerTooltip({
       </div>
       <p className="text-label leading-snug font-medium text-ink">
         {lead.briefing?.headline ??
-          `${lead.company_name} ${filedPhrase(lead.signal_type)} a filing`}
+          `${displayCompanyName(lead.company_name)} ${filedPhrase(lead.signal_type)} a filing`}
       </p>
 
       {rest.length > 0 && (

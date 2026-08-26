@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
 import { normalizeSymbol } from "@/lib/share";
+import { displayCompanyName } from "@/lib/company-name";
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
@@ -16,7 +17,7 @@ async function companyName(symbol: string): Promise<string | null> {
     });
     if (!res.ok) return null;
     const info = await res.json();
-    return info?.company?.name ?? null;
+    return info?.company?.name ? displayCompanyName(info.company.name) : null;
   } catch {
     return null;
   }

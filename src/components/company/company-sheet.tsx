@@ -10,6 +10,7 @@ import { useWatchlists } from "@/hooks/use-watchlists";
 import { timeAgo, formatCatalystDate, formatMarketCap } from "@/lib/utils";
 import { isImportant } from "@/lib/event-actions";
 import { filedPhrase } from "@/lib/forms";
+import { displayCompanyName } from "@/lib/company-name";
 import { CompanyAvatar } from "@/components/watchlist/company-avatar";
 import { PriceChart } from "@/components/company/price-chart";
 import {
@@ -141,10 +142,13 @@ export function CompanySheet({
           <>
             <SheetHeader className="border-b border-line-subtle px-5 pt-5 pb-4">
               <div className="flex items-center gap-3">
-                <CompanyAvatar ticker={company.ticker} name={company.name} />
+                <CompanyAvatar
+                  ticker={company.ticker}
+                  name={displayCompanyName(company.name)}
+                />
                 <div className="min-w-0">
                   <SheetTitle className="truncate text-title leading-tight font-medium text-ink">
-                    {company.name}
+                    {displayCompanyName(company.name)}
                   </SheetTitle>
                   <p className="mt-0.5 text-meta text-ink-faint">
                     {company.ticker && (
@@ -296,7 +300,10 @@ export function CompanySheet({
       </SheetContent>
       {sharing && company?.ticker && (
         <ShareDialog
-          company={{ name: company.name, ticker: company.ticker }}
+          company={{
+            name: displayCompanyName(company.name),
+            ticker: company.ticker,
+          }}
           onClose={() => setSharing(false)}
         />
       )}

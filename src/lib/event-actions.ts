@@ -4,6 +4,7 @@ import { dealTermEntries } from "@/lib/deal-terms";
 import { evidenceEntries } from "@/lib/evidence";
 import { fullDateTime } from "@/lib/utils";
 import { filedPhrase } from "@/lib/forms";
+import { displayCompanyName } from "@/lib/company-name";
 
 /**
  * Binary importance: is this the kind of event that typically moves the
@@ -34,8 +35,8 @@ export function buildAiPrompt(event: FilingEvent): string {
   const { briefing } = event;
   const isPr = event.signal_type === "PR";
   const company = event.ticker
-    ? `${event.company_name} (${event.ticker})`
-    : event.company_name;
+    ? `${displayCompanyName(event.company_name)} (${event.ticker})`
+    : displayCompanyName(event.company_name);
   const filedAt = fullDateTime(event.received_at || event.filing_date);
 
   const lines: string[] = isPr
@@ -114,8 +115,8 @@ export function buildAiPrompt(event: FilingEvent): string {
 /** Short human-readable text used when sharing an update. */
 export function buildShareText(event: FilingEvent): string {
   const company = event.ticker
-    ? `${event.company_name} (${event.ticker})`
-    : event.company_name;
+    ? `${displayCompanyName(event.company_name)} (${event.ticker})`
+    : displayCompanyName(event.company_name);
   const headline = event.briefing?.headline;
   return headline
     ? `${company}: ${headline}`

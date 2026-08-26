@@ -9,6 +9,7 @@ import { timeAgo, fullDateTime } from "@/lib/utils";
 import { isImportant } from "@/lib/event-actions";
 import { evidenceEntries } from "@/lib/evidence";
 import { filedPhrase } from "@/lib/forms";
+import { displayCompanyName } from "@/lib/company-name";
 import { StockQuote } from "@/components/company/stock-quote";
 import { ImportantMarker, MetaLabel } from "@/components/ui/badge";
 import { ChevronDownIcon, PlusIcon } from "@/components/ui/icons";
@@ -54,8 +55,8 @@ export function FilingCard({
   onToggleExpanded,
   selected = false,
 }: FilingCardProps) {
-  const { ticker, company_name, company_id, briefing, filing_date, received_at } =
-    event;
+  const { ticker, company_id, briefing, filing_date, received_at } = event;
+  const company_name = displayCompanyName(event.company_name);
 
   const important = isImportant(event);
   const { openCompany } = useDashboard();
