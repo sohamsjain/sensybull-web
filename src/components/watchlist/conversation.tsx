@@ -5,6 +5,7 @@ import { useState, useRef, useLayoutEffect, useMemo } from "react";
 import type { WatchlistEntry } from "@/types/api";
 import type { FilingEvent } from "@/types/events";
 import { dayLabel, formatCatalystDate } from "@/lib/utils";
+import { displayCompanyName } from "@/lib/company-name";
 import { useDashboard } from "@/app/(dashboard)/layout";
 import { usePinnedCompanies } from "@/hooks/use-pinned-companies";
 import { useQuote } from "@/hooks/use-quote";
@@ -159,7 +160,11 @@ export function Conversation({
           <ChevronLeftIcon />
         </IconButton>
 
-        <CompanyAvatar ticker={company.ticker} name={company.name} size="sm" />
+        <CompanyAvatar
+          ticker={company.ticker}
+          name={displayCompanyName(company.name)}
+          size="sm"
+        />
 
         <div className="min-w-0 flex-1">
           <div className="flex min-w-0 items-baseline gap-2">
@@ -173,10 +178,10 @@ export function Conversation({
                 })
               }
               className="block min-w-0 text-left"
-              title={`View ${company.name}`}
+              title={`View ${displayCompanyName(company.name)}`}
             >
               <p className="truncate text-label leading-tight font-medium text-ink transition-colors hover:text-brand-ink">
-                {company.name}
+                {displayCompanyName(company.name)}
               </p>
             </button>
             {/* Price sits beside the name; the name truncates before it does */}
@@ -326,7 +331,7 @@ export function Conversation({
             <EmptyState
               className="pt-16"
               title="No filings yet"
-              description={`The moment ${company.name} files with the SEC, the decoded briefing lands here — usually within minutes of hitting EDGAR.`}
+              description={`The moment ${displayCompanyName(company.name)} files with the SEC, the decoded briefing lands here — usually within minutes of hitting EDGAR.`}
             />
           ) : (
             ordered.map((event, i) => {

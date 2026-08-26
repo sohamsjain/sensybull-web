@@ -15,6 +15,7 @@ import { ImportantMarker, MetaLabel } from "@/components/ui/badge";
 import { ChevronDownIcon } from "@/components/ui/icons";
 import { filedPhrase, formTag, formTagDuplicatesEventType } from "@/lib/forms";
 import { cn } from "@/lib/utils";
+import { displayCompanyName } from "@/lib/company-name";
 
 /**
  * One filing event in a company's history.
@@ -90,7 +91,7 @@ export function FilingMessage({ event }: { event: FilingEvent }) {
         </h3>
       ) : (
         <h3 className="text-body-lg leading-snug text-ink-muted">
-          {event.company_name} {filedPhrase(event.signal_type)}.
+          {displayCompanyName(event.company_name)} {filedPhrase(event.signal_type)}.
         </h3>
       )}
 

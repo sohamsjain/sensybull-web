@@ -6,6 +6,7 @@ import { useTheme } from "next-themes";
 
 import { useAuth } from "@/hooks/use-auth";
 import { api } from "@/lib/api-client";
+import { displayCompanyName } from "@/lib/company-name";
 import type { CompanySearchResult, CompanySearchResponse } from "@/types/api";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { EnterIcon, SearchIcon } from "@/components/ui/icons";
@@ -136,7 +137,7 @@ export function CommandPalette() {
     () => [
       ...results.map((r) => ({
         key: `co-${r.id}`,
-        label: r.name,
+        label: displayCompanyName(r.name),
         hint: r.ticker,
         group: "Companies" as const,
         company: r,

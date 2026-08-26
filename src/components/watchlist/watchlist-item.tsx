@@ -6,6 +6,7 @@ import { CountBadge } from "@/components/ui/badge";
 import { CheckIcon, MutedIcon, PinIcon } from "@/components/ui/icons";
 import { listTimestamp, fullDateTime } from "@/lib/utils";
 import { cn } from "@/lib/utils";
+import { displayCompanyName } from "@/lib/company-name";
 
 import { CompanyAvatar } from "./company-avatar";
 
@@ -86,7 +87,11 @@ export function WatchlistItem({
     >
       {selectable && <SelectionBox selected={selected} className="mt-0.5" />}
 
-      <CompanyAvatar ticker={company.ticker} name={company.name} size="sm" />
+      <CompanyAvatar
+        ticker={company.ticker}
+        name={displayCompanyName(company.name)}
+        size="sm"
+      />
 
       <div className="-mb-2.5 min-w-0 flex-1 border-b border-line-subtle pb-2.5">
         {/* Who, and when it last moved */}
@@ -108,7 +113,7 @@ export function WatchlistItem({
                 hasUnread ? "text-ink" : "text-ink-muted"
               )}
             >
-              {company.name}
+              {displayCompanyName(company.name)}
             </span>
           </span>
           <span

@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import type { WatchlistEntry, CompanySearchResult, CompanySearchResponse } from "@/types/api";
 import { api } from "@/lib/api-client";
+import { displayCompanyName } from "@/lib/company-name";
 import { usePinnedCompanies } from "@/hooks/use-pinned-companies";
 import { useQuotes } from "@/hooks/use-quotes";
 import { useWatchlistSelection } from "@/hooks/use-watchlist-selection";
@@ -378,7 +379,7 @@ export function WatchlistPanel({
                         {r.ticker}
                       </span>
                       <span className="truncate text-meta text-ink-faint">
-                        {r.name}
+                        {displayCompanyName(r.name)}
                       </span>
                     </span>
                     <span className="shrink-0 text-micro font-medium text-brand-ink">

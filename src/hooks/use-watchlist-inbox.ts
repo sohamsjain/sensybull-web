@@ -6,6 +6,7 @@ import type { FilingEvent } from "@/types/events";
 import { api } from "@/lib/api-client";
 import { filedPhrase } from "@/lib/forms";
 import { addToDefaultWatchlist } from "@/lib/default-watchlist";
+import { displayCompanyName } from "@/lib/company-name";
 import { useAuth } from "@/hooks/use-auth";
 import { useSocket } from "@/context/socket-provider";
 
@@ -24,7 +25,7 @@ function toPreview(event: FilingEvent): EventPreview {
     id: event.id,
     headline:
       event.briefing?.headline ||
-      `${event.company_name} ${filedPhrase(event.signal_type)}`,
+      `${displayCompanyName(event.company_name)} ${filedPhrase(event.signal_type)}`,
     significance: event.briefing?.significance || null,
     sentiment: event.briefing?.sentiment || null,
     primary_event_type: event.briefing?.primary_event_type || null,

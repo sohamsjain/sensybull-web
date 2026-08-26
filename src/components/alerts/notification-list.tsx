@@ -2,6 +2,7 @@
 
 import { useAlertNotifications } from "@/hooks/use-alerts";
 import { timeAgo } from "@/lib/utils";
+import { displayCompanyName } from "@/lib/company-name";
 import { Badge, ImportantMarker } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -71,7 +72,7 @@ export function NotificationList() {
                     {important && <ImportantMarker />}
                   </div>
                   <p className="mt-0.5 truncate text-meta text-ink-faint">
-                    {n.filing_event.company_name}
+                    {displayCompanyName(n.filing_event.company_name)}
                     {n.filing_event.event_types?.length > 0 &&
                       ` — ${n.filing_event.event_types.join(", ")}`}
                   </p>

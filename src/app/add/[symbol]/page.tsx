@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { cache } from "react";
 import type { ShareInfo } from "@/types/api";
 import { normalizeSymbol, SITE_URL } from "@/lib/share";
+import { displayCompanyName } from "@/lib/company-name";
 import { AddFlow } from "@/components/share/add-flow";
 
 const API_URL =
@@ -38,7 +39,7 @@ export async function generateMetadata({ params }: AddPageProps): Promise<Metada
     };
   }
 
-  const title = `Track ${info.company.name} on Sensybull`;
+  const title = `Track ${displayCompanyName(info.company.name)} on Sensybull`;
   const description =
     "Receive material filings, earnings, press releases and company updates.";
   return {
@@ -63,7 +64,7 @@ export default async function AddPage({ params }: AddPageProps) {
   const jsonLd = info && {
     "@context": "https://schema.org",
     "@type": "Corporation",
-    name: info.company.name,
+    name: displayCompanyName(info.company.name),
     tickerSymbol: info.symbol,
     url: `${SITE_URL}/add/${info.symbol}`,
     ...(info.company.sector ? { industry: info.company.sector } : {}),
@@ -89,7 +90,14 @@ export default async function AddPage({ params }: AddPageProps) {
       )}
       <AddFlow
         symbol={symbol}
-        company={info ? { name: info.company.name, ticker: info.symbol } : null}
+        company={
+          info
+            ? {
+                name: displayCompanyName(info.company.name),
+                ticker: info.symbol,
+              }
+            : null
+        }
       />
     </>
   );
