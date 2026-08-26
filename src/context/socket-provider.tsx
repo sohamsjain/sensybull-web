@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import type { Socket } from "socket.io-client";
 import { connectSocket, disconnectSocket } from "@/lib/socket";
-import { getTokens } from "@/lib/api-client";
+import { getTokens, onTokenChange } from "@/lib/api-client";
 import { useAuth } from "@/hooks/use-auth";
 
 interface SocketContextValue {
@@ -31,11 +31,17 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [connected, setConnected] = useState(false);
 
-  useEffect(() => {
-    if (!user) return;
+  // The socket authenticates once, with whatever access token it was handed at
+  // connect time. That token expires long before the session does, so track it
+  // and reconnect whenever a refresh mints a new one.
+  const [token, setToken] = useState<string | null>(() => getTokens().access);
 
-    const { access } = getTokens();
-    const s = connectSocket(access);
+  useEffect(() => onTokenChange(setToken), []);
+
+  useEffect(() => {
+    if (!user || !token) return;
+
+    const s = connectSocket(token);
 
     const onConnect = () => {
       setConnected(true);
@@ -53,7 +59,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
       setSocket(null);
       setConnected(false);
     };
-  }, [user]);
+  }, [user, token]);
 
   return (
     <SocketContext.Provider value={{ socket, connected }}>
