@@ -26,12 +26,12 @@ export function SearchInput({
   return (
     <div
       className={cn(
-        "flex h-8 min-w-0 items-center gap-2 rounded-md border border-line bg-surface px-2.5",
+        "flex h-9 min-w-0 items-center gap-2 rounded-md border border-line bg-surface px-3",
         "transition-colors focus-within:border-brand",
         className
       )}
     >
-      <SearchIcon className="size-3.5 shrink-0 text-ink-faint" aria-hidden />
+      <SearchIcon className="size-4 shrink-0 text-ink-faint" aria-hidden />
       <input
         type="search"
         value={value}
@@ -49,7 +49,7 @@ export function SearchInput({
           aria-label="Clear search"
           className="shrink-0 text-ink-faint transition-colors hover:text-ink"
         >
-          <CloseIcon className="size-3.5" />
+          <CloseIcon className="size-4" />
         </button>
       ) : (
         hint

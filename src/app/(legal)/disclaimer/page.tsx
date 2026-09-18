@@ -24,7 +24,7 @@ export default function Disclaimer() {
 
         <div className="max-w-none">
           <div className="p-6 rounded-md border border-line-subtle bg-canvas-sunken">
-            <h2 className="text-xl font-semibold mb-4 text-ink">Investment Disclaimer</h2>
+            <h2 className="text-title font-semibold mb-4 text-ink">Investment Disclaimer</h2>
             <p className="leading-relaxed text-ink-muted mb-4">
               <strong>
                 Sensybull provides financial news and information for educational purposes only.
@@ -50,7 +50,7 @@ export default function Disclaimer() {
           </div>
 
           <section className="mt-12 p-6 rounded-md border border-line-subtle bg-canvas-sunken">
-            <h2 className="text-xl font-semibold mb-4 text-ink">No Warranties</h2>
+            <h2 className="text-title font-semibold mb-4 text-ink">No Warranties</h2>
             <p className="leading-relaxed text-ink-muted">
               While we strive to provide accurate and timely information, Sensybull makes no
               representations or warranties of any kind, express or implied, about the completeness,
@@ -60,7 +60,7 @@ export default function Disclaimer() {
           </section>
 
           <section className="mt-8 p-6 rounded-md border border-line-subtle bg-canvas-sunken">
-            <h2 className="text-xl font-semibold mb-4 text-ink">Limitation of Liability</h2>
+            <h2 className="text-title font-semibold mb-4 text-ink">Limitation of Liability</h2>
             <p className="leading-relaxed text-ink-muted">
               In no event will Sensybull be liable for any loss or damage including without limitation,
               indirect or consequential loss or damage, or any loss or damage whatsoever arising from
@@ -69,7 +69,7 @@ export default function Disclaimer() {
           </section>
 
           <section className="mt-12 p-6 rounded-md border border-line-subtle bg-canvas-sunken">
-            <h2 className="text-xl font-semibold mb-4 text-ink">Contact Information</h2>
+            <h2 className="text-title font-semibold mb-4 text-ink">Contact Information</h2>
             <div className="text-ink-muted space-y-2">
               <p>
                 <strong>Soham Siddhesh Jain</strong>

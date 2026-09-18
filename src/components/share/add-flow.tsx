@@ -99,7 +99,7 @@ export function AddFlow({ symbol, company: companyProp }: AddFlowProps) {
       toast(
         added
           ? {
-              title: `Added ${displayCompanyName(data.company.name)} to your watchlist.`,
+              title: `Now following ${displayCompanyName(data.company.name)}.`,
               description: "You'll now receive material updates.",
               tone: "success",
             }
@@ -205,7 +205,7 @@ export function AddFlow({ symbol, company: companyProp }: AddFlowProps) {
             <div className="mb-2 text-title text-success">✓</div>
             <h1 className="text-title font-medium text-ink">
               {state === "success"
-                ? `${displayName} added to your watchlist.`
+                ? `You\u2019re following ${displayName}.`
                 : `You're already tracking ${displayName}.`}
             </h1>
             <p className="mt-1.5 text-label text-ink-muted">

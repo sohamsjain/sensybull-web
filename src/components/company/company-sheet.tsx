@@ -262,7 +262,7 @@ export function CompanySheet({
                 ) : historyState === "gated" ? (
                   <p className="text-meta leading-relaxed text-ink-faint">
                     {user
-                      ? "Decoded filing history unlocks for companies on your watchlist — track it above, or browse the raw filings on EDGAR."
+                      ? "Plain-English filing history unlocks once you follow a company — follow it above, or browse the raw filings on EDGAR."
                       : "Sign in and track this company to see its decoded filing history."}
                   </p>
                 ) : events.length === 0 ? (

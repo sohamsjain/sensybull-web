@@ -9,7 +9,12 @@ import { orderKeyFor, type FeedScope } from "@/hooks/use-events";
 import { dayLabel } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
-import { ArrowUpIcon } from "@/components/ui/icons";
+import {
+  ArrowUpIcon,
+  CompaniesIcon,
+  SearchIcon,
+  UpdatesIcon,
+} from "@/components/ui/icons";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FilingCard } from "./filing-card";
 
@@ -29,6 +34,10 @@ interface FilingListProps {
   onAddToWatchlist?: (companyId: string) => void;
   addingCompanyId?: string | null;
   isLoggedIn?: boolean;
+  /** Clears every filter, so a zero-result state can undo itself. */
+  onResetFilters?: () => void;
+  /** Switches the feed to the public stream from an empty "my companies". */
+  onShowEverything?: () => void;
 }
 
 /**
@@ -63,6 +72,8 @@ export function FilingList({
   onAddToWatchlist,
   addingCompanyId,
   isLoggedIn,
+  onResetFilters,
+  onShowEverything,
 }: FilingListProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -351,9 +362,17 @@ export function FilingList({
           {/* Empty states */}
           {displayed.length === 0 && allCount > 0 && (
             <EmptyState
+              icon={SearchIcon}
               className="pt-16"
-              title="Nothing matches"
-              description={`Try switching to "All", clearing the category filter, or emptying the search box.`}
+              title="No updates match these filters"
+              description={`${allCount} update${allCount === 1 ? " is" : "s are"} hidden by the filters above.`}
+              action={
+                onResetFilters && (
+                  <Button variant="outline" onClick={onResetFilters}>
+                    Clear filters
+                  </Button>
+                )
+              }
             />
           )}
           {allCount === 0 && !loading && scope === "mine" && (
@@ -369,20 +388,28 @@ export function FilingList({
                   ? "Follow a company and every filing and press release it publishes lands here, in plain English. Or switch to Everything to watch the whole market live."
                   : "The companies you follow haven't filed anything recently. Switch to Everything to see the whole market."
               }
+              icon={CompaniesIcon}
               action={
                 followedCount === 0 ? (
                   <Link href="/watchlist">
-                    <Button size="sm">Add a company</Button>
+                    <Button>Follow a company</Button>
                   </Link>
-                ) : undefined
+                ) : (
+                  onShowEverything && (
+                    <Button variant="outline" onClick={onShowEverything}>
+                      Show everything
+                    </Button>
+                  )
+                )
               }
             />
           )}
           {allCount === 0 && !loading && scope === "all" && (
             <EmptyState
+              icon={UpdatesIcon}
               className="pt-16"
-              title="No events yet"
-              description="New filings and press releases appear here in real time, seconds after they're published."
+              title="Nothing has been filed yet today"
+              description="New filings and press releases appear here in real time, seconds after they're published. You don't need to refresh."
             />
           )}
           {loading && allCount === 0 && (

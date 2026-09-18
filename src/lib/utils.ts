@@ -11,7 +11,6 @@ import { extendTailwindMerge } from "tailwind-merge";
  * utility has to be listed here — see `globals.css`.
  */
 const TEXT_SIZES = [
-  "nano",
   "micro",
   "meta",
   "label",

@@ -12,7 +12,11 @@ import { StatusDot } from "@/components/ui/badge";
 import { Chip } from "@/components/ui/chip";
 import { EmptyState } from "@/components/ui/empty-state";
 import { IconButton } from "@/components/ui/icon-button";
-import { CollapsePaneIcon } from "@/components/ui/icons";
+import {
+  CollapsePaneIcon,
+  CompaniesIcon,
+  MarkReadIcon,
+} from "@/components/ui/icons";
 import { Kbd } from "@/components/ui/kbd";
 import { GroupLabel } from "@/components/ui/section";
 import { SearchInput } from "@/components/ui/search-input";
@@ -244,8 +248,8 @@ export function WatchlistPanel({
   return (
     <div className="flex h-full flex-col">
       {/* Header — swaps to a selection toolbar in selection mode */}
-      <div className="shrink-0 px-3 pt-2.5 pb-2">
-        <div className="mb-2 flex h-7 items-center justify-between gap-2">
+      <div className="shrink-0 px-3 pt-2.5 pb-2.5">
+        <div className="mb-2 flex h-9 items-center justify-between gap-2">
           {selecting ? (
             <>
               <span className="text-label font-medium text-ink">
@@ -270,8 +274,8 @@ export function WatchlistPanel({
             </>
           ) : (
             <>
-              <h2 className="flex items-center gap-2 text-title font-medium text-ink">
-                Watchlist
+              <h2 className="flex items-center gap-2 text-title font-semibold text-ink">
+                Companies
                 <StatusDot
                   live={connected}
                   title={
@@ -304,8 +308,8 @@ export function WatchlistPanel({
                     size="sm"
                     onClick={onCollapse}
                     className="hidden md:inline-flex"
-                    title="Hide the watchlist"
-                    aria-label="Hide the watchlist"
+                    title="Hide the company list"
+                    aria-label="Hide the company list"
                   >
                     <CollapsePaneIcon />
                   </IconButton>
@@ -320,7 +324,7 @@ export function WatchlistPanel({
           value={filter}
           onValueChange={setFilter}
           placeholder={
-            selecting ? "Filter your watchlist…" : "Search or add a company…"
+            selecting ? "Filter these companies…" : "Search or add a company…"
           }
           hint={<Kbd className="hidden md:inline-flex">/</Kbd>}
         />
@@ -331,20 +335,24 @@ export function WatchlistPanel({
         {loading ? (
           <SkeletonRows />
         ) : entries.length === 0 && !query ? (
+          /* The full first-run explanation lives in the pane beside this
+             one; here the search box directly above is the whole answer. */
           <EmptyState
-            title="Track your first company"
-            description="New filings and press releases from companies you follow arrive here in plain English, seconds after they're published. Search above to add one."
+            icon={CompaniesIcon}
+            title="No companies yet"
+            description="Search above to follow your first one."
           />
         ) : (
           <>
             {/* Companies you already follow */}
             {query && matchingEntries.length > 0 && (
-              <GroupLabel>On your watchlist</GroupLabel>
+              <GroupLabel>Already following</GroupLabel>
             )}
             {unreadOnly && matchingEntries.length === 0 && !query && (
               <EmptyState
+                icon={MarkReadIcon}
                 title="You're all caught up"
-                description="Nothing unread across the companies you follow."
+                description="Nothing unread across the companies you follow. Turn off the unread filter to see them all."
               />
             )}
             {matchingEntries.map((entry) => (
