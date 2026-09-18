@@ -144,6 +144,47 @@ describe("session persistence", () => {
     expect(hasSession()).toBe(false);
   });
 
+  it("sends the CSRF header stored at sign-in when no cookie is readable", async () => {
+    // Production shape: the app is on sensybull.com and the cookie belongs to
+    // api.sensybull.com, so `document.cookie` is empty here. Reading only the
+    // cookie sent no header, every refresh 401'd, and the reader signed in
+    // again as soon as the 24h access token expired.
+    stubBrowser("");
+
+    const fetchMock = vi.fn(async (_url: string, _init?: RequestInit) =>
+      json({ access_token: jwt(3600) })
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const { setTokens, refreshAccessToken } = await load();
+    setTokens(jwt(-10), "csrf-from-body");
+    await refreshAccessToken();
+
+    const init = fetchMock.mock.calls[0][1] as RequestInit;
+    expect((init.headers as Record<string, string>)["X-CSRF-TOKEN"]).toBe(
+      "csrf-from-body"
+    );
+  });
+
+  it("keeps the stored CSRF token across an access-token renewal", async () => {
+    stubBrowser("");
+    const fetchMock = vi.fn(async (_url: string, _init?: RequestInit) =>
+      json({ access_token: jwt(3600) })
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const { setTokens, refreshAccessToken } = await load();
+    setTokens(jwt(-10), "csrf-from-body");
+    // The renewal itself carries no CSRF token; the next one must still send it.
+    await refreshAccessToken();
+    await refreshAccessToken();
+
+    const init = fetchMock.mock.calls[1][1] as RequestInit;
+    expect((init.headers as Record<string, string>)["X-CSRF-TOKEN"]).toBe(
+      "csrf-from-body"
+    );
+  });
+
   it("sends the CSRF header read from the cookie", async () => {
     store.set("sensybull:session", "1");
     const fetchMock = vi.fn(async (_url: string, _init?: RequestInit) =>

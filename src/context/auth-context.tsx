@@ -95,7 +95,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       method: "POST",
       body: JSON.stringify({ email, password }),
     });
-    setTokens(data.access_token);
+    setTokens(data.access_token, data.csrf_token);
     setUser(data.user);
   };
 
@@ -104,7 +104,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       method: "POST",
       body: JSON.stringify({ name, email, password }),
     });
-    setTokens(data.access_token);
+    setTokens(data.access_token, data.csrf_token);
     setUser(data.user);
   };
 
@@ -113,7 +113,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       method: "POST",
       body: JSON.stringify({ code }),
     });
-    setTokens(data.access_token);
+    setTokens(data.access_token, data.csrf_token);
     setUser(data.user);
   };
 
@@ -122,7 +122,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       method: "POST",
       body: JSON.stringify({ id_token: idToken, user }),
     });
-    setTokens(data.access_token);
+    setTokens(data.access_token, data.csrf_token);
     setUser(data.user);
   };
 
@@ -138,7 +138,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       method: "POST",
       body: JSON.stringify({ token }),
     });
-    setTokens(data.access_token);
+    setTokens(data.access_token, data.csrf_token);
     setUser(data.user);
   };
 

@@ -10,6 +10,20 @@ const ACCESS_KEY = "access_token";
  * session.
  */
 const SESSION_KEY = "sensybull:session";
+/**
+ * The CSRF half of the refresh token's double-submit pair.
+ *
+ * The API also publishes it as the non-httpOnly `csrf_refresh_token` cookie,
+ * but that cookie belongs to the API's own host (api.sensybull.com) and this
+ * app runs on another one (sensybull.com) — `document.cookie` here can never
+ * see it. Reading only the cookie meant `X-CSRF-TOKEN` was never sent, every
+ * `/auth/refresh` came back 401, and the session died the moment the access
+ * token expired: a fresh sign-in every single day. So the value is taken from
+ * the sign-in response body and kept here. That is no weaker than the cookie
+ * was — it is script-readable by design, and a cross-site attacker can read
+ * neither this nor a cookie on another origin.
+ */
+const CSRF_KEY = "sensybull:csrf";
 
 /** Refresh this many ms before the access token's own `exp`. */
 const REFRESH_SKEW_MS = 60_000;
@@ -24,7 +38,7 @@ export function getTokens(): { access: string | null } {
   return { access: localStorage.getItem(ACCESS_KEY) };
 }
 
-export function setTokens(access: string | null): void {
+export function setTokens(access: string | null, csrf?: string | null): void {
   if (typeof window === "undefined") return;
   if (access) {
     localStorage.setItem(ACCESS_KEY, access);
@@ -32,6 +46,9 @@ export function setTokens(access: string | null): void {
   } else {
     localStorage.removeItem(ACCESS_KEY);
   }
+  // Only sign-in responses carry a CSRF token; a plain access-token renewal
+  // must not wipe the one already stored.
+  if (csrf) localStorage.setItem(CSRF_KEY, csrf);
   notifyTokenChange(access);
 }
 
@@ -39,6 +56,7 @@ export function clearTokens(): void {
   if (typeof window === "undefined") return;
   localStorage.removeItem(ACCESS_KEY);
   localStorage.removeItem(SESSION_KEY);
+  localStorage.removeItem(CSRF_KEY);
   // Clean up any refresh token persisted before the httpOnly-cookie migration.
   localStorage.removeItem("refresh_token");
   notifyTokenChange(null);
@@ -92,8 +110,23 @@ function readCookie(name: string): string | null {
   return match ? decodeURIComponent(match[1]) : null;
 }
 
+/**
+ * The CSRF token to echo back on `/auth/refresh` and `/auth/logout`.
+ *
+ * The stored value (from the sign-in response) comes first; the cookie is the
+ * fallback for a same-host deployment, where it is readable and is the only
+ * source a session predating this change has.
+ */
+function csrfToken(): string | null {
+  if (typeof window !== "undefined") {
+    const stored = localStorage.getItem(CSRF_KEY);
+    if (stored) return stored;
+  }
+  return readCookie("csrf_refresh_token");
+}
+
 function csrfHeaders(): Record<string, string> {
-  const csrf = readCookie("csrf_refresh_token");
+  const csrf = csrfToken();
   return csrf ? { "X-CSRF-TOKEN": csrf } : {};
 }
 
