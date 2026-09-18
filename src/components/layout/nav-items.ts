@@ -1,6 +1,7 @@
 import {
   BellIcon,
   CompaniesIcon,
+  FinancialsIcon,
   UpdatesIcon,
   type IconProps,
 } from "@/components/ui/icons";
@@ -22,9 +23,11 @@ export interface NavItem {
  * Primary navigation, shared by the desktop rail and the mobile tab bar so
  * the two can never drift.
  *
- * The two workspace destinations hold the same updates cut two ways — one by
- * company, one by time — so they are named for that rather than for the
- * feature behind them. "Watchlist" and "Feed" were internal words: the first
+ * The first two workspace destinations hold the same updates cut two ways —
+ * one by company, one by time — so they are named for that rather than for
+ * the feature behind them. The third holds a company's financial statements
+ * and filings (the screener-style pages under /company), and is named for
+ * what is on the page rather than "Explore" or "Research". "Watchlist" and "Feed" were internal words: the first
  * asked the reader to know that a star means "companies I follow", and the
  * second is meaningless until you have already seen the screen. They also
  * collided with the feed's own scope chips, which are called "My companies"
@@ -43,6 +46,12 @@ export const NAV_ITEMS: NavItem[] = [
     label: "Updates",
     hint: "Every filing and press release as it lands, newest first",
     Icon: UpdatesIcon,
+  },
+  {
+    href: "/company",
+    label: "Financials",
+    hint: "Results, balance sheets, cash flows, ratios and filings for any US company",
+    Icon: FinancialsIcon,
   },
   {
     href: "/alerts",

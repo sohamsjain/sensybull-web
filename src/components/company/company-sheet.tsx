@@ -208,6 +208,13 @@ export function CompanySheet({
                   </>
                 )}
                 {company.ticker && (
+                  <Link href={`/company/${company.ticker}`} onClick={onClose}>
+                    <Button size="sm" variant="outline">
+                      Financials
+                    </Button>
+                  </Link>
+                )}
+                {company.ticker && (
                   <Button
                     size="sm"
                     variant="ghost"
