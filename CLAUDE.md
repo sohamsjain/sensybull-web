@@ -16,7 +16,8 @@
 - Watchlist inbox: `GET /watchlist/` (companies + unread counts under `items`), `POST /watchlist/:companyId/read`, `PUT /watchlist/:companyId/mute`. Bulk counterparts back multi-select — `POST /watchlist/read`, `PUT /watchlist/mute`, `POST /watchlist/remove`, all taking `{company_ids}` — and drop ids the user no longer follows instead of failing the batch (trust the echoed `company_ids`)
 - Share links: `GET /share/:symbol` (public share info, no internal IDs), `POST /watchlists/track` (auth, idempotent add-by-ticker), `POST /share/events` (public funnel analytics). See `docs/TRACK_LINKS.md`
 - WebSocket: Socket.IO namespace `/feed`, auth via `{token}` dict, events: `filing_event`, `filing_event_update`, `connected`, `price_reaction`. The `/feed` socket is owned once at the dashboard layout by `SocketProvider` (`useSocket`) and shared by all pages — it persists across client-side navigation
-- Removed (July 2026 hard rollback — do not re-add without an explicit decision): all `/positions/*` endpoints, the `thesis_alert` socket event, `GET /events/catalysts`, and `GET /movers`
+- Thesis monitoring is the product direction as of Sept 2026 (see `PRODUCT_VISION.md`) — the landing page sells it, the API does not implement it yet. The thesis surfaces are being rebuilt: thesis capture per company, an `intact | watch | drift` verdict per event, a `THESIS DRIFT` alert. Read `PRODUCT_VISION.md`'s "Scope discipline" before adding to it; the July 2026 rollback happened because the first attempt grew without a stop condition
+- Still removed, and not part of the thesis rebuild: `GET /events/catalysts` (key dates live inside updates and the company sheet) and `GET /movers`. The old `/positions/*` endpoints and the `thesis_alert` socket event are gone too — the rebuild designs its own contract rather than restoring theirs
 
 ## Project Structure
 - `src/types/` — API and event type definitions
@@ -38,7 +39,8 @@
 - `src/app/embed/[symbol]/` — iframe-able track button (route handler, frameable by design; header carve-out in next.config.ts)
 - `src/components/share/` — TrackButton, ShareDialog (company sheet), AddFlow
 - `src/lib/share.ts` (canonical link/snippet builders) + `src/lib/share-analytics.ts` (funnel events); global toast in `src/components/ui/app-toaster.tsx` (mounted in root layout)
-- Removed pages (July 2026): `/positions` (thesis feature, hard rollback), `/calendar` (catalyst calendar; key dates live inside updates and the company sheet), `/movers` (today's gainers/losers among recent filers — removed with the `GET /movers` API endpoint)
+- Removed pages: `/calendar` (catalyst calendar; key dates live inside updates and the company sheet) and `/movers` (removed with the `GET /movers` API endpoint), both July 2026. The old `/positions` page went with the same rollback; thesis surfaces are being rebuilt from scratch under the Sept 2026 direction, not restored
+- `src/components/landing/landing-page.tsx` is the marketing page, and it is deliberately ahead of the product: it describes thesis monitoring the API doesn't ship yet. The illustrative portfolio counts and timeline are labelled "Illustrative." — keep that label. Never let a mock on this page imply a verified figure
 
 ## Product rules (see PRODUCT_VISION.md)
 - Updates collapse to headline-only; summary, key dates, and action buttons appear only when expanded. No per-update "investor takeaway" bullets, no significance explainers
