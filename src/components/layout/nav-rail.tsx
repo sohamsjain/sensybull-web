@@ -123,7 +123,7 @@ export function NavRail() {
     <TooltipProvider delay={400}>
       <aside
         aria-label="Primary"
-        className="hidden w-19 shrink-0 flex-col items-center gap-0.5 border-r border-line-subtle bg-canvas-sunken px-1.5 py-3 md:flex"
+        className="hidden w-19 shrink-0 flex-col items-center gap-0.5 overflow-x-hidden overflow-y-auto border-r border-line-subtle bg-canvas-sunken px-1.5 py-3 md:flex"
       >
         <Link
           href="/watchlist"
@@ -180,7 +180,10 @@ export function NavRail() {
             <KeyboardIcon className="size-[18px]" />
           </RailAction>
 
-          <div className="mt-1.5 flex items-center gap-0.5 border-t border-line-subtle pt-2.5">
+          {/* Stacked, not a row: the rail is 76px wide and each of these is
+              36px, so three side by side overflow it and get clipped at both
+              edges. Anything added here follows the rail's own axis. */}
+          <div className="mt-1.5 flex w-full flex-col items-center gap-0.5 border-t border-line-subtle pt-2.5">
             <FontSizeToggle />
             <ThemeToggle />
             <ProfileMenu />
