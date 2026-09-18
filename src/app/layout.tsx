@@ -8,19 +8,20 @@ const siteUrl = "https://www.sensybull.com";
 
 export const metadata: Metadata = {
   title: {
-    default: "Sensybull — SEC Filings, Decoded",
+    default: "Sensybull — Know when your investment thesis changes",
     template: "%s | Sensybull",
   },
   description:
-    "Every material SEC filing — 8-Ks, activist stakes, tenders, insider buys — decoded into a plain-English briefing, seconds after it hits EDGAR. Track your companies, get alerts, stay ahead. Free to use.",
+    "Sensybull watches the companies you own and tells you when something happens that could change why you own them. Every 8-K and press release, read against your thesis, seconds after it's published. Free while in beta.",
   keywords: [
+    "investment thesis",
+    "portfolio monitoring",
+    "thesis drift",
     "SEC filings",
-    "8-K filings",
+    "8-K alerts",
     "EDGAR",
-    "SEC alerts",
     "stock filings",
     "SEC filing tracker",
-    "SEC filing alerts",
     "investment research",
     "real-time SEC filings",
   ],
@@ -33,9 +34,9 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: siteUrl,
     siteName: "Sensybull",
-    title: "Sensybull — SEC Filings, Decoded",
+    title: "Sensybull — Know when your investment thesis changes",
     description:
-      "Every material SEC filing decoded into a plain-English briefing, seconds after it hits EDGAR. Free to use.",
+      "Sensybull watches the companies you own and tells you when something happens that could change why you own them. Free while in beta.",
     // The opaque tile rather than the transparent mark: social cards paint
     // their own background, so a bare silhouette can land invisible.
     images: [
@@ -49,9 +50,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary",
-    title: "Sensybull — SEC Filings, Decoded",
+    title: "Sensybull — Know when your investment thesis changes",
     description:
-      "Every material SEC filing decoded into a plain-English briefing, seconds after it hits EDGAR. Free to use.",
+      "Sensybull watches the companies you own and tells you when something happens that could change why you own them. Free while in beta.",
     images: ["/logo-tile.png"],
   },
   robots: {
