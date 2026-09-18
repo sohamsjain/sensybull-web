@@ -90,7 +90,7 @@ export function FilingCard({
     <article
       onClick={toggleExpanded}
       className={cn(
-        "group grid cursor-pointer grid-cols-[2.5rem_1fr] gap-x-3 px-4 py-3 transition-colors",
+        "group grid cursor-pointer grid-cols-[2.5rem_1fr] gap-x-3.5 px-4 py-4 transition-colors",
         selected && "bg-brand-soft",
         // An open update keeps its own background: the panels inside it are
         // the tinted things, and a hover fill would swallow them.
@@ -154,7 +154,7 @@ export function FilingCard({
             <StockQuote quote={quote} size="sm" />
             {/* Fixed width so prices line up in a column down the feed */}
             <span
-              className="w-14 text-right text-micro whitespace-nowrap tabular-nums text-ink-faint"
+              className="w-16 text-right text-micro whitespace-nowrap tabular-nums text-ink-faint"
               title={fullDateTime(eventTimestamp)}
             >
               {timeAgo(eventTimestamp)}
@@ -164,7 +164,7 @@ export function FilingCard({
 
         {/* Category, priority, and the one action worth offering unopened */}
         {(important || category || canTrack) && (
-          <div className="mt-0.5 flex items-center justify-between gap-3">
+          <div className="mt-1 flex items-center justify-between gap-3">
             <div className="flex min-w-0 flex-wrap items-center gap-2.5">
               {important && <ImportantMarker />}
               {category && <MetaLabel>{category}</MetaLabel>}
@@ -176,10 +176,10 @@ export function FilingCard({
                   onAddToWatchlist!(company_id!);
                 }}
                 disabled={addingToWatchlist}
-                className="inline-flex shrink-0 items-center gap-1 rounded-sm px-1.5 py-0.5 text-micro font-medium text-brand-ink transition-colors hover:bg-brand-soft disabled:opacity-50"
+                className="inline-flex h-7 shrink-0 items-center gap-1 rounded-sm px-2 text-micro font-medium text-brand-ink transition-colors hover:bg-brand-soft disabled:opacity-50"
                 title={`Track ${ticker || company_name}`}
               >
-                <PlusIcon className="size-3" />
+                <PlusIcon className="size-3.5" />
                 Track
               </button>
             )}
@@ -187,7 +187,7 @@ export function FilingCard({
         )}
 
         {/* Headline */}
-        <h3 className="mt-1 text-body-lg leading-snug text-ink">
+        <h3 className="mt-1.5 text-body-lg font-medium text-ink">
           {briefing
             ? briefing.headline
             : `${company_name} ${filedPhrase(event.signal_type)}.`}
@@ -197,13 +197,13 @@ export function FilingCard({
         {expanded && (
           <>
             {briefing?.summary && (
-              <p className="mt-1.5 text-label leading-relaxed text-ink-muted">
+              <p className="mt-2.5 text-label leading-relaxed text-ink-muted">
                 {briefing.summary}
               </p>
             )}
 
             {briefing?.mode === "facts_only" && (
-              <p className="mt-1.5 text-meta leading-relaxed text-ink-faint">
+              <p className="mt-2.5 text-meta leading-relaxed text-ink-faint">
                 An AI summary isn&apos;t available for this filing — read the
                 source document below.
               </p>
@@ -229,10 +229,10 @@ export function FilingCard({
         )}
 
         {hasExpandedContent && (
-          <div className="mt-1.5 flex select-none items-center gap-1 text-micro text-ink-faint transition-colors group-hover:text-ink-muted">
+          <div className="mt-2 flex select-none items-center gap-1.5 text-micro font-medium text-ink-faint transition-colors group-hover:text-brand-ink">
             <ChevronDownIcon
               className={cn(
-                "size-3 transition-transform duration-150",
+                "size-3.5 transition-transform duration-150",
                 expanded && "rotate-180"
               )}
             />

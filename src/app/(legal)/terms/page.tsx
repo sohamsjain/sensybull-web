@@ -339,7 +339,7 @@ export default function TermsOfService() {
 
             {/* 8.2 Dispute Resolution */}
             <div className="mb-8 p-6 rounded-md border border-danger/25 bg-danger-soft">
-              <h3 className="text-xl font-semibold mb-4 text-ink">8.2 Dispute Resolution</h3>
+              <h3 className="text-title font-semibold mb-4 text-ink">8.2 Dispute Resolution</h3>
               <p className="leading-relaxed text-ink-muted mb-6">
                 Please read the following arbitration agreement in this Section (the &quot;Arbitration
                 Agreement&quot;) carefully. It requires you to arbitrate disputes with Company, its
@@ -350,7 +350,7 @@ export default function TermsOfService() {
               </p>
 
               <div className="mb-6 border-l-2 border-danger pl-4">
-                <h4 className="text-lg font-semibold mb-3 text-ink">
+                <h4 className="text-body-lg font-semibold mb-3 text-ink">
                   (a) Applicability of Arbitration Agreement
                 </h4>
                 <p className="mb-3 leading-relaxed text-ink-muted">
@@ -382,7 +382,7 @@ export default function TermsOfService() {
               </div>
 
               <div className="mb-6 border-l-2 border-danger pl-4">
-                <h4 className="text-lg font-semibold mb-3 text-ink">
+                <h4 className="text-body-lg font-semibold mb-3 text-ink">
                   (b) Informal Dispute Resolution
                 </h4>
                 <p className="mb-3 leading-relaxed text-ink-muted">
@@ -424,7 +424,7 @@ export default function TermsOfService() {
               </div>
 
               <div className="mb-6 border-l-2 border-danger pl-4">
-                <h4 className="text-lg font-semibold mb-3 text-ink">
+                <h4 className="text-body-lg font-semibold mb-3 text-ink">
                   (c) Arbitration Rules and Forum
                 </h4>
                 <p className="mb-3 leading-relaxed text-ink-muted">
@@ -474,7 +474,7 @@ export default function TermsOfService() {
               </div>
 
               <div className="mb-6 border-l-2 border-danger pl-4">
-                <h4 className="text-lg font-semibold mb-3 text-ink">
+                <h4 className="text-body-lg font-semibold mb-3 text-ink">
                   (d) Authority of Arbitrator
                 </h4>
                 <p className="mb-3 leading-relaxed text-ink-muted">
@@ -511,7 +511,7 @@ export default function TermsOfService() {
               </div>
 
               <div className="mb-6 border-l-2 border-danger pl-4">
-                <h4 className="text-lg font-semibold mb-3 text-ink">
+                <h4 className="text-body-lg font-semibold mb-3 text-ink">
                   (e) Waiver of Jury Trial
                 </h4>
                 <p className="leading-relaxed text-ink-muted">
@@ -527,7 +527,7 @@ export default function TermsOfService() {
               </div>
 
               <div className="mb-6 border-l-2 border-danger pl-4">
-                <h4 className="text-lg font-semibold mb-3 text-ink">
+                <h4 className="text-body-lg font-semibold mb-3 text-ink">
                   (f) Waiver of Class or Other Non-Individualized Relief
                 </h4>
                 <p className="mb-3 leading-relaxed text-ink-muted">
@@ -560,7 +560,7 @@ export default function TermsOfService() {
               </div>
 
               <div className="mb-6 border-l-2 border-danger pl-4">
-                <h4 className="text-lg font-semibold mb-3 text-ink">
+                <h4 className="text-body-lg font-semibold mb-3 text-ink">
                   (g) Attorneys&apos; Fees and Costs
                 </h4>
                 <p className="leading-relaxed text-ink-muted">
@@ -580,7 +580,7 @@ export default function TermsOfService() {
               </div>
 
               <div className="mb-6 border-l-2 border-danger pl-4">
-                <h4 className="text-lg font-semibold mb-3 text-ink">
+                <h4 className="text-body-lg font-semibold mb-3 text-ink">
                   (h) Batch Arbitration
                 </h4>
                 <p className="mb-3 leading-relaxed text-ink-muted">
@@ -626,7 +626,7 @@ export default function TermsOfService() {
               </div>
 
               <div className="mb-6 border-l-2 border-danger pl-4">
-                <h4 className="text-lg font-semibold mb-3 text-ink">
+                <h4 className="text-body-lg font-semibold mb-3 text-ink">
                   (i) 30-Day Right to Opt Out
                 </h4>
                 <p className="leading-relaxed text-ink-muted">
@@ -643,7 +643,7 @@ export default function TermsOfService() {
               </div>
 
               <div className="mb-6 border-l-2 border-danger pl-4">
-                <h4 className="text-lg font-semibold mb-3 text-ink">
+                <h4 className="text-body-lg font-semibold mb-3 text-ink">
                   (j) Invalidity, Expiration
                 </h4>
                 <p className="leading-relaxed text-ink-muted">
@@ -661,7 +661,7 @@ export default function TermsOfService() {
               </div>
 
               <div className="border-l-2 border-danger pl-4">
-                <h4 className="text-lg font-semibold mb-3 text-ink">
+                <h4 className="text-body-lg font-semibold mb-3 text-ink">
                   (k) Modification
                 </h4>
                 <p className="leading-relaxed text-ink-muted">
@@ -756,7 +756,7 @@ export default function TermsOfService() {
             </div>
 
             <div className="mb-6 p-6 rounded-md border border-line-subtle bg-canvas-sunken">
-              <h3 className="text-xl font-semibold mb-4 text-ink">8.8 Contact Information</h3>
+              <h3 className="text-title font-semibold mb-4 text-ink">8.8 Contact Information</h3>
               <div className="space-y-2 text-ink-muted">
                 <p>
                   <strong>Soham Siddhesh Jain</strong>

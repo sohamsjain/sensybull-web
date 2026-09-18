@@ -81,7 +81,7 @@ export function FeedToolbar({ connected }: { connected: boolean }) {
 
   return (
     <div className="shrink-0 border-b border-line-subtle bg-canvas">
-      <div className="mx-auto flex h-12 w-full max-w-3xl items-center gap-2.5 px-4">
+      <div className="mx-auto flex h-14 w-full max-w-3xl items-center gap-2.5 px-4">
         {/* Signed-in readers choose whose filings they're looking at */}
         {user && (
           <SegmentedControl
@@ -123,14 +123,14 @@ export function FeedToolbar({ connected }: { connected: boolean }) {
 
       {/* items-start so All/Important stays on the first line of chips when
           the categories wrap onto a second and third row */}
-      <div className="mx-auto flex w-full max-w-3xl items-start gap-2.5 px-4 pb-2">
+      <div className="mx-auto flex w-full max-w-3xl items-start gap-2.5 px-4 pb-2.5">
         <SegmentedControl
           options={FILTERS}
           value={filter}
           onChange={setFilter}
           label="Show all updates or only important ones"
         />
-        <span className="mt-1 h-5 w-px shrink-0 bg-line-subtle" />
+        <span className="mt-1.5 h-5 w-px shrink-0 bg-line-subtle" />
         <ChipRow
           className="min-w-0 flex-1 md:flex-wrap md:overflow-visible md:[mask-image:none]"
           role="tablist"

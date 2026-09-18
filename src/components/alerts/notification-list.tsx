@@ -6,6 +6,7 @@ import { displayCompanyName } from "@/lib/company-name";
 import { Badge, ImportantMarker } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
+import { BellIcon } from "@/components/ui/icons";
 import { Table, TD, TH, THead, TR } from "@/components/ui/data-table";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -38,10 +39,11 @@ export function NotificationList() {
   if (notifications.length === 0) {
     return (
       <EmptyState
+        icon={BellIcon}
         align="start"
         className="px-0 py-6"
-        title="No notifications yet"
-        description="Deliveries appear here once a filing from a company you follow matches your alert settings."
+        title="Nothing delivered yet"
+        description="Alerts appear here once a company you follow files something that matches the settings above."
       />
     );
   }

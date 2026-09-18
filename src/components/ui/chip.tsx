@@ -22,7 +22,7 @@ export function Chip({
       type="button"
       data-selected={selected || undefined}
       className={cn(
-        "shrink-0 rounded-sm px-2.5 py-1 text-meta font-medium transition-colors",
+        "shrink-0 rounded-sm px-2.5 py-1.5 text-meta font-medium transition-colors",
         "disabled:pointer-events-none disabled:opacity-40",
         selected
           ? "bg-brand text-brand-on"
@@ -88,7 +88,7 @@ export function SegmentedControl<T extends string>({
           aria-selected={value === option.value}
           onClick={() => onChange(option.value)}
           className={cn(
-            "rounded-sm px-3 py-1 text-meta font-medium transition-colors",
+            "rounded-sm px-3 py-1.5 text-meta font-medium transition-colors",
             value === option.value
               ? "bg-brand text-brand-on"
               : "text-ink-muted hover:text-ink"

@@ -22,14 +22,14 @@ function SelectionBox({
     <span
       aria-hidden="true"
       className={cn(
-        "flex size-4 shrink-0 items-center justify-center rounded-xs border transition-colors",
+        "flex size-[18px] shrink-0 items-center justify-center rounded-xs border transition-colors",
         className,
         selected
           ? "border-brand bg-brand text-brand-on"
           : "border-line-strong text-transparent"
       )}
     >
-      <CheckIcon className="size-3" strokeWidth={3} />
+      <CheckIcon className="size-3.5" strokeWidth={3} />
     </span>
   );
 }
@@ -79,7 +79,7 @@ export function WatchlistItem({
       data-company-id={company.id}
       {...checkboxProps}
       className={cn(
-        "flex w-full items-start gap-2.5 border-l-2 px-3 py-2.5 text-left transition-colors outline-none",
+        "flex w-full items-start gap-3 border-l-2 px-3 py-3 text-left transition-colors outline-none",
         highlighted
           ? "border-l-brand bg-brand-soft"
           : "border-l-transparent hover:bg-surface-hover"
@@ -93,7 +93,7 @@ export function WatchlistItem({
         size="sm"
       />
 
-      <div className="-mb-2.5 min-w-0 flex-1 border-b border-line-subtle pb-2.5">
+      <div className="-mb-3 min-w-0 flex-1 border-b border-line-subtle pb-3">
         {/* Who, and when it last moved */}
         <div className="flex items-baseline justify-between gap-2">
           <span className="flex min-w-0 items-baseline gap-1.5">
@@ -136,10 +136,10 @@ export function WatchlistItem({
           )}
           <span className="flex shrink-0 items-center gap-1.5">
             {pinned && (
-              <PinIcon className="size-3 text-ink-faint" aria-label="Pinned" />
+              <PinIcon className="size-3.5 text-ink-faint" aria-label="Pinned" />
             )}
             {muted && (
-              <MutedIcon className="size-3 text-ink-faint" aria-label="Muted" />
+              <MutedIcon className="size-3.5 text-ink-faint" aria-label="Muted" />
             )}
             <CountBadge count={unread_count} muted={muted} />
           </span>
@@ -148,7 +148,7 @@ export function WatchlistItem({
         {/* What happened — two lines, so the reader can decide from the list */}
         <p
           className={cn(
-            "mt-1 line-clamp-2 text-meta",
+            "mt-1.5 line-clamp-2 text-meta",
             hasUnread
               ? "text-ink-muted"
               : last_event

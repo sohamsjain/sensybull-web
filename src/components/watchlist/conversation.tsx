@@ -17,6 +17,7 @@ import { IconButton } from "@/components/ui/icon-button";
 import {
   ChartIcon,
   ChevronLeftIcon,
+  DocumentIcon,
   MoreIcon,
   MutedIcon,
   TimelineIcon,
@@ -150,7 +151,7 @@ export function Conversation({
   return (
     <div className="flex h-full min-w-0 flex-col">
       {/* Header */}
-      <header className="flex h-12 shrink-0 items-center gap-2.5 border-b border-line-subtle bg-canvas px-3">
+      <header className="flex h-14 shrink-0 items-center gap-2.5 border-b border-line-subtle bg-canvas px-3">
         <IconButton
           size="md"
           onClick={onBack}
@@ -329,9 +330,10 @@ export function Conversation({
             </div>
           ) : ordered.length === 0 ? (
             <EmptyState
+              icon={DocumentIcon}
               className="pt-16"
-              title="No filings yet"
-              description={`The moment ${displayCompanyName(company.name)} files with the SEC, the decoded briefing lands here — usually within minutes of hitting EDGAR.`}
+              title="Nothing filed yet"
+              description={`The moment ${displayCompanyName(company.name)} files with the SEC or puts out a press release, the briefing lands here — usually within minutes. You don't need to refresh.`}
             />
           ) : (
             ordered.map((event, i) => {

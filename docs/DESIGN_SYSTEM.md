@@ -61,36 +61,60 @@ Colour discipline:
 
 ## Type
 
-Roles, not sizes, so a dense table and a page heading can't drift apart. The
-whole product lives between 10px and 18px; hierarchy comes from weight and
-ink colour first, size last.
+Roles, not sizes, so a dense table and a page heading can't drift apart.
+Nothing in the product is smaller than 12px, and the ramp widens as it
+climbs, so a headline leads its summary instead of tying with it.
 
 | Utility | Size | Use |
 | --- | --- | --- |
-| `text-nano` | 10px | Count badges, mobile tab labels |
-| `text-micro` | 11px | Timestamps, keycaps, eyebrows |
-| `text-meta` | 12px | Metadata, secondary list line |
-| `text-label` | 13px | Labels, buttons, summaries |
-| `text-body` | 14px | Default reading size |
-| `text-body-lg` | 15px | Headlines, list primary line |
-| `text-title` | 16px | Pane and section titles |
-| `text-heading` | 18px | Page headings |
-| `text-display` / `text-display-lg` | 28 / 40px | Marketing pages only |
+| `text-micro` | 12px | Timestamps, keycaps, counts, eyebrows |
+| `text-meta` | 13px | Metadata, secondary list line |
+| `text-label` | 14px | Labels, buttons, summaries |
+| `text-body` | 15px | Default reading size |
+| `text-body-lg` | 17px | Headlines, list primary line |
+| `text-title` | 19px | Pane and section titles |
+| `text-heading` | 22px | Page headings |
+| `text-display` / `text-display-lg` | 32 / 48px | Marketing pages only |
+
+There is no 10px tier. A count badge, a mobile tab label and a key cap all
+sit at `text-micro` — if something genuinely cannot fit at 12px, the layout
+is what changes.
+
+The 12–15 end of the ramp steps in 1px, which looks arbitrary written down
+and is not. Down there hierarchy is carried by **weight and ink colour**,
+not size; a 2px jump between two adjacent metadata rows reads as a mistake
+rather than as a level. The ramp opens up from `body-lg` on, where size is
+doing the work.
 
 Numbers use `font-mono` with `tabular-nums` so figures compare vertically.
 Tickers are mono too — they read as identifiers, not prose.
 
-`.eyebrow` is the one way to title a group: 11px, semibold, uppercase,
+`.eyebrow` is the one way to title a group: 12px, semibold, uppercase,
 tracked, `ink-faint`.
+
+One deliberate off-scale value: `Input` is `text-base` (16px) below the `md`
+breakpoint. iOS zooms the viewport when a focused field is smaller than
+16px, and that is worse than one breakpoint being off-token.
 
 ## Space, radius, elevation
 
 - **Spacing** — Tailwind's 4px scale, but keep to a small vocabulary:
-  `0.5 1 1.5 2 2.5 3 4 5 6 8`. Rows are `px-3/px-4` with `py-2/py-3`.
-- **Radius** — `rounded-xs` 3px (inline chips, code), `rounded-sm` 4px
-  (buttons, chips, icon buttons), `rounded-md` 6px (inputs, panels, marks),
-  `rounded-lg` 8px (dialogs, popovers). `rounded-full` is for a count badge,
-  a status dot, a switch, or an avatar — nothing else.
+  `0.5 1 1.5 2 2.5 3 3.5 4 5 6 8`. Rows are `px-3/px-4` with `py-3/py-4`.
+- **Radius** — `rounded-xs` 4px (inline chips, code, tiny marks),
+  `rounded-sm` 6px (buttons, chips, icon buttons), `rounded-md` 8px (inputs,
+  panels, rows, marks), `rounded-lg` 12px (dialogs, popovers, sheets).
+  `rounded-full` is for a count badge, a status dot, a switch, or an avatar —
+  nothing else.
+
+  Every step is at least 1.33x the one below it. The previous 3 / 4 / 6 / 8
+  ramp was four steps nobody could tell apart: differences below the
+  threshold of perception don't read as hierarchy, they read as sloppiness.
+  If a new radius is needed, widen the ramp rather than squeezing a value
+  between two existing ones.
+- **Hit targets** — nothing interactive is under 28px, and the default
+  control height is 36px (`Button` default, `Input`, `SearchInput`,
+  `IconButton lg`). `Button size="xs"` (28px) is only for a control sitting
+  inline inside a row of text.
 - **Elevation** — `shadow-popover` and `shadow-overlay`, and only on things
   that actually float. Separation on the page comes from a hairline or a
   background change, never a shadow.
@@ -108,27 +132,36 @@ tracked, `ink-faint`.
 | `Badge`, `CountBadge`, `ImportantMarker`, `StatusDot`, `MetaLabel` | Every status and count in the product |
 | `Section`, `GroupLabel`, `Card` | Titled groups. A `Card` is for something that is genuinely one unit |
 | `Table` + `THead`/`TH`/`TR`/`TD` | Research tables: hairline rules, sticky header, `numeric` right-aligns and sets tabular mono |
-| `EmptyState`, `Skeleton`, `SkeletonRows` | Zero and loading states |
+| `EmptyState`, `Skeleton`, `SkeletonRows` | Zero, loading and error states. `EmptyState` takes an optional `icon` and an `action` — see "Nothing is a dead end" |
 | `Switch`, `Tip`, `Kbd`, `Dialog`, `Sheet`, `DropdownMenu`, `AppToaster` | — |
 | `icons.tsx` | **The** icon set. Import icons from here, never from `lucide-react` directly, and never hand-roll an `<svg>` |
 
 ## Layout
 
 ```
-┌────┬───────────────────┬──────────────────────────────┐
-│    │ list              │ detail                       │
-│rail│ (companies,       │ (filing history, feed,       │
-│    │  search, filters) │  settings)                   │
-└────┴───────────────────┴──────────────────────────────┘
+┌──────┬───────────────────┬──────────────────────────────┐
+│      │ list              │ detail                       │
+│ rail │ (companies,       │ (filing history, feed,       │
+│ 76px │  search, filters) │  settings)                   │
+└──────┴───────────────────┴──────────────────────────────┘
 ```
 
-- The rail is persistent, icon-width, and never scrolls. Destinations at the
-  top, settings at the foot, search reachable by pointer or `⌘K`.
-- Panes own their own headers (12 rows tall, hairline underneath). There is no
-  global header bar competing for vertical space.
+- The rail is persistent, 76px wide, and never scrolls. **Every destination
+  in it carries a visible text label under its glyph.** Three destinations
+  do not justify hiding their names behind a hover delay, and no glyph is
+  self-evident enough to stand alone — a star reads as "favourite"
+  everywhere on the web, so it cannot also mean "the companies I follow".
+  Destinations at the top, settings and shortcuts at the foot, search
+  reachable by pointer or `⌘K`.
+- Destinations are named for what they contain, not for the feature behind
+  them: **Companies** (by company) and **Updates** (by time). They come from
+  `NAV_ITEMS`, which also carries a one-line `hint` used as the tooltip —
+  the label says what it is, the hint says what it's for.
+- Panes own their own headers (14 rows tall, hairline underneath). There is
+  no global header bar competing for vertical space.
 - Reading columns cap at `max-w-3xl`; settings at `max-w-2xl`.
-- Mobile swaps the rail for `BottomTabs` — same destinations, same icons, same
-  order, from the same `NAV_ITEMS`.
+- Mobile swaps the rail for `BottomTabs` — same destinations, same icons,
+  same labels, same order, from the same `NAV_ITEMS`.
 
 ## Lists and density
 
@@ -164,13 +197,44 @@ and colour names. Without that, `cn("text-label", "text-ink")` silently drops
 **Any new `--text-*` or `--color-*` token has to be added to the lists in
 `utils.ts`**, and `src/lib/__tests__/cn.test.ts` guards the behaviour.
 
+## Nothing is a dead end
+
+Every empty, zero-result and error state says three things, in order: what
+would be here, why it isn't, and the one action that would fix it. "No
+results" on its own makes the reader guess whether the app is broken,
+whether they mistyped, or whether there is genuinely nothing.
+
+- A zero-result state caused by filters offers to clear them.
+- A reader with nothing followed yet gets `FirstRun`, not an instruction
+  they cannot follow. ("Pick a company to read its history" is useless to
+  someone with no companies.)
+- **"Couldn't reach the server" is never "not found".** `api()` throws an
+  `ApiError` carrying `status`, and `status === 0` (also `err.isOffline`)
+  means the request never landed. Telling a reader their link is dead when
+  their connection dropped sends them to the wrong fix.
+- A failed action never looks like a completed one: report it with
+  `toast({ tone: "danger" })`. An empty `catch {}` around a mutation is a
+  bug.
+
+## Shortcuts are documented in the product
+
+`?` opens `ShortcutsSheet`, which lists every shortcut the app listens for,
+grouped by surface. It is the documentation: if a key handler is added or
+removed in `filing-list.tsx` or `watchlist/page.tsx`, the list changes in
+the same commit. A shortcut nobody can discover is a shortcut nobody has.
+
 ## Visual QA checklist
 
 Before shipping a change, on both themes and at 390px / 1440px:
 
 - No raw palette class or hex outside the two documented exceptions.
-- No arbitrary font size or radius.
+- No arbitrary font size or radius, and no Tailwind default size
+  (`text-sm`, `text-lg`) — those are not tokens.
+- Nothing interactive is smaller than 28px.
 - Rows align on a consistent grid; hairlines are `line-subtle`.
+- **Check borders in both themes.** `line-subtle` is 6% white in dark mode:
+  on a dark card it vanishes, and a field with no visible edge reads as a
+  hole rather than somewhere to type. Fields use `border-line`.
 - Selected states are unmistakable; hover states are quiet.
 - Wide content scrolls inside its own container — the page never scrolls
   sideways. A pointer cannot swipe a hidden overflow: anything that scrolls

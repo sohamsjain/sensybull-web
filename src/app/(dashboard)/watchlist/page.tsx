@@ -9,6 +9,7 @@ import { useCompanyEvents } from "@/hooks/use-company-events";
 import { usePaneWidth } from "@/hooks/use-pane-width";
 import { WatchlistPanel } from "@/components/watchlist/watchlist-panel";
 import { Conversation } from "@/components/watchlist/conversation";
+import { FirstRun } from "@/components/watchlist/first-run";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ExpandPaneIcon } from "@/components/ui/icons";
@@ -45,6 +46,10 @@ export default function WatchlistPage() {
   } = useWatchlistInbox(activeCompanyId);
 
   const activeEntry = entries.find((c) => c.company.id === activeCompanyId) || null;
+  // A signed-in reader who follows nothing yet. Distinct from "still
+  // loading": showing onboarding during the first fetch would flash it at
+  // every reader with a full watchlist.
+  const firstRun = !authLoading && !loading && !!user && entries.length === 0;
   const { events, loading: eventsLoading, hasMore, loadEarlier } =
     useCompanyEvents(activeCompanyId, socket);
   const pane = usePaneWidth();
@@ -142,8 +147,8 @@ export default function WatchlistPage() {
     return (
       <div className="flex h-full items-center justify-center px-6">
         <EmptyState
-          title="Your watchlist, decoded"
-          description="Follow the companies you care about. New filings and press releases arrive in plain English — with unread counts, so you never miss the one that matters."
+          title="Every filing, in plain English"
+          description="Follow the companies you care about. New SEC filings and press releases arrive rewritten in plain English, seconds after they publish — with unread counts, so you never miss the one that matters."
           action={
             <Link href="/login">
               <Button>Sign in to start</Button>
@@ -159,7 +164,7 @@ export default function WatchlistPage() {
       {/* Watchlist pane: full width on mobile, resizable column on desktop */}
       <div
         className={`${
-          activeCompanyId ? "hidden md:flex" : "flex"
+          activeCompanyId || firstRun ? "hidden md:flex" : "flex"
         } ${pane.collapsed ? "md:!hidden" : ""} w-full shrink-0 flex-col border-r border-line-subtle md:w-[var(--pane-w)]`}
         style={{ "--pane-w": `${pane.width}px` } as React.CSSProperties}
       >
@@ -196,8 +201,8 @@ export default function WatchlistPage() {
         <button
           onClick={pane.expand}
           className="hidden w-7 shrink-0 items-center justify-center border-r border-line-subtle text-ink-faint transition-colors hover:bg-surface-hover hover:text-ink md:flex"
-          title="Show the watchlist"
-          aria-label="Show the watchlist"
+          title="Show the company list"
+          aria-label="Show the company list"
         >
           <ExpandPaneIcon className="size-4" />
         </button>
@@ -206,7 +211,7 @@ export default function WatchlistPage() {
       {/* Company history pane */}
       <div
         className={`${
-          activeCompanyId ? "flex" : "hidden md:flex"
+          activeCompanyId || firstRun ? "flex" : "hidden md:flex"
         } flex-1 min-w-0`}
       >
         {activeEntry ? (
@@ -224,17 +229,22 @@ export default function WatchlistPage() {
               onRemove={handleRemove}
             />
           </div>
+        ) : firstRun ? (
+          /* Nothing followed yet: "pick a company" is an instruction that
+             can't be followed, so this pane becomes the way to get one. */
+          <FirstRun onAddCompany={addCompany} />
         ) : (
           <div className="flex flex-1 items-center justify-center bg-canvas-sunken">
             <div className="max-w-sm px-6 text-center">
-              <p className="text-title font-medium text-ink">Your watchlist</p>
-              <p className="mt-1.5 text-label leading-relaxed text-ink-faint">
-                Pick a company to read its filing history in plain English.
-                Every briefing links back to the original document on SEC
-                EDGAR, and the chart view shows how the stock moved around
-                each filing.
+              <p className="text-title font-semibold text-ink">
+                Pick a company
               </p>
-              <p className="mt-6 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-micro text-ink-faint">
+              <p className="mt-2 text-label leading-relaxed text-ink-muted">
+                Its filing history opens here in plain English. Every briefing
+                links back to the original document on SEC EDGAR, and the
+                chart view shows how the stock moved around each filing.
+              </p>
+              <p className="mt-6 flex flex-wrap items-center justify-center gap-x-2 gap-y-1.5 text-micro text-ink-faint">
                 <Kbd>↑</Kbd>
                 <Kbd>↓</Kbd>
                 <span>switch companies</span>
@@ -242,8 +252,8 @@ export default function WatchlistPage() {
                 <Kbd>/</Kbd>
                 <span>search</span>
                 <span className="text-ink-dim">·</span>
-                <Kbd>esc</Kbd>
-                <span>close</span>
+                <Kbd>?</Kbd>
+                <span>all shortcuts</span>
               </p>
             </div>
           </div>

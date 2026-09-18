@@ -3,8 +3,8 @@
 import { cn } from "@/lib/utils";
 
 const SIZES = {
-  sm: "size-6 [&_svg]:size-3.5",
-  md: "size-7 [&_svg]:size-4",
+  sm: "size-7 [&_svg]:size-3.5",
+  md: "size-8 [&_svg]:size-4",
   lg: "size-9 [&_svg]:size-[18px]",
 } as const;
 
@@ -12,6 +12,10 @@ const SIZES = {
  * Icon-only control for headers, rails and rows. Quiet by default: the
  * shape appears on hover, and the accent fill is reserved for a control
  * that is currently *on*.
+ *
+ * An icon-only control says nothing on its own, so every one of these needs
+ * a `title` (pointer) and an `aria-label` (assistive tech). The smallest
+ * size is 28px: below that a button becomes a target you have to aim at.
  */
 export function IconButton({
   size = "md",

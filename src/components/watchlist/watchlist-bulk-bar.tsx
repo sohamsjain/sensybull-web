@@ -34,7 +34,7 @@ export function WatchlistBulkBar({
     return (
       <div className="shrink-0 border-t border-line-subtle bg-canvas px-3 py-2">
         <p className="mb-1.5 text-meta text-ink-muted">
-          Remove {companies} from your watchlist?
+          Stop following {companies}?
         </p>
         <div className="flex items-center gap-1.5">
           <Button

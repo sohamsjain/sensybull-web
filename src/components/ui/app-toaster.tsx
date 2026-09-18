@@ -13,8 +13,12 @@ import { CloseIcon } from "@/components/ui/icons";
 export interface ToastInput {
   title: string;
   description?: string;
-  /** "success" gets the success accent; default is neutral. */
-  tone?: "success" | "neutral";
+  /**
+   * "success" gets the success accent, "danger" the error one; default is
+   * neutral. A failed action must not look like a completed one, so anything
+   * reporting a failure passes "danger".
+   */
+  tone?: "success" | "danger" | "neutral";
   durationMs?: number;
 }
 
@@ -67,16 +71,20 @@ export function AppToaster() {
       {toasts.map((t) => (
         <div
           key={t.key}
-          role="status"
+          role={t.tone === "danger" ? "alert" : "status"}
           className={`w-full rounded-md border border-line border-l-2 bg-surface-raised px-3 py-2.5 shadow-overlay ${
-            t.tone === "success" ? "border-l-success" : "border-l-line-strong"
+            t.tone === "success"
+              ? "border-l-success"
+              : t.tone === "danger"
+                ? "border-l-danger"
+                : "border-l-line-strong"
           }`}
         >
           <div className="flex items-start gap-2">
             <div className="min-w-0 flex-1">
               <div className="text-label font-medium text-ink">{t.title}</div>
               {t.description && (
-                <div className="mt-0.5 text-meta leading-relaxed text-ink-muted">
+                <div className="mt-0.5 text-label leading-relaxed text-ink-muted">
                   {t.description}
                 </div>
               )}

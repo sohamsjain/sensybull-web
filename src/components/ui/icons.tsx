@@ -7,6 +7,12 @@
  *
  * Icons support comprehension; they do not decorate. If a label already says
  * it, it doesn't also need a glyph.
+ *
+ * A navigation glyph has one job: be guessable before it is learned. That
+ * rules out anything whose meaning is borrowed from another product — a star
+ * means "favourite" everywhere on the web, so it cannot also mean "the
+ * companies I follow". Where a glyph can't carry the meaning alone, it ships
+ * with a visible label rather than a better guess.
  */
 
 import {
@@ -16,6 +22,7 @@ import {
   ArrowUp,
   Bell,
   BellOff,
+  Building2,
   ChartCandlestick,
   Check,
   CheckCheck,
@@ -32,7 +39,9 @@ import {
   Link as LinkIcon,
   List,
   LoaderCircle,
+  Keyboard,
   Moon,
+  Newspaper,
   PanelLeftClose,
   PanelLeftOpen,
   Pin,
@@ -58,6 +67,7 @@ export {
   ArrowUp as ArrowUpIcon,
   Bell as BellIcon,
   BellOff as MutedIcon,
+  Building2 as CompaniesIcon,
   ChartCandlestick as ChartIcon,
   Check as CheckIcon,
   CheckCheck as MarkReadIcon,
@@ -71,17 +81,19 @@ export {
   ExternalLink as ExternalLinkIcon,
   FileText as DocumentIcon,
   Inbox as InboxIcon,
+  Keyboard as KeyboardIcon,
   LinkIcon,
-  List as FeedIcon,
+  List as ListIcon,
   LoaderCircle as SpinnerIcon,
   Moon as MoonIcon,
+  Newspaper as UpdatesIcon,
   PanelLeftClose as CollapsePaneIcon,
   PanelLeftOpen as ExpandPaneIcon,
   Pin as PinIcon,
   Plus as PlusIcon,
   Search as SearchIcon,
   Share2 as ShareIcon,
-  Star as WatchlistIcon,
+  Star as StarIcon,
   Sun as SunIcon,
   Trash2 as RemoveIcon,
   X as CloseIcon,

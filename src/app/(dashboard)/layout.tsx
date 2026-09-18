@@ -13,6 +13,7 @@ import { NavRail } from "@/components/layout/nav-rail";
 import { BottomTabs } from "@/components/layout/bottom-tabs";
 import { CompanySheet, type CompanyRef } from "@/components/company/company-sheet";
 import { CommandPalette } from "@/components/command-palette";
+import { ShortcutsSheet } from "@/components/shortcuts-sheet";
 import { SocketProvider } from "@/context/socket-provider";
 import { useAuth } from "@/hooks/use-auth";
 import type { FeedScope } from "@/hooks/use-events";
@@ -147,7 +148,7 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
           <div className="flex-1 flex min-w-0 overflow-hidden">
             {/* pb clears the mobile bottom tab bar */}
             <main
-              className={`flex-1 overflow-hidden ${user ? "pb-14 md:pb-0" : ""}`}
+              className={`flex-1 overflow-hidden ${user ? "pb-16 md:pb-0" : ""}`}
             >
               {children}
             </main>
@@ -158,6 +159,7 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
             onClose={() => setCompanySheet(null)}
           />
           <CommandPalette />
+          <ShortcutsSheet />
         </div>
       </SocketProvider>
     </DashboardContext.Provider>

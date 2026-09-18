@@ -240,14 +240,58 @@ async function request(path: string, options: RequestInit): Promise<Response> {
   return res;
 }
 
+/**
+ * A failed request, with the status attached.
+ *
+ * Callers need to tell "this doesn't exist" (404) from "we couldn't reach
+ * the server" (`status === 0`) — telling a reader their link is dead when
+ * their wifi dropped sends them to the wrong fix. `status` is 0 for any
+ * failure that never produced a response.
+ */
+export class ApiError extends Error {
+  readonly status: number;
+
+  constructor(message: string, status: number) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+  }
+
+  /** The request never reached the server, or the response never arrived. */
+  get isOffline(): boolean {
+    return this.status === 0;
+  }
+}
+
 export async function api<T>(
   path: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const res = await request(path, options);
-  const data = await res.json();
+  let res: Response;
+  try {
+    res = await request(path, options);
+  } catch {
+    throw new ApiError("Couldn't reach the server", 0);
+  }
+
+  // An error body isn't always JSON — a gateway timeout or a proxy error
+  // page is HTML, and parsing it would mask the real status behind a
+  // "Unexpected token '<'" that tells the reader nothing.
+  let data: unknown;
+  try {
+    data = await res.json();
+  } catch {
+    if (!res.ok) {
+      throw new ApiError(`Request failed (${res.status})`, res.status);
+    }
+    throw new ApiError("The server sent a response we couldn't read", res.status);
+  }
+
   if (!res.ok) {
-    throw new Error(data.error || `Request failed (${res.status})`);
+    const message =
+      (data as { error?: string } | null)?.error ||
+      `Request failed (${res.status})`;
+    throw new ApiError(message, res.status);
   }
   return data as T;
 }

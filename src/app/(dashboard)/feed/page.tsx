@@ -9,10 +9,12 @@ import { useQuotes } from "@/hooks/use-quotes";
 import { addToDefaultWatchlist } from "@/lib/default-watchlist";
 import { FilingList } from "@/components/feed/filing-list";
 import { FeedToolbar } from "@/components/feed/feed-toolbar";
+import { toast } from "@/components/ui/app-toaster";
 
 export default function FeedPage() {
   const { user } = useAuth();
-  const { scope, filter, eventType, search } = useDashboard();
+  const { scope, setScope, filter, setFilter, eventType, setEventType, search, setSearch } =
+    useDashboard();
 
   const { watchlists, loading: watchlistsLoading, refetch } = useWatchlists();
   const [addingCompanyId, setAddingCompanyId] = useState<string | null>(null);
@@ -55,11 +57,27 @@ export default function FeedPage() {
       try {
         await addToDefaultWatchlist(companyId);
         await refetch();
-      } catch {}
+      } catch {
+        // A follow that silently does nothing is indistinguishable from one
+        // that worked, and the reader finds out days later when no updates
+        // arrive.
+        toast({
+          title: "Couldn't follow that company",
+          description: "Check your connection and try again.",
+          tone: "danger",
+        });
+      }
       setAddingCompanyId(null);
     },
     [refetch]
   );
+
+  /** Undo every filter at once, from the zero-result state they produced. */
+  const resetFilters = useCallback(() => {
+    setFilter("all");
+    setEventType(null);
+    setSearch("");
+  }, [setFilter, setEventType, setSearch]);
 
   return (
     <div className="h-full flex flex-col min-w-0">
@@ -78,6 +96,8 @@ export default function FeedPage() {
           onAddToWatchlist={handleAddToWatchlist}
           addingCompanyId={addingCompanyId}
           isLoggedIn={!!user}
+          onResetFilters={resetFilters}
+          onShowEverything={() => setScope("all")}
         />
       </div>
     </div>
