@@ -103,6 +103,10 @@ export interface CompanySearchResult {
   id: string;
   name: string;
   ticker: string;
+  market_cap?: number | null;
+  industry?: string | null;
+  /** True when the company has a financials page (`/company/<ticker>`). */
+  has_fundamentals?: boolean;
 }
 
 export interface CompanySearchResponse {

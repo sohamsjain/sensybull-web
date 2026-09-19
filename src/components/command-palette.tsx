@@ -7,6 +7,7 @@ import { useTheme } from "next-themes";
 import { useAuth } from "@/hooks/use-auth";
 import { api } from "@/lib/api-client";
 import { displayCompanyName } from "@/lib/company-name";
+import { companyHref } from "@/components/fundamentals/company-search";
 import type { CompanySearchResult, CompanySearchResponse } from "@/types/api";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { EnterIcon, SearchIcon } from "@/components/ui/icons";
@@ -80,9 +81,9 @@ export function CommandPalette() {
     return () => clearTimeout(timer);
   }, [open]);
 
-  // Company typeahead (auth only — the endpoint requires a session)
+  // Company typeahead (public — the endpoint works signed out)
   useEffect(() => {
-    if (!open || !user) return;
+    if (!open) return;
     const q = query.trim();
     const timer = setTimeout(async () => {
       if (!q) {
@@ -97,7 +98,7 @@ export function CommandPalette() {
       } catch {}
     }, 200);
     return () => clearTimeout(timer);
-  }, [query, open, user]);
+  }, [query, open]);
 
   const close = useCallback(() => setOpen(false), []);
 
@@ -113,6 +114,11 @@ export function CommandPalette() {
           ]
         : []),
       { id: "feed", label: "Go to Feed", run: () => router.push("/feed") },
+      {
+        id: "financials",
+        label: "Go to Financials",
+        run: () => router.push("/company"),
+      },
       ...(user
         ? [
             {
@@ -157,7 +163,7 @@ export function CommandPalette() {
     (row: (typeof rows)[number]) => {
       close();
       if ("company" in row && row.company) {
-        router.push(`/watchlist?c=${row.company.id}`);
+        router.push(companyHref(row.company));
       } else if ("action" in row && row.action) {
         row.action.run();
       }
@@ -195,9 +201,7 @@ export function CommandPalette() {
               setSelected(0);
             }}
             onKeyDown={onInputKeyDown}
-            placeholder={
-              user ? "Search companies or actions…" : "Search actions…"
-            }
+            placeholder="Search companies or actions…"
             className="w-full bg-transparent py-3 text-body text-ink outline-none placeholder:text-ink-faint"
           />
         </div>

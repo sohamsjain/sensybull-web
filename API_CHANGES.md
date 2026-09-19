@@ -1,5 +1,101 @@
 # API Changes
 
+## 2026-09-18 (fundamentals explorer, phase 0)
+
+Screener.in-style company pages. Plan and data model: sensybull-api
+`docs/FUNDAMENTALS_PLAN.md`. All three endpoints are **public** (no JWT),
+rate-limited, Redis-cached, and carry `Cache-Control: public, s-maxage=…`
+so Next's fetch cache can hold them.
+
+### `GET /fundamentals/<symbol>` — everything the company page renders
+
+```
+200 {
+  "status": "ready" | "building" | "unavailable" | "empty",
+  "company": { id, ticker, name, cik, exchange, industry, sector, description,
+               website, ceo, employees, ipo_date, is_adr, fiscal_year_end_month },
+  "as_of":   { latest_annual_end, latest_quarter_end, last_synced_at, price_updated_at },
+  "ratios":  { market_cap, price, high_52w, low_52w, pe_ttm, book_value_ps,
+               dividend_yield, roce, roe, shares_outstanding, pb, ev, ev_ebitda,
+               debt_to_equity, interest_coverage, opm_ttm, eps_ttm, revenue_ttm,
+               net_income_ttm, fcf_ttm, dividends_ttm_ps, sales_cagr_3y,
+               profit_cagr_3y, ttm_is_fy },
+  "growth":  { sales: {10y,5y,3y,ttm}, profit: {…}, price: {10y,5y,3y,1y},
+               roe: {10y,5y,3y,last} },            // percentages
+  "analysis": { pros: [..], cons: [..], key_points: [..] },
+  "quarterly": { periods: [{key,label,fiscal_year,fiscal_period,quality_flags}],
+                 rows: { sales: [..], expenses: [..], operating_profit, opm_pct,
+                         other_income, interest, depreciation, profit_before_tax,
+                         tax_pct, net_profit, eps },
+                 breakdown: { cost_of_revenue_pct: [..], sga_pct, rnd_pct, other_opex_pct } },
+  "annual": {
+    "income":   { periods, rows (quarterly rows + dividend_payout_pct), breakdown },
+    "balance":  { periods, rows: { fixed_assets, investments, other_assets, total_assets,
+                                   borrowings, other_liabilities, total_liabilities,
+                                   equity_capital, reserves, total_equity },
+                  breakdown: { fixed_assets: {ppe_net, goodwill, intangibles: [..]}, … } },
+    "cashflow": { periods, rows: { cash_from_operating, cash_from_investing,
+                                   cash_from_financing, net_cash_flow, free_cash_flow },
+                  breakdown: {…} },
+    "ratios":   { periods, rows: { debtor_days, inventory_days, days_payable,
+                                   cash_conversion_cycle, working_capital_days, roce_pct } }
+  },
+  "table_defaults": { annual_years: 12, quarters: 12 }
+}
+```
+
+- Tables are **column-oriented**: one array per row, one value per period,
+  oldest → newest (the last column is the newest). `annual.income` ends
+  with a synthetic `TTM` period (`key: "ttm"`) when four consecutive
+  quarters exist. Amounts are whole dollars; `*_pct` rows and `*_days`
+  rows are already percentages / days; `eps` is dollars per share.
+- Up to 40 quarters and every annual year are sent; `table_defaults` says
+  how many columns the table shows by default (row charts use them all).
+- Row *order* is not the JSON key order (Flask sorts keys). The web row
+  spec (`src/lib/fundamentals/rows.ts`) owns order and labels. US balance
+  sheets are Assets → Liabilities → Equity.
+- `status`: `ready` is the normal case. `building` (**HTTP 202**,
+  `Cache-Control: no-store`) means this ticker had never been synced and a
+  backfill just started — poll every ~2s, it lands in a few seconds.
+  `unavailable` means FMP is unreachable / the key is unset; `empty` means
+  FMP has no statements (ETFs, funds, shells). All three carry the
+  `company` block so the header still renders.
+- `ratios.price` / `market_cap` / `pe_ttm` / `pb` / `dividend_yield` are
+  recomputed from the live company price on every response.
+- `periods[].quality_flags` may contain `pbt_reconcile_fail`,
+  `no_ebitda`, `no_revenue`, `balance_mismatch`, `missing_statement` —
+  show a small note, don't hide the column.
+- 400 `invalid_symbol`, 404 `unknown_ticker`.
+
+### `GET /fundamentals/<symbol>/documents`
+
+```
+200 { symbol, cik, edgar_url,
+      filings: { annual: [{form, filed, period, description, url}], quarterly: [..],
+                 proxy: [..], recent_8k_count },
+      filings_error: null | "edgar_unavailable",
+      updates: [{ id, signal_type, source, filing_date, headline, important, url, event_types }] }
+```
+
+`filings` comes from EDGAR's submissions API (10-K/20-F, 10-Q, DEF 14A);
+`updates` is the company's last 10 briefings (link to `/e/<id>`).
+
+### `GET /companies/search` is now public and richer
+
+No longer requires a session (the company page's search box works signed
+out). Results gain `market_cap`, `industry`, `has_fundamentals`, and are
+ordered ticker match → market cap desc, so the operating company outranks
+same-named shells. Route company results to `/company/<ticker>` when
+`has_fundamentals` is true.
+
+### Ops
+
+New cron steps after `sync-market-data`: `flask sync-fundamentals`
+(backfills unsynced companies, refreshes recent filers via FMP's earnings
+calendar, rolling 30-day full refresh) and `flask rebuild-fundamentals`
+(re-derives price-dependent ratios). Env: `FMP_API_KEY`,
+`FMP_CALLS_PER_MINUTE`, `FUNDAMENTALS_ON_DEMAND`.
+
 ## 2026-09-18 (daily-logout fix)
 
 ### Auth responses carry `csrf_token`
