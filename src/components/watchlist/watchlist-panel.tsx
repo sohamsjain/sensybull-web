@@ -9,20 +9,30 @@ import { useQuotes } from "@/hooks/use-quotes";
 import { useWatchlistSelection } from "@/hooks/use-watchlist-selection";
 import { toast } from "@/components/ui/app-toaster";
 import { StatusDot } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Chip } from "@/components/ui/chip";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 import { EmptyState } from "@/components/ui/empty-state";
 import { IconButton } from "@/components/ui/icon-button";
 import {
-  CollapsePaneIcon,
+  CloseIcon,
   CompaniesIcon,
   MarkReadIcon,
+  MoreIcon,
+  MutedIcon,
+  RemoveIcon,
 } from "@/components/ui/icons";
 import { Kbd } from "@/components/ui/kbd";
 import { GroupLabel } from "@/components/ui/section";
 import { SearchInput } from "@/components/ui/search-input";
 import { SkeletonRows } from "@/components/ui/skeleton";
 import { WatchlistItem } from "./watchlist-item";
-import { WatchlistBulkBar } from "./watchlist-bulk-bar";
 
 interface WatchlistPanelProps {
   entries: WatchlistEntry[];
@@ -39,9 +49,17 @@ interface WatchlistPanelProps {
   onSelectionModeChange?: (active: boolean) => void;
 }
 
-/** Which bulk request is in flight, so the bar can disable itself. */
+/** Which bulk request is in flight, so the menus can disable themselves. */
 type BulkAction = "mute" | "read" | "remove";
 
+const companiesLabel = (n: number) => `${n} ${n === 1 ? "company" : "companies"}`;
+
+/**
+ * The watchlist column, laid out the way a chat list is: a title with one
+ * overflow menu, the search box, then All / Unread under it. Multi-select
+ * is entered from the menu; the header then becomes "N selected" with its
+ * own menu of things to do to them, and ✕ leaves.
+ */
 export function WatchlistPanel({
   entries,
   loading,
@@ -61,6 +79,7 @@ export function WatchlistPanel({
   const [addingId, setAddingId] = useState<string | null>(null);
   const [unreadOnly, setUnreadOnly] = useState(false);
   const [busy, setBusy] = useState<BulkAction | null>(null);
+  const [confirmRemove, setConfirmRemove] = useState(false);
   const { pinned } = usePinnedCompanies();
 
   // One request for the whole list's prices, refreshed on a 60s poll
@@ -151,6 +170,10 @@ export function WatchlistPanel({
     onSelectionModeChange?.(selecting);
   }, [selecting, onSelectionModeChange]);
 
+  // Leaving selection mode also drops a pending remove confirmation
+  // (adjust-during-render, so it never flashes for a frame)
+  if (!selecting && confirmRemove) setConfirmRemove(false);
+
   // Esc leaves selection mode. Skipped while typing so Esc still just blurs
   // the search box (the page's handler owns that).
   useEffect(() => {
@@ -203,6 +226,7 @@ export function WatchlistPanel({
         toast({
           title: failure,
           description: "Nothing was changed. Check your connection and try again.",
+          tone: "danger",
         });
       } finally {
         setBusy(null);
@@ -213,7 +237,7 @@ export function WatchlistPanel({
 
   const handleBulkMute = (muted: boolean) => {
     const ids = selection.selectedIds;
-    const label = `${ids.length} ${ids.length === 1 ? "company" : "companies"}`;
+    const label = companiesLabel(ids.length);
     runBulk(
       "mute",
       ids,
@@ -229,53 +253,105 @@ export function WatchlistPanel({
       "read",
       ids,
       () => onBulkMarkRead(ids),
-      `Marked ${ids.length} ${ids.length === 1 ? "company" : "companies"} as read`,
+      `Marked ${companiesLabel(ids.length)} as read`,
+      "Couldn't mark as read"
+    );
+  };
+
+  /** Every company with something unread, without entering selection. */
+  const handleMarkAllRead = () => {
+    const ids = entries.filter((c) => c.unread_count > 0).map((c) => c.company.id);
+    runBulk(
+      "read",
+      ids,
+      () => onBulkMarkRead(ids),
+      "Marked everything as read",
       "Couldn't mark as read"
     );
   };
 
   const handleBulkRemove = () => {
     const ids = selection.selectedIds;
+    setConfirmRemove(false);
     runBulk(
       "remove",
       ids,
       () => onBulkRemove(ids),
-      `Removed ${ids.length} ${ids.length === 1 ? "company" : "companies"}`,
+      `Removed ${companiesLabel(ids.length)}`,
       "Couldn't remove"
     );
   };
 
+  const nothingSelected = selection.count === 0 || busy !== null;
+
   return (
     <div className="flex h-full flex-col">
-      {/* Header — swaps to a selection toolbar in selection mode */}
-      <div className="shrink-0 px-3 pt-2.5 pb-2.5">
-        <div className="mb-2 flex h-9 items-center justify-between gap-2">
+      {/* Header — swaps to the selection bar in selection mode */}
+      <div className="shrink-0 px-3 pt-2.5 pb-2">
+        <div className="mb-2 flex h-9 items-center gap-1">
           {selecting ? (
             <>
-              <span className="text-label font-medium text-ink">
+              <IconButton
+                size="md"
+                onClick={exitSelection}
+                title="Leave selection"
+                aria-label="Leave selection"
+              >
+                <CloseIcon />
+              </IconButton>
+              <span className="ml-1 flex-1 text-label font-medium text-ink">
                 {selection.count} selected
               </span>
-              <div className="flex items-center gap-1">
-                <Chip
-                  variant="quiet"
-                  onClick={selection.toggleAll}
-                  disabled={visibleIds.length === 0}
+              <DropdownMenu>
+                <DropdownMenuTrigger
+                  render={
+                    <IconButton
+                      size="md"
+                      title="Actions for the selected companies"
+                      aria-label="Actions for the selected companies"
+                    />
+                  }
                 >
-                  {selection.allVisibleSelected ? "Clear" : "Select all"}
-                </Chip>
-                <Chip
-                  variant="quiet"
-                  onClick={exitSelection}
-                  className="text-brand-ink hover:text-brand-ink"
-                >
-                  Done
-                </Chip>
-              </div>
+                  <MoreIcon />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="min-w-56">
+                  <DropdownMenuItem
+                    onClick={selection.toggleAll}
+                    disabled={visibleIds.length === 0}
+                  >
+                    {selection.allVisibleSelected ? "Clear selection" : "Select all"}
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    disabled={nothingSelected}
+                    onClick={handleBulkMarkRead}
+                  >
+                    <MarkReadIcon />
+                    Mark as read
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    disabled={nothingSelected}
+                    onClick={() => handleBulkMute(!allMuted)}
+                  >
+                    <MutedIcon />
+                    {allMuted ? "Unmute notifications" : "Mute notifications"}
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    variant="destructive"
+                    disabled={nothingSelected}
+                    onClick={() => setConfirmRemove(true)}
+                  >
+                    <RemoveIcon />
+                    Remove from watchlist
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </>
           ) : (
             <>
-              <h2 className="flex items-center gap-2 text-title font-semibold text-ink">
-                Companies
+              <h2 className="flex flex-1 items-center gap-2 text-title font-semibold text-ink">
+                Watchlist
                 <StatusDot
                   live={connected}
                   title={
@@ -285,36 +361,44 @@ export function WatchlistPanel({
                   }
                 />
               </h2>
-              <div className="flex items-center gap-0.5">
-                <Chip
-                  variant="quiet"
-                  selected={unreadOnly}
-                  onClick={() => setUnreadOnly((v) => !v)}
-                  title={unreadOnly ? "Show all companies" : "Show unread only"}
+              <DropdownMenu>
+                <DropdownMenuTrigger
+                  render={
+                    <IconButton
+                      size="md"
+                      title="Watchlist options"
+                      aria-label="Watchlist options"
+                    />
+                  }
                 >
-                  Unread{totalUnread > 0 ? ` ${totalUnread}` : ""}
-                </Chip>
-                {entries.length > 1 && (
-                  <Chip
-                    variant="quiet"
+                  <MoreIcon />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="min-w-52">
+                  <DropdownMenuItem
+                    disabled={entries.length === 0}
                     onClick={() => selection.enter()}
-                    title="Select several companies to mute or remove together"
                   >
-                    Select
-                  </Chip>
-                )}
-                {onCollapse && (
-                  <IconButton
-                    size="sm"
-                    onClick={onCollapse}
-                    className="hidden md:inline-flex"
-                    title="Hide the company list"
-                    aria-label="Hide the company list"
+                    Select companies
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    disabled={totalUnread === 0 || busy !== null}
+                    onClick={handleMarkAllRead}
                   >
-                    <CollapsePaneIcon />
-                  </IconButton>
-                )}
-              </div>
+                    Mark all as read
+                  </DropdownMenuItem>
+                  {onCollapse && (
+                    <>
+                      <DropdownMenuSeparator className="hidden md:block" />
+                      <DropdownMenuItem
+                        className="hidden md:flex"
+                        onClick={onCollapse}
+                      >
+                        Hide the list
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </>
           )}
         </div>
@@ -328,7 +412,58 @@ export function WatchlistPanel({
           }
           hint={<Kbd className="hidden md:inline-flex">/</Kbd>}
         />
+
+        {/* Under the search, like a chat list: everything, or only unread */}
+        <div
+          role="tablist"
+          aria-label="Show all companies or only unread"
+          className="mt-2 flex items-center gap-1.5"
+        >
+          <Chip
+            role="tab"
+            aria-selected={!unreadOnly}
+            selected={!unreadOnly}
+            onClick={() => setUnreadOnly(false)}
+          >
+            All
+          </Chip>
+          <Chip
+            role="tab"
+            aria-selected={unreadOnly}
+            selected={unreadOnly}
+            onClick={() => setUnreadOnly(true)}
+          >
+            Unread{totalUnread > 0 ? ` ${totalUnread}` : ""}
+          </Chip>
+        </div>
       </div>
+
+      {/* Remove confirms inline, like the single-company confirm in the
+          conversation header — a dialog is heavier than the decision. */}
+      {selecting && confirmRemove && (
+        <div className="shrink-0 border-y border-line-subtle bg-canvas-sunken px-3 py-2">
+          <p className="mb-1.5 text-meta text-ink-muted">
+            Stop following {companiesLabel(selection.count)}?
+          </p>
+          <div className="flex items-center gap-1.5">
+            <Button
+              size="xs"
+              variant="destructive"
+              disabled={busy !== null}
+              onClick={handleBulkRemove}
+            >
+              Remove
+            </Button>
+            <Button
+              size="xs"
+              variant="ghost"
+              onClick={() => setConfirmRemove(false)}
+            >
+              Cancel
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* List */}
       <div className="flex-1 overflow-y-auto">
@@ -352,7 +487,7 @@ export function WatchlistPanel({
               <EmptyState
                 icon={MarkReadIcon}
                 title="You're all caught up"
-                description="Nothing unread across the companies you follow. Turn off the unread filter to see them all."
+                description="Nothing unread across the companies you follow. Switch back to All to see them."
               />
             )}
             {matchingEntries.map((entry) => (
@@ -382,13 +517,8 @@ export function WatchlistPanel({
                     disabled={addingId !== null}
                     className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left transition-colors hover:bg-surface-hover disabled:opacity-50"
                   >
-                    <span className="flex min-w-0 items-baseline gap-2">
-                      <span className="font-mono text-label font-semibold text-ink">
-                        {r.ticker}
-                      </span>
-                      <span className="truncate text-meta text-ink-faint">
-                        {displayCompanyName(r.name)}
-                      </span>
+                    <span className="truncate text-label text-ink">
+                      {displayCompanyName(r.name)}
                     </span>
                     <span className="shrink-0 text-micro font-medium text-brand-ink">
                       {addingId === r.id ? "Adding…" : "Track"}
@@ -410,17 +540,6 @@ export function WatchlistPanel({
           </>
         )}
       </div>
-
-      {selecting && (
-        <WatchlistBulkBar
-          count={selection.count}
-          allMuted={allMuted}
-          busy={busy !== null}
-          onMute={handleBulkMute}
-          onMarkRead={handleBulkMarkRead}
-          onRemove={handleBulkRemove}
-        />
-      )}
     </div>
   );
 }

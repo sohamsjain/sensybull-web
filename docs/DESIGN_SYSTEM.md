@@ -139,29 +139,33 @@ breakpoint. iOS zooms the viewport when a focused field is smaller than
 ## Layout
 
 ```
-┌──────┬───────────────────┬──────────────────────────────┐
-│      │ list              │ detail                       │
-│ rail │ (companies,       │ (filing history, feed,       │
-│ 76px │  search, filters) │  settings)                   │
-└──────┴───────────────────┴──────────────────────────────┘
+┌────────────────────────────────────────────────────────┐
+│ navbar  Sensybull  Watchlist  Feed      [search]  (me) │
+├───────────────────┬────────────────────────────────────┤
+│ list              │ detail                             │
+│ (companies,       │ (filing history, feed,             │
+│  search, filters) │  settings)                         │
+└───────────────────┴────────────────────────────────────┘
 ```
 
-- The rail is persistent, 76px wide, and never scrolls. **Every destination
-  in it carries a visible text label under its glyph.** Three destinations
-  do not justify hiding their names behind a hover delay, and no glyph is
-  self-evident enough to stand alone — a star reads as "favourite"
-  everywhere on the web, so it cannot also mean "the companies I follow".
-  Destinations at the top, settings and shortcuts at the foot, search
-  reachable by pointer or `⌘K`.
-- Destinations are named for what they contain, not for the feature behind
-  them: **Companies** (by company) and **Updates** (by time). They come from
-  `NAV_ITEMS`, which also carries a one-line `hint` used as the tooltip —
-  the label says what it is, the hint says what it's for.
-- Panes own their own headers (14 rows tall, hairline underneath). There is
-  no global header bar competing for vertical space.
+- One horizontal bar, 48px, on every width (`TopNav`). Wordmark, then the
+  two destinations as text — **Watchlist** (by company) and **Feed** (by
+  time) — then a company search box, then the account menu. Destinations
+  come from `NAV_ITEMS`, which also carries a one-line `hint` used as the
+  tooltip. The active destination is `bg-brand-soft text-brand-ink`.
+- The search box (`NavSearch`) is the way to a company's financials, and a
+  result always opens in a new tab. Below `sm` it collapses to a glyph that
+  opens the `⌘K` palette, which does the same thing.
+- Every preference lives in the account menu (`ProfileMenu`): theme, text
+  size, alert preferences, the shortcut list, log out. Nothing else in the
+  chrome carries a setting.
+- Panes own their own headers (14 rows tall, hairline underneath) beneath
+  the bar. The watchlist column is laid out like a chat list: title with
+  one `⋮` menu, search, then All / Unread chips under it.
 - Reading columns cap at `max-w-3xl`; settings at `max-w-2xl`.
-- Mobile swaps the rail for `BottomTabs` — same destinations, same icons,
-  same labels, same order, from the same `NAV_ITEMS`.
+- Company names are links: wherever one appears it opens the financials
+  page in a new tab (`src/lib/fundamentals/links.ts`). The watchlist page
+  shows no ticker symbols at all.
 
 ## Lists and density
 

@@ -7,6 +7,7 @@ import { CheckIcon, MutedIcon, PinIcon } from "@/components/ui/icons";
 import { listTimestamp, fullDateTime } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { displayCompanyName } from "@/lib/company-name";
+import { fundamentalsHref, NEW_TAB } from "@/lib/fundamentals/links";
 
 import { CompanyAvatar } from "./company-avatar";
 
@@ -41,6 +42,11 @@ function SelectionBox({
  * headline gets two lines because deciding whether to open a company is
  * mostly a question of whether that sentence is interesting — truncating it
  * at one line makes the reader click to find out.
+ *
+ * No ticker anywhere in the row: the name is the identity, and it is a link
+ * to the company's financials (new tab) while the row itself opens the
+ * company's history here. The row is a div with the button role rather than
+ * a <button> so that link can live inside it legitimately.
  */
 export function WatchlistItem({
   entry,
@@ -64,22 +70,28 @@ export function WatchlistItem({
   onToggleSelect?: (extend: boolean) => void;
 }) {
   const { company, last_event, last_activity_at, unread_count, muted } = entry;
+  const name = displayCompanyName(company.name);
   const hasUnread = unread_count > 0;
   const highlighted = selected || (active && !selectable);
 
-  // In selection mode the row is a checkbox, not a link to the company —
-  // one hit target, so there's no half-pressed state to reason about.
-  const checkboxProps = selectable
-    ? ({ role: "checkbox", "aria-checked": selected } as const)
-    : {};
+  const activate = (extend: boolean) =>
+    selectable ? onToggleSelect?.(extend) : onSelect();
 
   return (
-    <button
-      onClick={(e) => (selectable ? onToggleSelect?.(e.shiftKey) : onSelect())}
+    <div
+      role={selectable ? "checkbox" : "button"}
+      aria-checked={selectable ? selected : undefined}
+      tabIndex={0}
+      onClick={(e) => activate(e.shiftKey)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          activate(e.shiftKey);
+        }
+      }}
       data-company-id={company.id}
-      {...checkboxProps}
       className={cn(
-        "flex w-full items-start gap-3 border-l-2 px-3 py-3 text-left transition-colors outline-none",
+        "flex w-full cursor-pointer items-start gap-3 border-l-2 px-3 py-3 text-left transition-colors outline-none",
         highlighted
           ? "border-l-brand bg-brand-soft"
           : "border-l-transparent hover:bg-surface-hover"
@@ -89,33 +101,38 @@ export function WatchlistItem({
 
       <CompanyAvatar
         ticker={company.ticker}
-        name={displayCompanyName(company.name)}
+        name={name}
         size="sm"
+        fallback="initials"
       />
 
       <div className="-mb-3 min-w-0 flex-1 border-b border-line-subtle pb-3">
         {/* Who, and when it last moved */}
         <div className="flex items-baseline justify-between gap-2">
-          <span className="flex min-w-0 items-baseline gap-1.5">
-            {company.ticker && (
-              <span
-                className={cn(
-                  "shrink-0 font-mono text-label font-semibold",
-                  hasUnread ? "text-ink" : "text-ink-muted"
-                )}
-              >
-                {company.ticker}
-              </span>
-            )}
+          {company.ticker && !selectable ? (
+            <a
+              href={fundamentalsHref(company.ticker)}
+              {...NEW_TAB}
+              onClick={(e) => e.stopPropagation()}
+              onKeyDown={(e) => e.stopPropagation()}
+              className={cn(
+                "min-w-0 truncate text-label font-medium transition-colors hover:text-brand-ink hover:underline underline-offset-2",
+                hasUnread ? "text-ink" : "text-ink-muted"
+              )}
+              title={`${name} financials (opens in a new tab)`}
+            >
+              {name}
+            </a>
+          ) : (
             <span
               className={cn(
-                "truncate text-label",
+                "min-w-0 truncate text-label font-medium",
                 hasUnread ? "text-ink" : "text-ink-muted"
               )}
             >
-              {displayCompanyName(company.name)}
+              {name}
             </span>
-          </span>
+          )}
           <span
             className={cn(
               "shrink-0 text-micro whitespace-nowrap tabular-nums",
@@ -159,6 +176,6 @@ export function WatchlistItem({
           {last_event ? last_event.headline : "No filings yet"}
         </p>
       </div>
-    </button>
+    </div>
   );
 }

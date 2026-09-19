@@ -9,16 +9,12 @@ import {
   Suspense,
 } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
-import { NavRail } from "@/components/layout/nav-rail";
-import { BottomTabs } from "@/components/layout/bottom-tabs";
-import { CompanySheet, type CompanyRef } from "@/components/company/company-sheet";
+import { TopNav } from "@/components/layout/top-nav";
 import { CommandPalette } from "@/components/command-palette";
 import { ShortcutsSheet } from "@/components/shortcuts-sheet";
 import { SocketProvider } from "@/context/socket-provider";
 import { useAuth } from "@/hooks/use-auth";
 import type { FeedScope } from "@/hooks/use-events";
-
-export type { CompanyRef };
 
 /** The one feed filter: everything, or only market-moving updates. */
 export type FeedFilter = "all" | "important";
@@ -51,7 +47,6 @@ interface DashboardContextValue {
   setEventType: (value: string | null) => void;
   search: string;
   setSearch: (value: string) => void;
-  openCompany: (company: CompanyRef) => void;
 }
 
 const DashboardContext = createContext<DashboardContextValue>({
@@ -63,7 +58,6 @@ const DashboardContext = createContext<DashboardContextValue>({
   setEventType: () => {},
   search: "",
   setSearch: () => {},
-  openCompany: () => {},
 });
 
 export const useDashboard = () => useContext(DashboardContext);
@@ -89,7 +83,6 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
     () => searchParams.get("t") || null
   );
   const [search, setSearch] = useState(() => searchParams.get("q") ?? "");
-  const [companySheet, setCompanySheet] = useState<CompanyRef | null>(null);
 
   // Settle the scope once we know who's reading: their last choice if they
   // made one, otherwise their own companies. Done during render rather than
@@ -119,11 +112,6 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
     window.history.replaceState(null, "", qs ? `${pathname}?${qs}` : pathname);
   }, [scope, filter, eventType, search, pathname]);
 
-  const openCompany = useCallback(
-    (company: CompanyRef) => setCompanySheet(company),
-    []
-  );
-
   return (
     <DashboardContext.Provider
       value={{
@@ -135,29 +123,17 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
         setEventType,
         search,
         setSearch,
-        openCompany,
       }}
     >
       {/* One socket for the whole session, owned above the pages so it
           survives navigation. */}
       <SocketProvider>
         {/* overflow-hidden pins the app shell to the viewport so the document
-            itself never grows a second scrollbar */}
-        <div className="flex h-dvh overflow-hidden bg-canvas text-ink">
-          <NavRail />
-          <div className="flex-1 flex min-w-0 overflow-hidden">
-            {/* pb clears the mobile bottom tab bar */}
-            <main
-              className={`flex-1 overflow-hidden ${user ? "pb-16 md:pb-0" : ""}`}
-            >
-              {children}
-            </main>
-          </div>
-          <BottomTabs />
-          <CompanySheet
-            company={companySheet}
-            onClose={() => setCompanySheet(null)}
-          />
+            itself never grows a second scrollbar. The navbar takes its row
+            and the page takes the rest; pages size themselves with h-full. */}
+        <div className="flex h-dvh flex-col overflow-hidden bg-canvas text-ink">
+          <TopNav />
+          <main className="min-h-0 flex-1 overflow-hidden">{children}</main>
           <CommandPalette />
           <ShortcutsSheet />
         </div>

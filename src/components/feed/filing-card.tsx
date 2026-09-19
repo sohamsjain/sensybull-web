@@ -4,12 +4,12 @@ import { useState } from "react";
 
 import type { FilingEvent } from "@/types/events";
 import type { Quote } from "@/types/api";
-import { useDashboard } from "@/app/(dashboard)/layout";
 import { timeAgo, fullDateTime } from "@/lib/utils";
 import { isImportant } from "@/lib/event-actions";
 import { evidenceEntries } from "@/lib/evidence";
 import { filedPhrase } from "@/lib/forms";
 import { displayCompanyName } from "@/lib/company-name";
+import { fundamentalsHref, NEW_TAB } from "@/lib/fundamentals/links";
 import { StockQuote } from "@/components/company/stock-quote";
 import { ImportantMarker, MetaLabel } from "@/components/ui/badge";
 import { ChevronDownIcon, PlusIcon } from "@/components/ui/icons";
@@ -59,7 +59,6 @@ export function FilingCard({
   const company_name = displayCompanyName(event.company_name);
 
   const important = isImportant(event);
-  const { openCompany } = useDashboard();
   const [internalExpanded, setInternalExpanded] = useState(false);
   const expanded = expandedProp ?? internalExpanded;
   const toggleExpanded =
@@ -103,34 +102,23 @@ export function FilingCard({
         {/* Identity · price · time */}
         <div className="flex items-baseline justify-between gap-3">
           <div className="flex min-w-0 items-baseline gap-2">
-            {company_id ? (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  openCompany({
-                    id: company_id,
-                    name: company_name,
-                    ticker,
-                    cik: event.cik || null,
-                  });
-                }}
+            {/* The name opens the company's financials in a new tab, so
+                the reader keeps their place in the stream */}
+            {ticker ? (
+              <a
+                href={fundamentalsHref(ticker)}
+                {...NEW_TAB}
+                onClick={(e) => e.stopPropagation()}
                 className="group/company flex min-w-0 items-baseline gap-2 text-left"
-                title={`View ${company_name}`}
+                title={`${company_name} financials (opens in a new tab)`}
               >
-                {ticker && (
-                  <span className="shrink-0 font-mono text-label font-semibold text-ink transition-colors group-hover/company:text-brand-ink">
-                    {ticker}
-                  </span>
-                )}
-                <span
-                  className={cn(
-                    "truncate text-meta text-ink-faint",
-                    ticker && "hidden sm:inline"
-                  )}
-                >
+                <span className="shrink-0 font-mono text-label font-semibold text-ink transition-colors group-hover/company:text-brand-ink">
+                  {ticker}
+                </span>
+                <span className="hidden truncate text-meta text-ink-faint transition-colors group-hover/company:text-brand-ink sm:inline">
                   {company_name}
                 </span>
-              </button>
+              </a>
             ) : (
               <>
                 {ticker && (

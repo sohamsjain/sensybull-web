@@ -10,14 +10,15 @@ import { displayCompanyName } from "@/lib/company-name";
 import { useAuth } from "@/hooks/use-auth";
 import { useSocket } from "@/context/socket-provider";
 
-/** Inbox order: unread companies first, then most recent activity. */
-function sortEntries(list: WatchlistEntry[]): WatchlistEntry[] {
-  return [...list].sort((a, b) => {
-    const aUnread = a.unread_count > 0 ? 0 : 1;
-    const bUnread = b.unread_count > 0 ? 0 : 1;
-    if (aUnread !== bUnread) return aUnread - bUnread;
-    return (b.last_activity_at || "").localeCompare(a.last_activity_at || "");
-  });
+/**
+ * Inbox order: most recent activity first, like a chat list. Unread state
+ * never moves a row — floating unread companies to the top meant a company
+ * sank the moment it was opened, which read as a bug rather than a sort.
+ */
+export function sortEntries(list: WatchlistEntry[]): WatchlistEntry[] {
+  return [...list].sort((a, b) =>
+    (b.last_activity_at || "").localeCompare(a.last_activity_at || "")
+  );
 }
 
 function toPreview(event: FilingEvent): EventPreview {

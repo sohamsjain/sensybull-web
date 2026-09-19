@@ -29,7 +29,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ChartLegend } from "./chart-legend";
 import { ChartMarkerTooltip } from "./chart-marker-tooltip";
 
-const LOOKBACKS: BarsLookback[] = ["1M", "3M", "6M", "1Y"];
+/**
+ * Every chart opens on the last three months. There is no period switcher:
+ * the full-pane chart pans and zooms, and pulls older history in as the
+ * reader drags left, so a row of 1M/3M/6M/1Y chips was a second way to do
+ * what the chart already does.
+ */
+const LOOKBACK: BarsLookback = "3M";
 const COMPACT_HEIGHT = 220;
 /** Pull the next page once this few bars remain off the left edge. */
 const LOAD_MARGIN = 12;
@@ -111,9 +117,8 @@ export function PriceChart({
   const { resolvedTheme } = useTheme();
   const palette = useMemo(() => chartPalette(resolvedTheme), [resolvedTheme]);
 
-  const [lookback, setLookback] = useState<BarsLookback>("3M");
   const [scope, setScope] = useState<MarkerScope>("moves");
-  const { bars, state, loadOlder, loadingOlder } = useBars(companyId, lookback);
+  const { bars, state, loadOlder, loadingOlder } = useBars(companyId, LOOKBACK);
 
   // Bumped whenever the chart object is rebuilt, so the data effects refill it
   const [epoch, setEpoch] = useState(0);
@@ -260,7 +265,7 @@ export function PriceChart({
     const volume = volumeRef.current;
     if (!chart || !candles || !volume || bars.length === 0) return;
 
-    const key = `${companyId}:${lookback}`;
+    const key = companyId;
     const rendered = renderedRef.current;
     const fresh = rendered.key !== key;
     const range = fresh ? null : chart.timeScale().getVisibleLogicalRange();
@@ -282,7 +287,7 @@ export function PriceChart({
       }
     }
     renderedRef.current = { key, count: bars.length };
-  }, [bars, companyId, lookback, palette, epoch]);
+  }, [bars, companyId, palette, epoch]);
 
   useEffect(() => {
     markersRef.current?.setMarkers(toSeriesMarkers(markers, palette));
@@ -362,34 +367,18 @@ export function PriceChart({
 
   return (
     <div className={fill ? "flex h-full min-h-0 flex-col" : undefined}>
-      <div className="mb-2 flex shrink-0 flex-wrap items-center gap-x-2 gap-y-1.5">
-        <div className="flex items-center gap-1">
-          {LOOKBACKS.map((lb) => (
-            <Chip
-              key={lb}
-              variant="quiet"
-              selected={lookback === lb}
-              onClick={() => setLookback(lb)}
-              className="font-mono"
-            >
-              {lb}
-            </Chip>
-          ))}
-        </div>
-
-        <div className="ml-auto flex items-center gap-2">
-          {fill && (
-            <Chip variant="quiet" onClick={resetZoom} title="Fit all loaded bars">
-              Reset
-            </Chip>
-          )}
-          <SegmentedControl
-            label="Which updates to mark"
-            options={MARKER_SCOPES}
-            value={scope}
-            onChange={setScope}
-          />
-        </div>
+      <div className="mb-2 flex shrink-0 items-center justify-end gap-2">
+        {fill && (
+          <Chip variant="quiet" onClick={resetZoom} title="Fit all loaded bars">
+            Reset
+          </Chip>
+        )}
+        <SegmentedControl
+          label="Which updates to mark"
+          options={MARKER_SCOPES}
+          value={scope}
+          onChange={setScope}
+        />
       </div>
 
       <div
