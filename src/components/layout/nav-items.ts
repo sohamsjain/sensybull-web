@@ -1,63 +1,37 @@
-import {
-  BellIcon,
-  CompaniesIcon,
-  FinancialsIcon,
-  UpdatesIcon,
-  type IconProps,
-} from "@/components/ui/icons";
+import { CompaniesIcon, UpdatesIcon, type IconProps } from "@/components/ui/icons";
 
 export interface NavItem {
   href: string;
-  /** The word in the rail and the tab bar. Short enough not to wrap. */
+  /** The word in the navbar. Short enough not to wrap. */
   label: string;
   /** One line of "what is this screen", for tooltips and onboarding. */
   hint: string;
   Icon: React.ComponentType<IconProps>;
   /** Shows the unread-company count. */
   unread?: boolean;
-  /** Pushed to the end of the rail — settings-shaped, not workspace-shaped. */
-  secondary?: boolean;
+  /** Needs a session — hidden from guests. */
+  authed?: boolean;
 }
 
 /**
- * Primary navigation, shared by the desktop rail and the mobile tab bar so
- * the two can never drift.
- *
- * The first two workspace destinations hold the same updates cut two ways —
- * one by company, one by time — so they are named for that rather than for
- * the feature behind them. The third holds a company's financial statements
- * and filings (the screener-style pages under /company), and is named for
- * what is on the page rather than "Explore" or "Research". "Watchlist" and "Feed" were internal words: the first
- * asked the reader to know that a star means "companies I follow", and the
- * second is meaningless until you have already seen the screen. They also
- * collided with the feed's own scope chips, which are called "My companies"
- * and "Everything".
+ * Primary navigation: the two ways of reading the same updates — by company
+ * (**Watchlist**) and by time (**Feed**). Company financials have no entry
+ * of their own; the navbar's search box is the way in, and it opens the
+ * company's page in a new tab.
  */
 export const NAV_ITEMS: NavItem[] = [
   {
     href: "/watchlist",
-    label: "Companies",
+    label: "Watchlist",
     hint: "The companies you follow, and everything they have filed",
     Icon: CompaniesIcon,
     unread: true,
+    authed: true,
   },
   {
     href: "/feed",
-    label: "Updates",
+    label: "Feed",
     hint: "Every filing and press release as it lands, newest first",
     Icon: UpdatesIcon,
-  },
-  {
-    href: "/company",
-    label: "Financials",
-    hint: "Results, balance sheets, cash flows, ratios and filings for any US company",
-    Icon: FinancialsIcon,
-  },
-  {
-    href: "/alerts",
-    label: "Alerts",
-    hint: "How and when Sensybull tells you something happened",
-    Icon: BellIcon,
-    secondary: true,
   },
 ];

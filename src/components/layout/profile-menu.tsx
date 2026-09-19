@@ -1,9 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
+
 import { useAuth } from "@/hooks/use-auth";
 import { useFontScale } from "@/hooks/use-font-scale";
+import { openShortcuts } from "@/components/shortcuts-sheet";
+import {
+  BellIcon,
+  FontSizeIcon,
+  KeyboardIcon,
+  MoonIcon,
+  SunIcon,
+} from "@/components/ui/icons";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -13,14 +23,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 /**
- * Round profile avatar; opens account actions. Theme and font-size entries
- * are included so the settings stay reachable on mobile, where the rail's
- * dedicated toggles are hidden.
+ * The account menu, and the home of every preference: theme, text size,
+ * alert preferences, the shortcut list, and sign-out. One place, so the
+ * navbar carries a single control for all of it.
  */
-export function ProfileMenu({ side = "right" }: { side?: "right" | "top" }) {
+export function ProfileMenu() {
   const { user, logout } = useAuth();
   const { resolvedTheme, setTheme } = useTheme();
   const { scale, cycle } = useFontScale();
+  const router = useRouter();
   const [imgFailed, setImgFailed] = useState(false);
 
   if (!user) return null;
@@ -48,6 +59,8 @@ export function ProfileMenu({ side = "right" }: { side?: "right" | "top" }) {
       </span>
     );
 
+  const dark = resolvedTheme === "dark";
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
@@ -57,28 +70,30 @@ export function ProfileMenu({ side = "right" }: { side?: "right" | "top" }) {
       >
         {avatar}
       </DropdownMenuTrigger>
-      <DropdownMenuContent side={side} align="end" className="min-w-52">
+      <DropdownMenuContent side="bottom" align="end" className="min-w-56">
         <div className="px-1.5 py-1.5">
-          <p className="truncate text-label font-medium text-ink">
-            {user.name}
-          </p>
-          <p className="truncate text-meta text-ink-faint">
-            {user.email}
-          </p>
+          <p className="truncate text-label font-medium text-ink">{user.name}</p>
+          <p className="truncate text-meta text-ink-faint">{user.email}</p>
         </div>
         <DropdownMenuSeparator />
-        <DropdownMenuItem
-          className="md:hidden"
-          onClick={() =>
-            setTheme(resolvedTheme === "dark" ? "light" : "dark")
-          }
-        >
-          {resolvedTheme === "dark" ? "Light theme" : "Dark theme"}
+        <DropdownMenuItem onClick={() => setTheme(dark ? "light" : "dark")}>
+          {dark ? <SunIcon /> : <MoonIcon />}
+          {dark ? "Light theme" : "Dark theme"}
         </DropdownMenuItem>
-        <DropdownMenuItem className="md:hidden" onClick={cycle}>
+        <DropdownMenuItem onClick={cycle}>
+          <FontSizeIcon />
           Text size: {scale.label}
         </DropdownMenuItem>
-        <DropdownMenuSeparator className="md:hidden" />
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={() => router.push("/alerts")}>
+          <BellIcon />
+          Alert preferences
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={openShortcuts}>
+          <KeyboardIcon />
+          Keyboard shortcuts
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem onClick={logout}>Log out</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

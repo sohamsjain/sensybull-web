@@ -7,7 +7,7 @@ import { useTheme } from "next-themes";
 import { useAuth } from "@/hooks/use-auth";
 import { api } from "@/lib/api-client";
 import { displayCompanyName } from "@/lib/company-name";
-import { companyHref } from "@/components/fundamentals/company-search";
+import { companyLinkProps } from "@/lib/fundamentals/links";
 import type { CompanySearchResult, CompanySearchResponse } from "@/types/api";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { EnterIcon, SearchIcon } from "@/components/ui/icons";
@@ -163,7 +163,9 @@ export function CommandPalette() {
     (row: (typeof rows)[number]) => {
       close();
       if ("company" in row && row.company) {
-        router.push(companyHref(row.company));
+        const { href, target } = companyLinkProps(row.company);
+        if (target) window.open(href, "_blank", "noopener,noreferrer");
+        else router.push(href);
       } else if ("action" in row && row.action) {
         row.action.run();
       }

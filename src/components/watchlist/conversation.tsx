@@ -4,9 +4,9 @@ import { useState, useRef, useLayoutEffect, useMemo } from "react";
 
 import type { WatchlistEntry } from "@/types/api";
 import type { FilingEvent } from "@/types/events";
-import { dayLabel, formatCatalystDate } from "@/lib/utils";
+import { dayLabel } from "@/lib/utils";
 import { displayCompanyName } from "@/lib/company-name";
-import { useDashboard } from "@/app/(dashboard)/layout";
+import { fundamentalsHref, NEW_TAB } from "@/lib/fundamentals/links";
 import { usePinnedCompanies } from "@/hooks/use-pinned-companies";
 import { useQuote } from "@/hooks/use-quote";
 import { PriceChart } from "@/components/company/price-chart";
@@ -71,7 +71,7 @@ export function Conversation({
   onRemove,
 }: ConversationProps) {
   const { company, muted } = entry;
-  const { openCompany } = useDashboard();
+  const name = displayCompanyName(company.name);
   const { pinned, togglePin } = usePinnedCompanies();
   const isPinned = pinned.has(company.id);
   const [confirmRemove, setConfirmRemove] = useState(false);
@@ -94,23 +94,6 @@ export function Conversation({
 
   // Chronological for display: oldest at top, newest at bottom
   const ordered = useMemo(() => [...events].reverse(), [events]);
-
-  // Upcoming catalysts across loaded events, pinned at the top
-  const pinnedCatalysts = useMemo(() => {
-    const today = new Date().toISOString().slice(0, 10);
-    const seen = new Set<string>();
-    const upcoming: { event: string; date: string }[] = [];
-    for (const e of events) {
-      for (const c of e.catalysts || []) {
-        if (!c.date || c.date < today) continue;
-        const key = `${c.date}:${c.event}`;
-        if (seen.has(key)) continue;
-        seen.add(key);
-        upcoming.push({ event: c.event, date: c.date });
-      }
-    }
-    return upcoming.sort((a, b) => a.date.localeCompare(b.date)).slice(0, 2);
-  }, [events]);
 
   // Scroll handling: bottom on open/new message, preserve position on load-earlier
   useLayoutEffect(() => {
@@ -144,10 +127,6 @@ export function Conversation({
     onLoadEarlier();
   };
 
-  const edgarCompanyUrl = company.cik
-    ? `https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=${company.cik}&type=&dateb=&owner=include&count=40`
-    : null;
-
   return (
     <div className="flex h-full min-w-0 flex-col">
       {/* Header */}
@@ -163,49 +142,32 @@ export function Conversation({
 
         <CompanyAvatar
           ticker={company.ticker}
-          name={displayCompanyName(company.name)}
+          name={name}
           size="sm"
+          fallback="initials"
         />
 
-        <div className="min-w-0 flex-1">
-          <div className="flex min-w-0 items-baseline gap-2">
-            <button
-              onClick={() =>
-                openCompany({
-                  id: company.id,
-                  name: company.name,
-                  ticker: company.ticker,
-                  cik: company.cik,
-                })
-              }
-              className="block min-w-0 text-left"
-              title={`View ${displayCompanyName(company.name)}`}
+        {/* Name and live price, nothing else: no ticker, no EDGAR link. The
+            name opens the company's financials in a new tab. */}
+        <div className="flex min-w-0 flex-1 items-baseline gap-2">
+          {company.ticker ? (
+            <a
+              href={fundamentalsHref(company.ticker)}
+              {...NEW_TAB}
+              className="min-w-0 truncate text-label leading-tight font-medium text-ink transition-colors hover:text-brand-ink"
+              title={`${name} financials (opens in a new tab)`}
             >
-              <p className="truncate text-label leading-tight font-medium text-ink transition-colors hover:text-brand-ink">
-                {displayCompanyName(company.name)}
-              </p>
-            </button>
-            {/* Price sits beside the name; the name truncates before it does */}
-            {company.ticker && (
-              <StockQuote quote={quote} loading={quoteState === "loading"} />
-            )}
-          </div>
-          <p className="truncate text-micro text-ink-faint">
-            {company.ticker && <span className="font-mono">{company.ticker}</span>}
-            {edgarCompanyUrl && (
-              <>
-                {company.ticker && " · "}
-                <a
-                  href={edgarCompanyUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline underline-offset-2 transition-colors hover:text-ink-muted"
-                >
-                  SEC filing history
-                </a>
-              </>
-            )}
-          </p>
+              {name}
+            </a>
+          ) : (
+            <p className="min-w-0 truncate text-label leading-tight font-medium text-ink">
+              {name}
+            </p>
+          )}
+          {/* Price sits beside the name; the name truncates before it does */}
+          {company.ticker && (
+            <StockQuote quote={quote} loading={quoteState === "loading"} />
+          )}
         </div>
 
         {muted && (
@@ -274,32 +236,12 @@ export function Conversation({
         )}
       </header>
 
-      {/* Upcoming catalysts */}
-      {pinnedCatalysts.length > 0 && (
-        <div className="shrink-0 border-b border-line-subtle bg-canvas-sunken px-4 py-1.5">
-          <div className="mx-auto w-full max-w-3xl">
-            {pinnedCatalysts.map((c, i) => (
-              <p key={i} className="truncate text-meta text-ink-muted">
-                <span className="font-mono tabular-nums text-ink">
-                  {formatCatalystDate(c.date)}
-                </span>
-                {" — "}
-                {c.event}
-              </p>
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* Full-pane price chart, toggled from the header */}
       {view === "chart" && (
         <div className="min-h-0 flex-1 px-4 py-3">
-          <PriceChart
-            companyId={company.id}
-            ticker={company.ticker}
-            events={events}
-            fill
-          />
+          {/* No ticker: the header already names the company, and the
+              watchlist shows no ticker symbols anywhere. */}
+          <PriceChart companyId={company.id} events={events} fill />
         </div>
       )}
 
@@ -333,7 +275,7 @@ export function Conversation({
               icon={DocumentIcon}
               className="pt-16"
               title="Nothing filed yet"
-              description={`The moment ${displayCompanyName(company.name)} files with the SEC or puts out a press release, the briefing lands here — usually within minutes. You don't need to refresh.`}
+              description={`The moment ${name} files with the SEC or puts out a press release, the briefing lands here — usually within minutes. You don't need to refresh.`}
             />
           ) : (
             ordered.map((event, i) => {

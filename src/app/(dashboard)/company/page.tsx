@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { CompanySearch } from "@/components/fundamentals/company-search";
+import { fundamentalsHref, NEW_TAB } from "@/lib/fundamentals/links";
 
 export const metadata: Metadata = {
   title: "Company financials",
@@ -31,7 +32,8 @@ export default function CompanyIndexPage() {
           {STARTERS.map((t) => (
             <li key={t}>
               <Link
-                href={`/company/${t}`}
+                href={fundamentalsHref(t)}
+                {...NEW_TAB}
                 className="inline-flex h-8 items-center rounded-sm bg-surface-hover px-2.5 font-mono text-meta font-medium text-ink-muted transition-colors hover:bg-surface-active hover:text-ink"
               >
                 {t}

@@ -48,7 +48,7 @@ const GROUPS: { title: string; items: Shortcut[] }[] = [
     ],
   },
   {
-    title: "Companies",
+    title: "Watchlist",
     items: [
       { keys: ["↑", "↓"], join: "or", action: "Move between companies" },
       { keys: ["/"], action: "Jump to search" },

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 
 import { useAuth } from "@/hooks/use-auth";
 import {
@@ -10,12 +9,10 @@ import {
   type FeedScope,
 } from "@/app/(dashboard)/layout";
 import { api } from "@/lib/api-client";
-import { Button } from "@/components/ui/button";
 import { StatusDot } from "@/components/ui/badge";
 import { Chip, ChipRow, SegmentedControl } from "@/components/ui/chip";
 import { Kbd } from "@/components/ui/kbd";
 import { SearchInput } from "@/components/ui/search-input";
-import { ThemeToggle } from "@/components/theme-toggle";
 
 const FILTERS: { value: FeedFilter; label: string }[] = [
   { value: "all", label: "All" },
@@ -101,24 +98,13 @@ export function FeedToolbar({ connected }: { connected: boolean }) {
           hint={<Kbd className="hidden md:inline-flex">/</Kbd>}
         />
 
-        <div className="ml-auto flex items-center gap-2.5">
-          <span
-            className="hidden items-center gap-1.5 text-meta text-ink-faint sm:flex"
-            aria-live="polite"
-          >
-            <StatusDot live={connected} />
-            {connected ? "Live" : "Connecting…"}
-          </span>
-          {/* Guests have no nav rail; give them theme + sign-in here */}
-          {!user && (
-            <>
-              <ThemeToggle size="md" />
-              <Link href="/login">
-                <Button size="sm">Sign in</Button>
-              </Link>
-            </>
-          )}
-        </div>
+        <span
+          className="ml-auto hidden items-center gap-1.5 text-meta text-ink-faint sm:flex"
+          aria-live="polite"
+        >
+          <StatusDot live={connected} />
+          {connected ? "Live" : "Connecting…"}
+        </span>
       </div>
 
       {/* items-start so All/Important stays on the first line of chips when

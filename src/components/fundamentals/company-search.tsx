@@ -6,17 +6,11 @@ import { useRouter } from "next/navigation";
 import { api, ApiError } from "@/lib/api-client";
 import { displayCompanyName } from "@/lib/company-name";
 import { formatCompactDollars } from "@/lib/fundamentals/format";
+import { companyLinkProps } from "@/lib/fundamentals/links";
 import type { CompanySearchResponse, CompanySearchResult } from "@/types/api";
 import { SearchInput } from "@/components/ui/search-input";
 import { Kbd } from "@/components/ui/kbd";
 import { cn } from "@/lib/utils";
-
-/** Where a company result goes: its financials when it has them. */
-export function companyHref(result: CompanySearchResult): string {
-  return result.has_fundamentals !== false && result.ticker
-    ? `/company/${result.ticker}`
-    : `/watchlist?c=${result.id}`;
-}
 
 /**
  * The search box that is the fundamentals section's home: type a ticker or
@@ -69,7 +63,11 @@ export function CompanySearch({ autoFocus = false }: { autoFocus?: boolean }) {
       setSelected((s) => Math.max(s - 1, 0));
     } else if (e.key === "Enter" && results[selected]) {
       e.preventDefault();
-      router.push(companyHref(results[selected]));
+      const { href, target } = companyLinkProps(results[selected]);
+      // Financials always open in a new tab; only the watchlist fallback
+      // navigates this one.
+      if (target) window.open(href, "_blank", "noopener,noreferrer");
+      else router.push(href);
     }
   };
 
@@ -103,7 +101,7 @@ export function CompanySearch({ autoFocus = false }: { autoFocus?: boolean }) {
           {results.map((r, i) => (
             <li key={r.id} role="option" aria-selected={i === selected}>
               <Link
-                href={companyHref(r)}
+                {...companyLinkProps(r)}
                 onMouseEnter={() => setSelected(i)}
                 className={cn(
                   "flex items-center gap-3 px-3 py-2.5 transition-colors",

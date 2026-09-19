@@ -21,11 +21,17 @@ export function CompanyAvatar({
   ticker,
   name,
   size = "md",
+  fallback = "ticker",
   className,
 }: {
   ticker: string | null;
   name: string;
   size?: keyof typeof SIZES;
+  /**
+   * What to print when there is no logo: the ticker, or the name's first
+   * two letters for surfaces that don't show tickers at all (the watchlist).
+   */
+  fallback?: "ticker" | "initials";
   className?: string;
 }) {
   const { resolvedTheme } = useTheme();
@@ -36,7 +42,8 @@ export function CompanyAvatar({
 
   const [failed, setFailed] = useState<string | null>(null);
   const showImg = src && failed !== src;
-  const label = ticker || name.slice(0, 2).toUpperCase();
+  const initials = name.slice(0, 2).toUpperCase();
+  const label = fallback === "ticker" ? ticker || initials : initials;
 
   return (
     <div

@@ -6,9 +6,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { useWatchlists } from "@/hooks/use-watchlists";
 import { toast } from "@/components/ui/app-toaster";
 import { Button } from "@/components/ui/button";
-import { CheckIcon, SearchIcon } from "@/components/ui/icons";
+import { CheckIcon } from "@/components/ui/icons";
 import { ShareDialog } from "@/components/share/share-dialog";
-import { openCommandPalette } from "@/components/command-palette";
 
 /**
  * Header actions: Track (or "In watchlist"), Updates, Share. Signed-out
@@ -71,14 +70,6 @@ export function CompanyActions({
       <Button size="sm" variant="ghost" onClick={() => setSharing(true)}>
         Share
       </Button>
-      {/* Signed-out readers have no rail, so the page carries its own way
-          to the next company. */}
-      {!user && (
-        <Button size="sm" variant="ghost" onClick={openCommandPalette}>
-          <SearchIcon />
-          Search
-        </Button>
-      )}
       {sharing && (
         <ShareDialog company={{ name, ticker }} onClose={() => setSharing(false)} />
       )}
