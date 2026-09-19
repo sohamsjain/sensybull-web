@@ -16,6 +16,9 @@ export interface AuthResponse {
   user: User;
   access_token: string;
   // The refresh token is delivered as an httpOnly cookie, not in the body.
+  // Its CSRF counterpart is in the body: the matching cookie belongs to the
+  // API's host, so this origin cannot read it (see `api-client.ts`).
+  csrf_token: string;
   message: string;
 }
 

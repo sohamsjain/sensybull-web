@@ -96,6 +96,39 @@ calendar, rolling 30-day full refresh) and `flask rebuild-fundamentals`
 (re-derives price-dependent ratios). Env: `FMP_API_KEY`,
 `FMP_CALLS_PER_MINUTE`, `FUNDAMENTALS_ON_DEMAND`.
 
+## 2026-09-18 (daily-logout fix)
+
+### Auth responses carry `csrf_token`
+
+Every successful auth response (`/auth/login`, `/auth/register`,
+`/auth/google`, `/auth/apple`, `/auth/magic-link/verify`) now includes the
+CSRF half of the refresh token's double-submit pair in the body:
+
+```
+POST /auth/login
+200 { "message": "...", "user": {...},
+      "access_token": "...", "csrf_token": "..." }
+```
+
+Why: the same value is published as the non-httpOnly `csrf_refresh_token`
+cookie, but that cookie is host-only on `api.sensybull.com` while the app
+runs on `sensybull.com`. `document.cookie` on the frontend's origin can
+never read a cookie belonging to another host, so `X-CSRF-TOKEN` was never
+sent, every `POST /auth/refresh` came back 401 ("Missing CSRF token"), and
+`api-client.ts` correctly treated that as a rejected session. The refresh
+token itself was fine — 365 days, non-session cookie — so the symptom was a
+sign-in that lasted exactly as long as the 24h access token: a new login
+every morning. Nothing in the tests caught it because they all stub
+`document.cookie` with the value present.
+
+Client: `setTokens(access, csrf)` stores it under `sensybull:csrf`;
+`csrfHeaders()` prefers it and falls back to the cookie (same-host
+deployments, and sessions that predate this change).
+
+Note: existing sessions have no stored CSRF token and cannot read the
+cookie, so their next refresh still fails — everyone signs in once more
+after this deploys, then stays signed in.
+
 ## 2026-08-25 (chart history paging)
 
 ### `GET /companies/<id>/bars` takes an optional `end`
