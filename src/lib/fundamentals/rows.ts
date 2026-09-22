@@ -284,15 +284,29 @@ export const GRANULARITY_OPTIONS: { value: Granularity; label: string }[] = [
 ];
 
 /**
- * Whether a statement column gets the banded background.
+ * Which statement columns get the banded background.
  *
- * Counted from the right, not the left: the newest period is the one the
- * reader is anchored to, and banding that started at the oldest column
- * would flip every cell's shade the day a new quarter lands. The newest
- * column stays clear and the one before it is banded, whatever the count.
+ * Banding marks where one fiscal year ends and the next begins, so it
+ * lands on the first quarter of each year and nowhere else — not on every
+ * other column. That makes it meaningful rather than decorative, and it
+ * is why an annual table gets no banding at all: every column there is
+ * already a year, so there is nothing left to separate.
+ *
+ * `fiscal_period` is the signal when FMP reports it. When it doesn't, a
+ * change of `fiscal_year` from the previous column says the same thing.
+ * The oldest column can only be judged on its own label, since there is
+ * no column before it to have changed from.
  */
-export function isBanded(index: number, count: number): boolean {
-  return (count - 1 - index) % 2 === 1;
+export function fiscalYearStarts(
+  periods: { fiscal_period: string | null; fiscal_year: number | null }[]
+): boolean[] {
+  return periods.map((p, i) => {
+    if (p.fiscal_period === "Q1") return true;
+    if (i === 0) return false;
+    const previous = periods[i - 1];
+    if (p.fiscal_year == null || previous.fiscal_year == null) return false;
+    return p.fiscal_year !== previous.fiscal_year;
+  });
 }
 
 /** Every row key the tables read, for the contract test against the API. */

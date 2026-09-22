@@ -9,7 +9,7 @@ import {
   PAGE_SECTIONS,
   RATIO_ROWS,
   allRowKeys,
-  isBanded,
+  fiscalYearStarts,
 } from "@/lib/fundamentals/rows";
 
 /**
@@ -104,18 +104,38 @@ describe("row specs mirror the API's row keys", () => {
 });
 
 describe("column banding", () => {
-  it("counts from the newest column so adding a period never reshades", () => {
-    // Newest (last) column clear, the one before it banded.
-    expect(isBanded(11, 12)).toBe(false);
-    expect(isBanded(10, 12)).toBe(true);
-    // One more period arrives: the same period keeps the same shade.
-    expect(isBanded(12, 13)).toBe(false);
-    expect(isBanded(11, 13)).toBe(true);
+  const q = (fiscal_period: string | null, fiscal_year: number | null) => ({
+    fiscal_period,
+    fiscal_year,
   });
 
-  it("never bands two neighbours the same", () => {
-    for (let i = 1; i < 20; i++) {
-      expect(isBanded(i, 20)).not.toBe(isBanded(i - 1, 20));
-    }
+  it("bands the first quarter of each fiscal year and nothing else", () => {
+    const periods = [
+      q("Q2", 2024), q("Q3", 2024), q("Q4", 2024),
+      q("Q1", 2025), q("Q2", 2025), q("Q3", 2025), q("Q4", 2025),
+      q("Q1", 2026),
+    ];
+    expect(fiscalYearStarts(periods)).toEqual([
+      false, false, false,
+      true, false, false, false,
+      true,
+    ]);
+  });
+
+  it("falls back to a change of fiscal year when the quarter is missing", () => {
+    const periods = [q(null, 2024), q(null, 2024), q(null, 2025), q(null, 2025)];
+    expect(fiscalYearStarts(periods)).toEqual([false, false, true, false]);
+  });
+
+  it("never bands the oldest column on the year-change rule alone", () => {
+    // There is no column before it to have changed from, so a mid-year
+    // first column stays plain; a genuine Q1 still bands.
+    expect(fiscalYearStarts([q("Q3", 2024), q("Q4", 2024)])[0]).toBe(false);
+    expect(fiscalYearStarts([q("Q1", 2024), q("Q2", 2024)])[0]).toBe(true);
+  });
+
+  it("bands nothing when neither signal is present", () => {
+    const periods = [q(null, null), q(null, null), q(null, null)];
+    expect(fiscalYearStarts(periods)).toEqual([false, false, false]);
   });
 });

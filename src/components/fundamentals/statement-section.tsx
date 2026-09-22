@@ -24,10 +24,13 @@ export interface StatementView {
  * separate sections — which is also why the income statement is one section
  * here and two on screener.
  *
- * The card matters: at this density the page is a wall of figures, and a
- * bordered plane is what tells the reader where one statement ends and the
- * next begins. The unit is stated once per statement, because it is the
- * same unit for every figure inside it.
+ * The card matters on a wide screen: at this density the page is a wall
+ * of figures, and a bordered plane is what tells the reader where one
+ * statement ends and the next begins. On a phone it costs more than it
+ * gives — a border and its inset padding eat width the table needs — so
+ * below `sm` the card drops its chrome and the statement runs edge to
+ * edge, separated by the heading alone. The unit is stated once per
+ * statement, because it is the same unit for every figure inside it.
  */
 export function StatementSection({
   title,
@@ -49,8 +52,8 @@ export function StatementSection({
   const empty = quarterly.table.periods.length === 0 && annual.table.periods.length === 0;
 
   return (
-    <div className="rounded-md border border-line-subtle bg-surface">
-      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-3 pt-3 pb-2 sm:px-4">
+    <div className="bg-surface sm:rounded-md sm:border sm:border-line-subtle">
+      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-2 pt-3 pb-2 sm:px-3">
         <div className="min-w-0">
           <h2 className="text-title font-medium text-ink">{title}</h2>
           <p className="text-micro text-ink-faint">
@@ -66,11 +69,12 @@ export function StatementSection({
           />
         )}
       </div>
-      <div className="px-3 pb-3 sm:px-4 sm:pb-4">
+      <div className="pb-2 sm:pb-3">
         <FinancialTable
           table={view.table}
           rows={view.rows}
           showFiscalPeriod={granularity === "quarterly"}
+          banded={granularity === "quarterly"}
         />
       </div>
     </div>

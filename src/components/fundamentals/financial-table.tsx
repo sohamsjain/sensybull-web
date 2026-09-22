@@ -2,7 +2,7 @@
 
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { StatementTable, RowValues } from "@/types/fundamentals";
-import { isBanded, type RowSpec } from "@/lib/fundamentals/rows";
+import { fiscalYearStarts, type RowSpec } from "@/lib/fundamentals/rows";
 import {
   formatAmount,
   formatDays,
@@ -53,24 +53,31 @@ function childValues(
  * right and scrolled into view, sticky row labels, every figure in one
  * unit as a whole number.
  *
- * The reading aids are deliberately layered so they never compete —
- * banding separates the *columns*, a rule above a subtotal separates the
- * *blocks*, and hover marks where the pointer is. There is no row
- * striping: with banded columns it reads as a checkerboard and the eye
- * loses the line it was following.
+ * Rows stripe and, on a quarterly table, the first quarter of each fiscal
+ * year bands. The two cross into a grid, which is the intent: the stripe
+ * carries the eye along a row, the band says where one year stops and the
+ * next starts, and a cell knows both at once.
+ *
+ * The row background has to stay opaque — the frozen label column inherits
+ * it, and anything translucent lets the figures scroll through underneath.
+ * So the stripe is a solid tint on the row and the band is a translucent
+ * tint on the cell, which is also what makes their intersection darker
+ * than either alone.
  */
 export function FinancialTable({
   table,
   rows,
   showFiscalPeriod = false,
+  banded = false,
 }: {
   table: StatementTable;
   rows: RowSpec[];
   /** Show "Q3 FY25" under each period label (quarters). */
   showFiscalPeriod?: boolean;
+  /** Band the first quarter of each fiscal year. Quarterly tables only. */
+  banded?: boolean;
 }) {
   const [expanded, setExpanded] = useState<Set<string>>(() => new Set());
-  const [hoverCol, setHoverCol] = useState<number | null>(null);
   const [scrolled, setScrolled] = useState(false);
   const scroller = useRef<HTMLDivElement>(null);
   // Whether the view is still following the newest period. True until the
@@ -79,6 +86,11 @@ export function FinancialTable({
 
   const periods = table.periods;
   const total = periods.length;
+
+  const bands = useMemo(
+    () => (banded ? fiscalYearStarts(periods) : periods.map(() => false)),
+    [banded, periods]
+  );
 
   const pinRight = useCallback(() => {
     const el = scroller.current;
@@ -114,14 +126,6 @@ export function FinancialTable({
     setScrolled(el.scrollLeft > 0);
   }, []);
 
-  // One delegated listener instead of a pair on every cell: at 40 columns
-  // the per-cell version is thousands of handlers.
-  const onPointerMove = useCallback((e: React.MouseEvent<HTMLTableElement>) => {
-    const cell = (e.target as HTMLElement).closest<HTMLElement>("[data-col]");
-    const col = cell?.dataset.col;
-    setHoverCol(col == null ? null : Number(col));
-  }, []);
-
   const flaggedNotes = useMemo(() => {
     const notes = new Map<string, string>();
     for (const p of periods) {
@@ -140,7 +144,7 @@ export function FinancialTable({
 
   if (total === 0) {
     return (
-      <p className="py-6 text-label text-ink-faint">
+      <p className="py-6 text-body text-ink-faint">
         No reported figures for this table.
       </p>
     );
@@ -158,6 +162,7 @@ export function FinancialTable({
     spec: RowSpec,
     depth: 0 | 1,
     values: RowValues | undefined,
+    striped: boolean,
     isFirst = false
   ) => {
     const isOpen = expanded.has(spec.key);
@@ -174,19 +179,16 @@ export function FinancialTable({
       <tr
         key={`${depth}-${spec.key}`}
         className={cn(
-          // A concrete background on the row is what lets the sticky label
-          // cell inherit it — with a transparent row the label column
-          // stops dead at its own edge and slices every band and hover.
-          "group/row bg-surface",
-          depth === 1 && "bg-canvas-sunken",
-          "hover:bg-surface-hover"
+          // Opaque, always: the frozen label cell inherits this.
+          striped ? "bg-stripe" : "bg-surface",
+          depth === 1 && "bg-canvas-sunken"
         )}
       >
         <th
           scope="row"
           className={cn(
-            "sticky left-0 z-[2] max-w-44 bg-inherit py-1 pr-3 text-left sm:max-w-none",
-            depth === 0 ? "pl-0 text-ink" : "pl-4 font-normal text-ink-muted",
+            "sticky left-0 z-[2] max-w-44 bg-inherit py-0.5 pr-3 text-left sm:max-w-none",
+            depth === 0 ? "pl-2 text-ink" : "pl-5 font-normal text-ink-muted",
             // A total earns weight and a rule; everything else stays
             // regular, so the totals are the only thing that stands out.
             spec.emphasis ? "font-semibold" : "font-normal",
@@ -199,19 +201,19 @@ export function FinancialTable({
               type="button"
               onClick={() => toggle(spec.key)}
               aria-expanded={isOpen}
-              className="group/toggle -my-1 flex min-h-7 w-full items-center justify-between gap-2 py-1 pr-1 text-left transition-colors hover:text-brand-ink"
+              className="group/toggle -my-0.5 flex min-h-7 w-full items-center justify-between gap-2 py-0.5 pr-1 text-left transition-colors hover:text-brand-ink"
             >
               {label}
               {/* The control sits on the right so every label in the
                   column starts at the same x, expandable or not. */}
               {isOpen ? (
-                <MinusIcon className="size-3 shrink-0 text-ink-faint transition-colors group-hover/toggle:text-brand-ink" />
+                <MinusIcon className="size-3.5 shrink-0 text-ink-faint transition-colors group-hover/toggle:text-brand-ink" />
               ) : (
-                <PlusIcon className="size-3 shrink-0 text-ink-faint transition-colors group-hover/toggle:text-brand-ink" />
+                <PlusIcon className="size-3.5 shrink-0 text-ink-faint transition-colors group-hover/toggle:text-brand-ink" />
               )}
             </button>
           ) : (
-            <span className="flex min-h-6 items-center">{label}</span>
+            <span className="flex min-h-7 items-center">{label}</span>
           )}
         </th>
         {periods.map((p, i) => {
@@ -220,17 +222,14 @@ export function FinancialTable({
           return (
             <td
               key={p.key}
-              data-col={i}
               className={cn(
-                "whitespace-nowrap px-2.5 py-1 text-right tabular-nums",
+                "whitespace-nowrap px-2 py-0.5 text-right tabular-nums",
                 depth === 0 ? "text-ink" : "text-ink-muted",
                 rule && "border-t border-line",
-                // Banding, then the TTM accent, then hover — each one
-                // allowed to win over the last.
-                isBanded(i, total) && !isTtm && "bg-canvas-sunken/70",
-                isTtm && "bg-brand-soft/40",
-                hoverCol === i && "bg-surface-active",
-                "group-hover/row:bg-transparent"
+                // Translucent, so it darkens the stripe underneath it
+                // rather than replacing it.
+                bands[i] && !isTtm && "bg-band",
+                isTtm && "bg-brand-soft"
               )}
             >
               {formatCell(value, spec.format)}
@@ -252,17 +251,13 @@ export function FinancialTable({
             cell's box-shadow is not painted, which is how the frozen
             column ends up with no edge at all. Zero spacing looks the
             same as a collapsed table. */}
-        <table
-          className="w-full border-separate border-spacing-0 text-meta"
-          onMouseMove={onPointerMove}
-          onMouseLeave={() => setHoverCol(null)}
-        >
+        <table className="w-full border-separate border-spacing-0 text-body">
           <thead>
             <tr className="bg-surface">
               <th
                 scope="col"
                 className={cn(
-                  "sticky left-0 z-[2] bg-inherit py-1.5 pr-3 text-left",
+                  "sticky left-0 z-[2] border-b border-line bg-inherit py-1 pr-3 pl-2 text-left",
                   scrolled && "border-r border-line shadow-sticky-column"
                 )}
                 aria-label="Line item"
@@ -273,12 +268,10 @@ export function FinancialTable({
                   <th
                     key={p.key}
                     scope="col"
-                    data-col={i}
                     className={cn(
-                      "whitespace-nowrap border-b border-line px-2.5 py-1.5 text-right font-medium text-ink-muted",
-                      isBanded(i, total) && !isTtm && "bg-canvas-sunken/70",
-                      isTtm && "bg-brand-soft/40 text-brand-ink",
-                      hoverCol === i && "bg-surface-active text-ink"
+                      "border-b border-line px-2 py-1 text-right font-medium whitespace-nowrap text-ink-muted",
+                      bands[i] && !isTtm && "bg-band",
+                      isTtm && "bg-brand-soft text-brand-ink"
                     )}
                     title={
                       flaggedKeys.has(p.key)
@@ -306,21 +299,35 @@ export function FinancialTable({
             </tr>
           </thead>
           <tbody>
-            {rows.flatMap((spec, index) => {
-              const out = [renderRow(spec, 0, table.rows[spec.key], index === 0)];
-              if (expanded.has(spec.key) && spec.children) {
-                for (const child of spec.children) {
-                  out.push(renderRow(child, 1, childValues(table, spec.key, child.key)));
+            {(() => {
+              // Striping counts rendered rows, not row specs, so an
+              // expanded breakdown doesn't break the alternation below it.
+              let printed = 0;
+              return rows.flatMap((spec, index) => {
+                const out = [
+                  renderRow(spec, 0, table.rows[spec.key], printed++ % 2 === 1, index === 0),
+                ];
+                if (expanded.has(spec.key) && spec.children) {
+                  for (const child of spec.children) {
+                    out.push(
+                      renderRow(
+                        child,
+                        1,
+                        childValues(table, spec.key, child.key),
+                        printed++ % 2 === 1
+                      )
+                    );
+                  }
                 }
-              }
-              return out;
-            })}
+                return out;
+              });
+            })()}
           </tbody>
         </table>
       </div>
 
       {flaggedNotes.length > 0 && (
-        <ul className="mt-2 space-y-0.5 text-micro text-ink-faint">
+        <ul className="mt-2 space-y-0.5 px-2 text-micro text-ink-faint">
           {flaggedNotes.map((note) => (
             <li key={note}>* {note}</li>
           ))}
