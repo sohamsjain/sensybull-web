@@ -64,6 +64,15 @@
   --color-surface-active: var(--surface-active);
 
   /* ---- Lines ---------------------------------------------------------- */
+  /* Statement tables. `stripe` is opaque, because the frozen label column
+     inherits the row's background and a translucent one would let the
+     figures scroll through underneath it. `band` is translucent by
+     design: it paints over whatever the row already laid down, so a
+     banded column crossing a striped row lands darker than either — the
+     grid the two together are meant to make. */
+  --color-stripe: var(--stripe);
+  --color-band: var(--band);
+
   --color-line: var(--line);
   --color-line-subtle: var(--line-subtle);
   --color-line-strong: var(--line-strong);
@@ -164,9 +173,11 @@
    Light — paper. Cool neutral greys so numbers and dense type stay calm.
    -------------------------------------------------------------------------- */
 :root {
-  --canvas: oklch(0.995 0.0015 265);
-  --canvas-sunken: oklch(0.963 0.003 265);
+  --canvas: oklch(0.955 0.003 265);
+  --canvas-sunken: oklch(0.932 0.004 265);
   --surface: oklch(1 0 0);
+  --stripe: oklch(0.972 0.003 265);
+  --band: oklch(0.42 0.02 265 / 9%);
   --surface-raised: oklch(1 0 0);
   --surface-hover: oklch(0.952 0.004 265);
   --surface-active: oklch(0.918 0.005 265);
@@ -206,9 +217,11 @@
    from ink, not from boxes.
    -------------------------------------------------------------------------- */
 .dark {
-  --canvas: oklch(0.168 0.008 268);
-  --canvas-sunken: oklch(0.132 0.007 268);
+  --canvas: oklch(0.128 0.007 268);
+  --canvas-sunken: oklch(0.108 0.006 268);
   --surface: oklch(0.203 0.009 268);
+  --stripe: oklch(0.178 0.009 268);
+  --band: oklch(0 0 0 / 28%);
   --surface-raised: oklch(0.223 0.01 268);
   --surface-hover: oklch(0.238 0.01 268);
   --surface-active: oklch(0.278 0.012 268);

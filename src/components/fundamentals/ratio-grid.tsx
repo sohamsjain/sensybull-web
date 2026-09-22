@@ -60,6 +60,11 @@ function ratioStat(key: HeaderRatioKey, r: Partial<FundamentalsRatios>): StatVal
  * scanning for one number finds it by its label, and every figure lands on
  * the same right edge so the column can be read straight down.
  *
+ * Alternate rows are tinted rather than ruled. A band carries the eye
+ * across all three columns at once, which is the direction this grid is
+ * actually read in; a rule under every cell would draw twenty-one
+ * horizontal lines and fight the figures for attention.
+ *
  * Server-rendered from the snapshot; only the price row goes live once the
  * page hydrates.
  */
@@ -74,22 +79,29 @@ export function RatioGrid({
   const live = quote && !quote.stale ? quote : null;
 
   return (
-    <dl className="grid grid-cols-1 gap-x-8 sm:grid-cols-2 lg:grid-cols-3">
-      {DEFAULT_HEADER_RATIOS.map((spec) => {
+    <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+      {DEFAULT_HEADER_RATIOS.map((spec, index) => {
         const isPrice = spec.key === "price";
         const stat = isPrice && live ? statPrice(live.price) : ratioStat(spec.key, ratios);
         const pct = isPrice && live ? live.change_pct : null;
         const missing = stat.value === EMPTY;
+        // Banding follows the widest layout's rows so the stripe reads
+        // straight across all three columns.
+        const striped = Math.floor(index / 3) % 2 === 1;
         return (
           <div
             key={spec.key}
             title={spec.hint}
-            className="flex items-baseline justify-between gap-3 border-b border-line-subtle py-1.5 last:border-b-0"
+            className={cn(
+              "flex items-baseline justify-between gap-3 px-2.5 py-1.5",
+              striped && "sm:bg-stripe",
+              index % 2 === 1 && "max-sm:bg-stripe"
+            )}
           >
-            <dt className="shrink-0 text-meta text-ink-muted">{spec.label}</dt>
+            <dt className="shrink-0 text-body text-ink-muted">{spec.label}</dt>
             <dd
               className={cn(
-                "flex min-w-0 items-baseline gap-1 text-meta tabular-nums",
+                "flex min-w-0 items-baseline gap-1 text-body tabular-nums",
                 missing ? "text-ink-faint" : "text-ink"
               )}
             >

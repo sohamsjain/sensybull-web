@@ -278,7 +278,13 @@ function Section({
       // Matched to the sticky nav's height so a jump lands the heading
       // just below the bar rather than behind it.
       style={{ scrollMarginTop: SECTION_NAV_HEIGHT }}
-      className={cn("py-4", narrow && "max-w-5xl")}
+      className={cn(
+        "py-4",
+        narrow && "max-w-5xl",
+        // A statement draws its own card and, below `sm`, runs past the
+        // page gutter: at 390px every pixel of width is a column.
+        bare && "-mx-4 sm:mx-0"
+      )}
     >
       {!bare && title && <h2 className="mb-3 text-title font-medium text-ink">{title}</h2>}
       {children}

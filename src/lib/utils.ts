@@ -29,6 +29,8 @@ const COLORS = [
   "surface-hover",
   "surface-active",
   "surface-raised",
+  "stripe",
+  "band",
   "line",
   "line-subtle",
   "line-strong",
