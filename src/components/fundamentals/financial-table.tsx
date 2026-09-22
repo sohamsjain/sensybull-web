@@ -1,18 +1,15 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { StatementTable, RowValues } from "@/types/fundamentals";
-import type { RowSpec } from "@/lib/fundamentals/rows";
+import { isBanded, type RowSpec } from "@/lib/fundamentals/rows";
 import {
   formatAmount,
   formatDays,
   formatPercent,
   formatPerShare,
-  type Units,
 } from "@/lib/fundamentals/format";
-import { useUnits } from "@/lib/fundamentals/units";
-import { Chip } from "@/components/ui/chip";
-import { ChevronDownIcon, ChevronRightIcon } from "@/components/ui/icons";
+import { MinusIcon, PlusIcon } from "@/components/ui/icons";
 import { cn } from "@/lib/utils";
 
 /** Periods flagged by the API's reconciliation checks, with the note shown. */
@@ -23,10 +20,10 @@ const QUALITY_NOTES: Record<string, string> = {
   no_ebitda: "Operating profit is derived from operating income plus depreciation.",
 };
 
-function formatCell(value: number | null, format: RowSpec["format"], units: Units) {
+function formatCell(value: number | null, format: RowSpec["format"]) {
   switch (format) {
     case "amount":
-      return formatAmount(value, units);
+      return formatAmount(value);
     case "percent":
       return formatPercent(value);
     case "days":
@@ -52,35 +49,78 @@ function childValues(
 }
 
 /**
- * One screener-style statement table: periods across, rows down, newest
- * period on the right, sticky row labels, tabular numbers. Rows with a
- * breakdown expand in place. The unit toggle is shared across every table
- * on the page and remembered for the reader.
+ * One statement table: periods across, rows down, newest period on the
+ * right and scrolled into view, sticky row labels, every figure in one
+ * unit as a whole number.
+ *
+ * The reading aids are deliberately layered so they never compete —
+ * banding separates the *columns*, a rule above a subtotal separates the
+ * *blocks*, and hover marks where the pointer is. There is no row
+ * striping: with banded columns it reads as a checkerboard and the eye
+ * loses the line it was following.
  */
 export function FinancialTable({
   table,
   rows,
-  defaultColumns,
-  caption,
   showFiscalPeriod = false,
 }: {
   table: StatementTable;
   rows: RowSpec[];
-  /** How many of the newest periods to show before "show all". */
-  defaultColumns: number;
-  /** Text under the table header, e.g. "Figures in $ Mn". */
-  caption?: string;
   /** Show "Q3 FY25" under each period label (quarters). */
   showFiscalPeriod?: boolean;
 }) {
-  const [units, setUnits] = useUnits();
   const [expanded, setExpanded] = useState<Set<string>>(() => new Set());
-  const [showAll, setShowAll] = useState(false);
+  const [hoverCol, setHoverCol] = useState<number | null>(null);
+  const [scrolled, setScrolled] = useState(false);
+  const scroller = useRef<HTMLDivElement>(null);
+  // Whether the view is still following the newest period. True until the
+  // reader scrolls away from the right edge, true again if they come back.
+  const pinnedRight = useRef(true);
 
-  const total = table.periods.length;
-  const visibleStart = showAll ? 0 : Math.max(0, total - defaultColumns);
-  const periods = table.periods.slice(visibleStart);
-  const hasAmounts = rows.some((r) => r.format === "amount");
+  const periods = table.periods;
+  const total = periods.length;
+
+  const pinRight = useCallback(() => {
+    const el = scroller.current;
+    if (!el || !pinnedRight.current) return;
+    el.scrollLeft = el.scrollWidth; // clamps to the maximum
+    setScrolled(el.scrollLeft > 0);
+  }, []);
+
+  // The newest period is the one worth reading, and it is at the far
+  // right — land there rather than making the reader drag.
+  //
+  // One measurement isn't enough: on hydration the table is often still
+  // at its unstyled width, and a scroll set while nothing overflows yet
+  // silently clamps back to zero. Watching the table's size instead
+  // re-pins whenever layout settles, a font lands, the window resizes, or
+  // the reader flips the statement between quarters and years.
+  useLayoutEffect(() => {
+    const el = scroller.current;
+    if (!el) return;
+    pinnedRight.current = true;
+    pinRight();
+    const observer = new ResizeObserver(pinRight);
+    observer.observe(el);
+    if (el.firstElementChild) observer.observe(el.firstElementChild);
+    return () => observer.disconnect();
+  }, [pinRight, table, rows]);
+
+  const onScroll = useCallback(() => {
+    const el = scroller.current;
+    if (!el) return;
+    // A fraction of a pixel of rounding shouldn't count as scrolling away.
+    pinnedRight.current = Math.ceil(el.scrollLeft) >= el.scrollWidth - el.clientWidth - 1;
+    setScrolled(el.scrollLeft > 0);
+  }, []);
+
+  // One delegated listener instead of a pair on every cell: at 40 columns
+  // the per-cell version is thousands of handlers.
+  const onPointerMove = useCallback((e: React.MouseEvent<HTMLTableElement>) => {
+    const cell = (e.target as HTMLElement).closest<HTMLElement>("[data-col]");
+    const col = cell?.dataset.col;
+    setHoverCol(col == null ? null : Number(col));
+  }, []);
 
   const flaggedNotes = useMemo(() => {
     const notes = new Map<string, string>();
@@ -114,26 +154,44 @@ export function FinancialTable({
       return next;
     });
 
-  const renderRow = (spec: RowSpec, depth: 0 | 1, values: RowValues | undefined) => {
+  const renderRow = (
+    spec: RowSpec,
+    depth: 0 | 1,
+    values: RowValues | undefined,
+    isFirst = false
+  ) => {
     const isOpen = expanded.has(spec.key);
+    // A rule above the first row would double the header's own.
+    const rule = spec.emphasis && !isFirst;
     const expandable = depth === 0 && !!spec.children?.length;
+    const label = (
+      <>
+        <span className={cn("truncate", spec.short && "hidden sm:inline")}>{spec.label}</span>
+        {spec.short && <span className="truncate sm:hidden">{spec.short}</span>}
+      </>
+    );
     return (
       <tr
         key={`${depth}-${spec.key}`}
         className={cn(
-          "border-b border-line-subtle last:border-0",
-          depth === 0 && "hover:bg-surface-hover/60",
-          depth === 1 && "bg-canvas-sunken/60",
-          spec.emphasis && "font-semibold"
+          // A concrete background on the row is what lets the sticky label
+          // cell inherit it — with a transparent row the label column
+          // stops dead at its own edge and slices every band and hover.
+          "group/row bg-surface",
+          depth === 1 && "bg-canvas-sunken",
+          "hover:bg-surface-hover"
         )}
       >
         <th
           scope="row"
           className={cn(
-            "sticky left-0 z-[1] whitespace-nowrap bg-canvas py-1.5 pr-3 text-left font-medium",
-            depth === 0 ? "pl-0 text-ink" : "pl-5 text-ink-faint font-normal",
-            spec.emphasis && "border-t border-line text-ink",
-            depth === 1 && "bg-canvas"
+            "sticky left-0 z-[2] max-w-44 bg-inherit py-1 pr-3 text-left sm:max-w-none",
+            depth === 0 ? "pl-0 text-ink" : "pl-4 font-normal text-ink-muted",
+            // A total earns weight and a rule; everything else stays
+            // regular, so the totals are the only thing that stands out.
+            spec.emphasis ? "font-semibold" : "font-normal",
+            rule && "border-t border-line",
+            scrolled && "border-r border-line shadow-sticky-column"
           )}
         >
           {expandable ? (
@@ -141,38 +199,41 @@ export function FinancialTable({
               type="button"
               onClick={() => toggle(spec.key)}
               aria-expanded={isOpen}
-              className="group/row inline-flex h-7 items-center gap-1 rounded-sm pr-1 -ml-1 pl-1 text-left transition-colors hover:text-brand-ink"
+              className="group/toggle -my-1 flex min-h-7 w-full items-center justify-between gap-2 py-1 pr-1 text-left transition-colors hover:text-brand-ink"
             >
+              {label}
+              {/* The control sits on the right so every label in the
+                  column starts at the same x, expandable or not. */}
               {isOpen ? (
-                <ChevronDownIcon className="size-3.5 text-ink-faint transition-colors group-hover/row:text-brand-ink" />
+                <MinusIcon className="size-3 shrink-0 text-ink-faint transition-colors group-hover/toggle:text-brand-ink" />
               ) : (
-                <ChevronRightIcon className="size-3.5 text-ink-faint transition-colors group-hover/row:text-brand-ink" />
+                <PlusIcon className="size-3 shrink-0 text-ink-faint transition-colors group-hover/toggle:text-brand-ink" />
               )}
-              <span className={cn(spec.short && "hidden sm:inline")}>{spec.label}</span>
-              {spec.short && <span className="sm:hidden">{spec.short}</span>}
             </button>
           ) : (
-            <span className="inline-flex h-7 items-center">
-              <span className={cn(spec.short && "hidden sm:inline")}>{spec.label}</span>
-              {spec.short && <span className="sm:hidden">{spec.short}</span>}
-            </span>
+            <span className="flex min-h-6 items-center">{label}</span>
           )}
         </th>
         {periods.map((p, i) => {
-          const value = values ? values[visibleStart + i] ?? null : null;
-          const text = formatCell(value, spec.format, units);
+          const value = values ? values[i] ?? null : null;
+          const isTtm = p.key === "ttm";
           return (
             <td
               key={p.key}
+              data-col={i}
               className={cn(
-                "whitespace-nowrap px-2 py-1.5 text-right font-mono tabular-nums",
+                "whitespace-nowrap px-2.5 py-1 text-right tabular-nums",
                 depth === 0 ? "text-ink" : "text-ink-muted",
-                spec.emphasis && "border-t border-line",
-                p.key === "ttm" && "bg-brand-soft/40",
-                value != null && value < 0 && "text-ink"
+                rule && "border-t border-line",
+                // Banding, then the TTM accent, then hover — each one
+                // allowed to win over the last.
+                isBanded(i, total) && !isTtm && "bg-canvas-sunken/70",
+                isTtm && "bg-brand-soft/40",
+                hoverCol === i && "bg-surface-active",
+                "group-hover/row:bg-transparent"
               )}
             >
-              {text}
+              {formatCell(value, spec.format)}
             </td>
           );
         })}
@@ -182,88 +243,71 @@ export function FinancialTable({
 
   return (
     <div>
-      <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-        <p className="text-micro text-ink-faint">
-          {caption ?? (hasAmounts ? `Figures in ${units === "bn" ? "$ Bn" : "$ Mn"}` : "")}
-          {total > defaultColumns && (
-            <>
-              {caption || hasAmounts ? " · " : ""}
-              <button
-                type="button"
-                onClick={() => setShowAll((s) => !s)}
-                className="text-brand-ink underline-offset-2 hover:underline"
-              >
-                {showAll
-                  ? `Show latest ${defaultColumns}`
-                  : `Show all ${total}`}
-              </button>
-            </>
-          )}
-        </p>
-        {hasAmounts && (
-          <div className="flex gap-1" role="group" aria-label="Units">
-            <Chip
-              selected={units === "mn"}
-              onClick={() => setUnits("mn")}
-              className="h-7 px-2 py-0 text-micro"
-            >
-              $ Mn
-            </Chip>
-            <Chip
-              selected={units === "bn"}
-              onClick={() => setUnits("bn")}
-              className="h-7 px-2 py-0 text-micro"
-            >
-              $ Bn
-            </Chip>
-          </div>
-        )}
-      </div>
-
-      <div className="w-full overflow-x-auto">
-        <table className="w-full border-collapse text-meta">
+      <div
+        ref={scroller}
+        onScroll={onScroll}
+        className="w-full overflow-x-auto overscroll-x-contain"
+      >
+        {/* Separated borders, not collapsed: under the collapsing model a
+            cell's box-shadow is not painted, which is how the frozen
+            column ends up with no edge at all. Zero spacing looks the
+            same as a collapsed table. */}
+        <table
+          className="w-full border-separate border-spacing-0 text-meta"
+          onMouseMove={onPointerMove}
+          onMouseLeave={() => setHoverCol(null)}
+        >
           <thead>
-            <tr className="border-b border-line">
+            <tr className="bg-surface">
               <th
                 scope="col"
-                className="sticky left-0 z-[1] bg-canvas py-1.5 pr-3 text-left"
+                className={cn(
+                  "sticky left-0 z-[2] bg-inherit py-1.5 pr-3 text-left",
+                  scrolled && "border-r border-line shadow-sticky-column"
+                )}
                 aria-label="Line item"
               />
-              {periods.map((p) => (
-                <th
-                  key={p.key}
-                  scope="col"
-                  className={cn(
-                    "whitespace-nowrap px-2 py-1.5 text-right font-medium text-ink-muted",
-                    p.key === "ttm" && "bg-brand-soft/40 text-brand-ink"
-                  )}
-                  title={
-                    flaggedKeys.has(p.key)
-                      ? "Some rows in this period are derived differently"
-                      : undefined
-                  }
-                >
-                  <span className="block">
-                    {p.label}
-                    {flaggedKeys.has(p.key) && (
-                      <span className="text-ink-faint" aria-hidden>
-                        {" "}
-                        *
+              {periods.map((p, i) => {
+                const isTtm = p.key === "ttm";
+                return (
+                  <th
+                    key={p.key}
+                    scope="col"
+                    data-col={i}
+                    className={cn(
+                      "whitespace-nowrap border-b border-line px-2.5 py-1.5 text-right font-medium text-ink-muted",
+                      isBanded(i, total) && !isTtm && "bg-canvas-sunken/70",
+                      isTtm && "bg-brand-soft/40 text-brand-ink",
+                      hoverCol === i && "bg-surface-active text-ink"
+                    )}
+                    title={
+                      flaggedKeys.has(p.key)
+                        ? "Some rows in this period are derived differently"
+                        : undefined
+                    }
+                  >
+                    <span className="block">
+                      {p.label}
+                      {flaggedKeys.has(p.key) && (
+                        <span className="text-ink-faint" aria-hidden>
+                          {" "}
+                          *
+                        </span>
+                      )}
+                    </span>
+                    {showFiscalPeriod && p.fiscal_period && p.fiscal_year && (
+                      <span className="block text-micro font-normal text-ink-faint">
+                        {p.fiscal_period} FY{String(p.fiscal_year).slice(-2)}
                       </span>
                     )}
-                  </span>
-                  {showFiscalPeriod && p.fiscal_period && p.fiscal_year && (
-                    <span className="block text-micro font-normal text-ink-faint">
-                      {p.fiscal_period} FY{String(p.fiscal_year).slice(-2)}
-                    </span>
-                  )}
-                </th>
-              ))}
+                  </th>
+                );
+              })}
             </tr>
           </thead>
           <tbody>
-            {rows.flatMap((spec) => {
-              const out = [renderRow(spec, 0, table.rows[spec.key])];
+            {rows.flatMap((spec, index) => {
+              const out = [renderRow(spec, 0, table.rows[spec.key], index === 0)];
               if (expanded.has(spec.key) && spec.children) {
                 for (const child of spec.children) {
                   out.push(renderRow(child, 1, childValues(table, spec.key, child.key)));

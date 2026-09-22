@@ -149,7 +149,13 @@ export const RATIO_ROWS: RowSpec[] = [
   { key: "roce_pct", label: "ROCE %", format: "percent" },
 ];
 
-/** The nine header ratios, in grid order. */
+/**
+ * The header stats. Screener fills a three-column block and lets the
+ * reader add rows; ours is fixed, but it prints every ratio the API
+ * already computes rather than a third of them. Read across in rows of
+ * three: valuation, then returns, then the trailing-twelve-month figures,
+ * then growth.
+ */
 export type HeaderRatioKey =
   | "market_cap"
   | "price"
@@ -168,6 +174,8 @@ export type HeaderRatioKey =
   | "opm_ttm"
   | "eps_ttm"
   | "fcf_ttm"
+  | "revenue_ttm"
+  | "net_income_ttm"
   | "sales_cagr_3y"
   | "profit_cagr_3y";
 
@@ -182,12 +190,30 @@ export const DEFAULT_HEADER_RATIOS: HeaderRatioSpec[] = [
   { key: "market_cap", label: "Market Cap", hint: "Shares outstanding × last price" },
   { key: "price", label: "Current Price", hint: "Last trade, refreshed every minute while the page is open" },
   { key: "high_low", label: "High / Low", hint: "52-week high and low close" },
+
   { key: "pe_ttm", label: "Stock P/E", hint: "Price ÷ diluted EPS over the trailing four quarters" },
   { key: "book_value_ps", label: "Book Value", hint: "Shareholders' equity ÷ shares outstanding, per share" },
   { key: "dividend_yield", label: "Dividend Yield", hint: "Dividends per share over the last 12 months ÷ price" },
+
   { key: "roce", label: "ROCE", hint: "EBIT ÷ (total assets − current liabilities), latest fiscal year" },
   { key: "roe", label: "ROE", hint: "Net income ÷ average shareholders' equity, latest fiscal year" },
+  { key: "opm_ttm", label: "OPM", hint: "Operating profit ÷ sales over the trailing four quarters" },
+
+  { key: "pb", label: "Price to Book", hint: "Price ÷ book value per share" },
+  { key: "ev_ebitda", label: "EV / EBITDA", hint: "Enterprise value ÷ EBITDA over the trailing four quarters" },
+  { key: "ev", label: "Enterprise Value", hint: "Market cap + debt − cash" },
+
+  { key: "debt_to_equity", label: "Debt to Equity", hint: "Total borrowings ÷ shareholders' equity, latest fiscal year" },
+  { key: "interest_coverage", label: "Interest Coverage", hint: "EBIT ÷ interest expense, latest fiscal year" },
   { key: "shares_outstanding", label: "Shares Outstanding", hint: "From the latest SEC cover page" },
+
+  { key: "revenue_ttm", label: "Sales", hint: "Sales over the trailing four quarters" },
+  { key: "net_income_ttm", label: "Net Profit", hint: "Net profit over the trailing four quarters" },
+  { key: "eps_ttm", label: "EPS", hint: "Diluted earnings per share over the trailing four quarters" },
+
+  { key: "fcf_ttm", label: "Free Cash Flow", hint: "Cash from operations − capital expenditure, trailing four quarters" },
+  { key: "sales_cagr_3y", label: "Sales Growth 3Yrs", hint: "Compounded annual sales growth over three fiscal years" },
+  { key: "profit_cagr_3y", label: "Profit Growth 3Yrs", hint: "Compounded annual profit growth over three fiscal years" },
 ];
 
 /** Growth grids under the P&L, each read left → right oldest window first. */
@@ -241,13 +267,33 @@ export const GROWTH_GRIDS: {
 /** Sections of the page, in order, for the sticky sub-nav. */
 export const PAGE_SECTIONS: { id: string; label: string }[] = [
   { id: "analysis", label: "Analysis" },
-  { id: "quarters", label: "Quarters" },
-  { id: "profit-loss", label: "Profit & Loss" },
+  { id: "income", label: "Income Statement" },
   { id: "balance-sheet", label: "Balance Sheet" },
   { id: "cash-flow", label: "Cash Flow" },
   { id: "ratios", label: "Ratios" },
+  { id: "growth", label: "Growth" },
   { id: "documents", label: "Documents" },
 ];
+
+/** Which granularity a statement is being read at. */
+export type Granularity = "quarterly" | "annual";
+
+export const GRANULARITY_OPTIONS: { value: Granularity; label: string }[] = [
+  { value: "quarterly", label: "Quarterly" },
+  { value: "annual", label: "Annual" },
+];
+
+/**
+ * Whether a statement column gets the banded background.
+ *
+ * Counted from the right, not the left: the newest period is the one the
+ * reader is anchored to, and banding that started at the oldest column
+ * would flip every cell's shade the day a new quarter lands. The newest
+ * column stays clear and the one before it is banded, whatever the count.
+ */
+export function isBanded(index: number, count: number): boolean {
+  return (count - 1 - index) % 2 === 1;
+}
 
 /** Every row key the tables read, for the contract test against the API. */
 export function allRowKeys(specs: RowSpec[]): string[] {

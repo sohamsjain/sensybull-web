@@ -6,8 +6,10 @@ import {
   CASHFLOW_ROWS,
   DEFAULT_HEADER_RATIOS,
   INCOME_ROWS,
+  PAGE_SECTIONS,
   RATIO_ROWS,
   allRowKeys,
+  isBanded,
 } from "@/lib/fundamentals/rows";
 
 /**
@@ -76,9 +78,44 @@ describe("row specs mirror the API's row keys", () => {
     }
   });
 
-  it("shows nine header ratios, shares outstanding in place of face value", () => {
-    expect(DEFAULT_HEADER_RATIOS).toHaveLength(9);
-    expect(DEFAULT_HEADER_RATIOS.map((r) => r.key)).toContain("shares_outstanding");
-    expect(DEFAULT_HEADER_RATIOS.map((r) => r.key)).not.toContain("face_value");
+  it("prints every ratio the API computes, in whole rows of three", () => {
+    const keys = DEFAULT_HEADER_RATIOS.map((r) => r.key);
+    // The grid is three columns; a partial last row leaves a hole in it.
+    expect(keys.length % 3).toBe(0);
+    expect(new Set(keys).size).toBe(keys.length);
+    // These were computed by the API and never rendered before.
+    for (const key of ["pb", "ev", "ev_ebitda", "debt_to_equity", "interest_coverage",
+                       "opm_ttm", "eps_ttm", "fcf_ttm", "revenue_ttm", "net_income_ttm",
+                       "sales_cagr_3y", "profit_cagr_3y"]) {
+      expect(keys).toContain(key);
+    }
+    expect(keys).toContain("shares_outstanding");
+    expect(keys).not.toContain("face_value");
+  });
+
+  it("has one income section, not a Quarters section and a P&L section", () => {
+    const ids = PAGE_SECTIONS.map((s) => s.id);
+    expect(ids).toContain("income");
+    expect(ids).not.toContain("quarters");
+    expect(ids).not.toContain("profit-loss");
+    // Growth is annual by definition, so it has its own home.
+    expect(ids).toContain("growth");
+  });
+});
+
+describe("column banding", () => {
+  it("counts from the newest column so adding a period never reshades", () => {
+    // Newest (last) column clear, the one before it banded.
+    expect(isBanded(11, 12)).toBe(false);
+    expect(isBanded(10, 12)).toBe(true);
+    // One more period arrives: the same period keeps the same shade.
+    expect(isBanded(12, 13)).toBe(false);
+    expect(isBanded(11, 13)).toBe(true);
+  });
+
+  it("never bands two neighbours the same", () => {
+    for (let i = 1; i < 20; i++) {
+      expect(isBanded(i, 20)).not.toBe(isBanded(i - 1, 20));
+    }
   });
 });

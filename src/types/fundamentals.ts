@@ -91,6 +91,13 @@ export interface StatementTable {
   breakdown?: Record<string, RowValues | Record<string, RowValues>>;
 }
 
+export interface StatementSet {
+  income: StatementTable;
+  balance: StatementTable;
+  cashflow: StatementTable;
+  ratios: StatementTable;
+}
+
 export interface FundamentalsPayload {
   status: FundamentalsStatus;
   company: FundamentalsCompany;
@@ -103,13 +110,13 @@ export interface FundamentalsPayload {
   ratios: Partial<FundamentalsRatios>;
   growth: FundamentalsGrowth;
   analysis: FundamentalsAnalysis;
-  quarterly: StatementTable;
-  annual: {
-    income: StatementTable;
-    balance: StatementTable;
-    cashflow: StatementTable;
-    ratios: StatementTable;
-  };
+  /**
+   * The same four statements at both granularities, so each one can offer
+   * a Quarterly/Annual switch in place rather than living in two sections.
+   * Only `annual.income` carries a TTM column and a dividend-payout row.
+   */
+  quarterly: StatementSet;
+  annual: StatementSet;
   table_defaults: { annual_years: number; quarters: number };
 }
 
