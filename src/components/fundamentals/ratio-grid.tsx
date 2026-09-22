@@ -4,57 +4,64 @@ import type { FundamentalsRatios } from "@/types/fundamentals";
 import { DEFAULT_HEADER_RATIOS, type HeaderRatioKey } from "@/lib/fundamentals/rows";
 import {
   EMPTY,
-  formatCompactDollars,
-  formatMultiple,
-  formatPerShare,
-  formatPercent,
+  EMPTY_STAT,
   formatPrice,
-  formatShares,
+  statCompactDollars,
+  statMultiple,
+  statPercent,
+  statPerShare,
+  statPrice,
+  statShares,
+  type StatValue,
 } from "@/lib/fundamentals/format";
 import { useQuote } from "@/hooks/use-quote";
 import { formatChangePct } from "@/lib/quote";
 import { cn } from "@/lib/utils";
 
-function ratioText(key: HeaderRatioKey, r: Partial<FundamentalsRatios>): string {
+function ratioStat(key: HeaderRatioKey, r: Partial<FundamentalsRatios>): StatValue {
   switch (key) {
     case "market_cap":
-      return formatCompactDollars(r.market_cap);
+    case "ev":
+    case "fcf_ttm":
+    case "revenue_ttm":
+    case "net_income_ttm":
+      return statCompactDollars(r[key]);
     case "price":
-      return formatPrice(r.price);
+      return statPrice(r.price);
     case "high_low":
       return r.high_52w != null && r.low_52w != null
-        ? `${formatPrice(r.high_52w)} / ${formatPrice(r.low_52w)}`
-        : EMPTY;
-    case "pe_ttm":
-      return formatMultiple(r.pe_ttm);
+        ? { value: `${formatPrice(r.high_52w)} / ${formatPrice(r.low_52w)}` }
+        : EMPTY_STAT;
     case "book_value_ps":
-      return r.book_value_ps != null ? `$${formatPerShare(r.book_value_ps)}` : EMPTY;
+    case "eps_ttm":
+      return statPerShare(r[key]);
     case "dividend_yield":
-      return formatPercent(r.dividend_yield, 2);
+      return statPercent(r.dividend_yield, 2);
     case "roce":
     case "roe":
     case "opm_ttm":
     case "sales_cagr_3y":
     case "profit_cagr_3y":
-      return formatPercent(r[key], 1);
+      return statPercent(r[key], 1);
     case "shares_outstanding":
-      return formatShares(r.shares_outstanding);
+      return statShares(r.shares_outstanding);
+    case "pe_ttm":
     case "pb":
     case "ev_ebitda":
     case "debt_to_equity":
     case "interest_coverage":
-      return formatMultiple(r[key]);
-    case "ev":
-    case "fcf_ttm":
-      return formatCompactDollars(r[key]);
-    case "eps_ttm":
-      return r.eps_ttm != null ? `$${formatPerShare(r.eps_ttm)}` : EMPTY;
+      return statMultiple(r[key]);
   }
 }
 
 /**
- * The nine-cell ratio grid under the company name. Server-rendered from the
- * snapshot; only the price cell goes live once the page hydrates.
+ * The header stats: one row per ratio, label left and figure right, three
+ * columns across. Screener's layout, and for the same reason — a reader
+ * scanning for one number finds it by its label, and every figure lands on
+ * the same right edge so the column can be read straight down.
+ *
+ * Server-rendered from the snapshot; only the price row goes live once the
+ * page hydrates.
  */
 export function RatioGrid({
   companyId,
@@ -67,21 +74,33 @@ export function RatioGrid({
   const live = quote && !quote.stale ? quote : null;
 
   return (
-    <dl className="grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-3">
+    <dl className="grid grid-cols-1 gap-x-8 sm:grid-cols-2 lg:grid-cols-3">
       {DEFAULT_HEADER_RATIOS.map((spec) => {
         const isPrice = spec.key === "price";
-        const text =
-          isPrice && live ? formatPrice(live.price) : ratioText(spec.key, ratios);
+        const stat = isPrice && live ? statPrice(live.price) : ratioStat(spec.key, ratios);
         const pct = isPrice && live ? live.change_pct : null;
+        const missing = stat.value === EMPTY;
         return (
-          <div key={spec.key} className="min-w-0" title={spec.hint}>
-            <dt className="text-micro text-ink-faint">{spec.label}</dt>
-            <dd className="flex items-baseline gap-1.5 font-mono text-label tabular-nums text-ink">
-              <span className="truncate">{text}</span>
+          <div
+            key={spec.key}
+            title={spec.hint}
+            className="flex items-baseline justify-between gap-3 border-b border-line-subtle py-1.5 last:border-b-0"
+          >
+            <dt className="shrink-0 text-meta text-ink-muted">{spec.label}</dt>
+            <dd
+              className={cn(
+                "flex min-w-0 items-baseline gap-1 text-meta tabular-nums",
+                missing ? "text-ink-faint" : "text-ink"
+              )}
+            >
+              <span className="truncate font-semibold">{stat.value}</span>
+              {stat.unit && (
+                <span className="shrink-0 font-normal text-ink-faint">{stat.unit}</span>
+              )}
               {pct != null && (
                 <span
                   className={cn(
-                    "text-micro",
+                    "shrink-0 text-micro",
                     pct >= 0 ? "text-success" : "text-danger"
                   )}
                 >

@@ -1,5 +1,36 @@
 # API Changes
 
+## 2026-09-22 (fundamentals: all four statements at both granularities)
+
+**Breaking:** `quarterly` in `GET /fundamentals/<symbol>` changed from a
+single statement table to an object of four, matching `annual`:
+
+```
+"quarterly": { "income": {…}, "balance": {…}, "cashflow": {…}, "ratios": {…} },
+"annual":    { "income": {…}, "balance": {…}, "cashflow": {…}, "ratios": {…} }
+```
+
+Every table keeps the same column-oriented shape. Only `annual.income`
+carries the TTM column and the `dividend_payout_pct` row; only quarterly
+periods carry `fiscal_period`.
+
+**Deploy the API before the web build that reads it** — the old client
+reads `quarterly.periods`, which no longer exists.
+
+Why: the company page now shows one Income Statement with a
+Quarterly/Annual switch rather than a Quarters section and a P&L section,
+and offers the same switch on the balance sheet, cash flow and ratios.
+No new upstream calls — `sync.py` already fetched and stored all three
+statements per quarter; the payload simply never built the tables.
+
+Also fixed, API-side: `ratio_rows()` now takes `period_days`. A days ratio
+divides a balance by a period's flow, so quarterly debtor / inventory /
+payable days computed against 365 came out four times too high, and ROCE
+read as a quarterly rather than annual rate. Annual figures are unchanged.
+
+`table_defaults` is still sent and is now unused by the web client, which
+renders every period the payload carries.
+
 ## 2026-09-18 (fundamentals explorer, phase 0)
 
 Screener.in-style company pages. Plan and data model: sensybull-api

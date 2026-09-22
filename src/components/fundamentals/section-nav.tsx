@@ -5,6 +5,13 @@ import { PAGE_SECTIONS } from "@/lib/fundamentals/rows";
 import { cn } from "@/lib/utils";
 
 /**
+ * The bar's own height, in px. Sections scroll-margin by exactly this, and
+ * the observer discounts exactly this, so "jump to Ratios" lands the
+ * heading directly under the bar instead of near it.
+ */
+export const SECTION_NAV_HEIGHT = 44;
+
+/**
  * The sticky sub-navigation across the top of a company page. Every
  * section is on the page already; this only scrolls. The current section
  * is tracked from scroll position so the bar doubles as a "where am I".
@@ -26,7 +33,7 @@ export function SectionNav({ sections = PAGE_SECTIONS }: { sections?: { id: stri
           .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
         if (visible[0]) setActive(visible[0].target.id);
       },
-      { rootMargin: "-56px 0px -60% 0px", threshold: 0 }
+      { rootMargin: `-${SECTION_NAV_HEIGHT}px 0px -60% 0px`, threshold: 0 }
     );
     elements.forEach((el) => observer.observe(el));
     return () => observer.disconnect();

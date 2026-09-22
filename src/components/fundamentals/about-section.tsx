@@ -3,16 +3,15 @@
 import { useState } from "react";
 import type { FundamentalsAnalysis, FundamentalsCompany } from "@/types/fundamentals";
 import { formatCount } from "@/lib/fundamentals/format";
-import { cn } from "@/lib/utils";
 
 const CLAMP_CHARS = 320;
 
 /**
- * "About" + "Analysis": a short description, the key points, and the
- * rule-generated pros and cons. The pros/cons sentences cite the numbers
- * they were built from (see the API's analysis.py) and are never edited here.
+ * "About": what the company is, beside the stats rather than below them.
+ * A reader who doesn't know the ticker needs the sentence and the numbers
+ * in one glance, which is why screener sets them side by side.
  */
-export function AboutSection({
+export function AboutPanel({
   company,
   analysis,
 }: {
@@ -36,76 +35,77 @@ export function AboutSection({
     facts.push(`Fiscal year ends ${month}`);
   }
 
-  const hasAnalysis = analysis.pros.length > 0 || analysis.cons.length > 0;
-
   return (
-    <div className="grid gap-6 md:grid-cols-2">
-      <div className="min-w-0">
-        <h3 className="eyebrow mb-2">About</h3>
-        {description ? (
-          <p className="text-label leading-relaxed text-ink-muted">
-            {shown}
-            {long && (
-              <>
-                {" "}
-                <button
-                  type="button"
-                  onClick={() => setOpen((o) => !o)}
-                  className="text-brand-ink underline-offset-2 hover:underline"
-                >
-                  {open ? "Show less" : "Read more"}
-                </button>
-              </>
-            )}
-          </p>
-        ) : (
-          <p className="text-label text-ink-faint">No description on file.</p>
-        )}
-        {facts.length > 0 && (
-          <p className="mt-2 text-meta text-ink-faint">{facts.join(" · ")}</p>
-        )}
-        {analysis.key_points.length > 0 && (
-          <>
-            <h4 className="eyebrow mt-4 mb-1.5">Key points</h4>
-            <ul className="space-y-1 text-label text-ink-muted">
-              {analysis.key_points.map((point) => (
-                <li key={point} className="flex gap-2">
-                  <span className="text-ink-faint" aria-hidden>
-                    ·
-                  </span>
-                  <span>{point}</span>
-                </li>
-              ))}
-            </ul>
-          </>
-        )}
-      </div>
-
-      <div className="min-w-0">
-        <h3 className="eyebrow mb-2">Analysis</h3>
-        {hasAnalysis ? (
-          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2">
-            <ProsCons title="Pros" items={analysis.pros} />
-            <ProsCons title="Cons" items={analysis.cons} />
-          </div>
-        ) : (
-          <p className="text-label text-ink-faint">
-            Not enough reported history to judge yet.
-          </p>
-        )}
-        <p className="mt-3 text-micro text-ink-faint">
-          Pros and cons are generated from the statements below by fixed rules.
-          They are a starting point for reading the numbers, not a
-          recommendation.
+    <div className="min-w-0">
+      <h2 className="eyebrow mb-2">About</h2>
+      {description ? (
+        <p className="text-label leading-relaxed text-ink-muted">
+          {shown}
+          {long && (
+            <>
+              {" "}
+              <button
+                type="button"
+                onClick={() => setOpen((o) => !o)}
+                className="text-brand-ink underline-offset-2 hover:underline"
+              >
+                {open ? "Show less" : "Read more"}
+              </button>
+            </>
+          )}
         </p>
-      </div>
+      ) : (
+        <p className="text-label text-ink-faint">No description on file.</p>
+      )}
+      {facts.length > 0 && <p className="mt-2 text-meta text-ink-faint">{facts.join(" · ")}</p>}
+      {analysis.key_points.length > 0 && (
+        <>
+          <h3 className="eyebrow mt-4 mb-1.5">Key points</h3>
+          <ul className="space-y-1 text-label text-ink-muted">
+            {analysis.key_points.map((point) => (
+              <li key={point} className="flex gap-2">
+                <span className="text-ink-faint" aria-hidden>
+                  ·
+                </span>
+                <span>{point}</span>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
     </div>
+  );
+}
+
+/**
+ * "Analysis": the rule-generated pros and cons. The sentences cite the
+ * numbers they were built from (see the API's analysis.py) and are never
+ * edited here.
+ */
+export function AnalysisPanel({ analysis }: { analysis: FundamentalsAnalysis }) {
+  const hasAnalysis = analysis.pros.length > 0 || analysis.cons.length > 0;
+  if (!hasAnalysis) {
+    return (
+      <p className="text-label text-ink-faint">Not enough reported history to judge yet.</p>
+    );
+  }
+  return (
+    <>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <ProsCons title="Pros" items={analysis.pros} />
+        <ProsCons title="Cons" items={analysis.cons} />
+      </div>
+      <p className="mt-3 text-micro text-ink-faint">
+        Pros and cons are generated from the statements below by fixed rules. They are a
+        starting point for reading the numbers, not a recommendation.
+      </p>
+    </>
   );
 }
 
 function ProsCons({ title, items }: { title: string; items: string[] }) {
   return (
-    <div className={cn("rounded-md border border-line-subtle bg-surface p-3")}>
+    <div className="min-w-0">
       <p className="mb-1.5 text-meta font-semibold text-ink">{title}</p>
       {items.length === 0 ? (
         <p className="text-meta text-ink-faint">None flagged.</p>
