@@ -63,6 +63,10 @@ function childValues(
  * So the stripe is a solid tint on the row and the band is a translucent
  * tint on the cell, which is also what makes their intersection darker
  * than either alone.
+ *
+ * The frozen column carries no edge or shadow: the row tint alone marks
+ * where the labels end, and a rule there competed with the banding for
+ * the same job.
  */
 export function FinancialTable({
   table,
@@ -78,7 +82,6 @@ export function FinancialTable({
   banded?: boolean;
 }) {
   const [expanded, setExpanded] = useState<Set<string>>(() => new Set());
-  const [scrolled, setScrolled] = useState(false);
   const scroller = useRef<HTMLDivElement>(null);
   // Whether the view is still following the newest period. True until the
   // reader scrolls away from the right edge, true again if they come back.
@@ -92,12 +95,47 @@ export function FinancialTable({
     [banded, periods]
   );
 
+  /**
+   * Hide the part-column that the frozen labels cut in half.
+   *
+   * Free horizontal scrolling leaves whatever fraction of a column happens
+   * to fall at the labels' right edge, and a clipped "90,877" reads as a
+   * real figure of 877. Snapping columns to that edge would fix it, but
+   * only by giving up the landing on the newest period — measured, it
+   * drags the newest column off-screen entirely.
+   *
+   * So the fraction is covered rather than prevented: each frozen cell
+   * paints a strip of its own background over exactly the overlap. It
+   * inherits the row's colour, so stripes and bands line up, and it is
+   * positioned rather than padded, so nothing reflows while scrolling.
+   */
+  const coverSliver = useCallback(() => {
+    const el = scroller.current;
+    if (!el) return;
+    const label = el.querySelector<HTMLElement>("thead th");
+    if (!label) return;
+    const edge = label.getBoundingClientRect().right;
+    let width = 0;
+    for (const cell of el.querySelectorAll<HTMLElement>("thead th[data-col]")) {
+      const box = cell.getBoundingClientRect();
+      if (box.left >= edge - 0.5) {
+        // Cover as far as the first column that is *whole*. Covering only
+        // the overlapped pixels is not enough: the figures are right
+        // aligned, so a column with its first 16px hidden still shows
+        // "3,715" of "43,715" — a plausible, wrong number.
+        width = Math.max(0, Math.ceil(box.left - edge));
+        break;
+      }
+    }
+    el.style.setProperty("--sliver", `${width}px`);
+  }, []);
+
   const pinRight = useCallback(() => {
     const el = scroller.current;
     if (!el || !pinnedRight.current) return;
     el.scrollLeft = el.scrollWidth; // clamps to the maximum
-    setScrolled(el.scrollLeft > 0);
-  }, []);
+    coverSliver();
+  }, [coverSliver]);
 
   // The newest period is the one worth reading, and it is at the far
   // right — land there rather than making the reader drag.
@@ -123,8 +161,8 @@ export function FinancialTable({
     if (!el) return;
     // A fraction of a pixel of rounding shouldn't count as scrolling away.
     pinnedRight.current = Math.ceil(el.scrollLeft) >= el.scrollWidth - el.clientWidth - 1;
-    setScrolled(el.scrollLeft > 0);
-  }, []);
+    coverSliver();
+  }, [coverSliver]);
 
   const flaggedNotes = useMemo(() => {
     const notes = new Map<string, string>();
@@ -144,7 +182,7 @@ export function FinancialTable({
 
   if (total === 0) {
     return (
-      <p className="py-6 text-body text-ink-faint">
+      <p className="px-4 py-6 text-body text-ink-faint">
         No reported figures for this table.
       </p>
     );
@@ -188,12 +226,12 @@ export function FinancialTable({
           scope="row"
           className={cn(
             "sticky left-0 z-[2] max-w-44 bg-inherit py-0.5 pr-3 text-left sm:max-w-none",
-            depth === 0 ? "pl-2 text-ink" : "pl-5 font-normal text-ink-muted",
+            "after:absolute after:top-0 after:bottom-0 after:left-full after:w-(--sliver) after:bg-inherit after:content-['']",
+            depth === 0 ? "pl-4 text-ink" : "pl-7 font-normal text-ink-muted",
             // A total earns weight and a rule; everything else stays
             // regular, so the totals are the only thing that stands out.
             spec.emphasis ? "font-semibold" : "font-normal",
-            rule && "border-t border-line",
-            scrolled && "border-r border-line shadow-sticky-column"
+            rule && "border-t border-line"
           )}
         >
           {expandable ? (
@@ -223,7 +261,7 @@ export function FinancialTable({
             <td
               key={p.key}
               className={cn(
-                "whitespace-nowrap px-2 py-0.5 text-right tabular-nums",
+                "whitespace-nowrap px-2 py-0.5 text-right tabular-nums last:pr-4",
                 depth === 0 ? "text-ink" : "text-ink-muted",
                 rule && "border-t border-line",
                 // Translucent, so it darkens the stripe underneath it
@@ -247,19 +285,16 @@ export function FinancialTable({
         onScroll={onScroll}
         className="w-full overflow-x-auto overscroll-x-contain"
       >
-        {/* Separated borders, not collapsed: under the collapsing model a
-            cell's box-shadow is not painted, which is how the frozen
-            column ends up with no edge at all. Zero spacing looks the
-            same as a collapsed table. */}
+        {/* Separated borders, not collapsed, so every cell draws its own
+            rule and a row's rule can't be swallowed by a neighbour's.
+            The first row skips its top rule so it doesn't double the
+            header's. Zero spacing looks the same as a collapsed table. */}
         <table className="w-full border-separate border-spacing-0 text-body">
           <thead>
             <tr className="bg-surface">
               <th
                 scope="col"
-                className={cn(
-                  "sticky left-0 z-[2] border-b border-line bg-inherit py-1 pr-3 pl-2 text-left",
-                  scrolled && "border-r border-line shadow-sticky-column"
-                )}
+                className="sticky left-0 z-[2] border-b border-line bg-inherit py-1 pr-3 pl-4 text-left after:absolute after:top-0 after:bottom-0 after:left-full after:w-(--sliver) after:bg-inherit after:content-['']"
                 aria-label="Line item"
               />
               {periods.map((p, i) => {
@@ -268,8 +303,9 @@ export function FinancialTable({
                   <th
                     key={p.key}
                     scope="col"
+                    data-col={i}
                     className={cn(
-                      "border-b border-line px-2 py-1 text-right font-medium whitespace-nowrap text-ink-muted",
+                      "border-b border-line px-2 py-1 text-right font-medium whitespace-nowrap text-ink-muted last:pr-4",
                       bands[i] && !isTtm && "bg-band",
                       isTtm && "bg-brand-soft text-brand-ink"
                     )}
@@ -327,7 +363,7 @@ export function FinancialTable({
       </div>
 
       {flaggedNotes.length > 0 && (
-        <ul className="mt-2 space-y-0.5 px-2 text-micro text-ink-faint">
+        <ul className="mt-2 space-y-0.5 px-4 text-micro text-ink-faint">
           {flaggedNotes.map((note) => (
             <li key={note}>* {note}</li>
           ))}
