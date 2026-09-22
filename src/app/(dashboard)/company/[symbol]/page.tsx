@@ -18,7 +18,11 @@ import { CompanyActions } from "@/components/fundamentals/company-actions";
 import { DocumentsSection } from "@/components/fundamentals/documents-section";
 import { GrowthGrids } from "@/components/fundamentals/growth-grids";
 import { RatioGrid } from "@/components/fundamentals/ratio-grid";
-import { SectionNav, SECTION_NAV_HEIGHT } from "@/components/fundamentals/section-nav";
+import {
+  SectionNav,
+  SECTION_NAV_HEIGHT,
+  TOP_SECTION_ID,
+} from "@/components/fundamentals/section-nav";
 import { StatementSection } from "@/components/fundamentals/statement-section";
 import { CompanyAvatar } from "@/components/watchlist/company-avatar";
 import { Button } from "@/components/ui/button";
@@ -105,8 +109,14 @@ export default async function CompanyPage({ params }: CompanyPageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <div className="mx-auto max-w-[88rem] px-4 pb-16">
+        {ready && <SectionNav companyName={name} />}
+
         {/* ── Header ─────────────────────────────────────────────── */}
-        <header className="pt-6 pb-5">
+        <header
+          id={TOP_SECTION_ID}
+          style={{ scrollMarginTop: SECTION_NAV_HEIGHT }}
+          className="pt-6 pb-5"
+        >
           <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
             <div className="flex min-w-0 items-start gap-3">
               <CompanyAvatar ticker={company.ticker} name={name} size="md" />
@@ -166,8 +176,6 @@ export default async function CompanyPage({ params }: CompanyPageProps) {
 
         {ready ? (
           <>
-            <SectionNav />
-
             <Section id="analysis" title="Analysis" narrow>
               <AnalysisPanel analysis={analysis} />
             </Section>

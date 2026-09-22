@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { PAGE_SECTIONS } from "@/lib/fundamentals/rows";
 import { cn } from "@/lib/utils";
 
@@ -11,60 +11,104 @@ import { cn } from "@/lib/utils";
  */
 export const SECTION_NAV_HEIGHT = 44;
 
-/**
- * The sticky sub-navigation across the top of a company page. Every
- * section is on the page already; this only scrolls. The current section
- * is tracked from scroll position so the bar doubles as a "where am I".
- */
-export function SectionNav({ sections = PAGE_SECTIONS }: { sections?: { id: string; label: string }[] }) {
-  const [active, setActive] = useState<string>(sections[0]?.id ?? "");
+/** The id of the page top, which the company's own name jumps back to. */
+export const TOP_SECTION_ID = "top";
 
+/**
+ * The sub-navigation, directly under the app's own bar and sticky there.
+ *
+ * Every section is already on the page; this only moves the viewport, and
+ * it moves it instantly. A smooth scroll across a page this tall is a
+ * second of watching rows fly past, which tells the reader nothing and
+ * delays what they asked for.
+ *
+ * The current section is tracked from scroll position, so the bar doubles
+ * as a "where am I" — hence the underline rather than a filled pill: it
+ * marks a position in the page, not a filter that has been switched on.
+ */
+export function SectionNav({
+  companyName,
+  sections = PAGE_SECTIONS,
+}: {
+  /** Shown first, jumping back to the top of the page. */
+  companyName?: string;
+  sections?: { id: string; label: string }[];
+}) {
+  const items = companyName
+    ? [{ id: TOP_SECTION_ID, label: companyName }, ...sections]
+    : sections;
+  const [active, setActive] = useState<string>(items[0]?.id ?? "");
+  const bar = useRef<HTMLElement>(null);
+
+  // Which section is under the bar, measured rather than observed.
+  //
+  // An IntersectionObserver would need its band expressed as a static
+  // rootMargin, and this bar's distance from the top of the viewport is
+  // not static — it sits below the app's own bar, so the band starts at
+  // 93px, not at the bar's own 44. Reading the bar's live position each
+  // time is both shorter and correct at any chrome height. Eight sections
+  // is nothing to measure; the work is thrown away until the next frame.
   useEffect(() => {
-    const elements = sections
-      .map((s) => document.getElementById(s.id))
-      .filter((el): el is HTMLElement => !!el);
-    if (elements.length === 0) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        // The topmost visible section wins; a section that just scrolled
-        // above the fold stays active until the next one arrives.
-        const visible = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-        if (visible[0]) setActive(visible[0].target.id);
-      },
-      { rootMargin: `-${SECTION_NAV_HEIGHT}px 0px -60% 0px`, threshold: 0 }
-    );
-    elements.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, [sections]);
+    const el = bar.current;
+    if (!el) return;
+    const scroller = el.closest<HTMLElement>(".overflow-y-auto");
+    const target: HTMLElement | Window = scroller ?? window;
+    let frame = 0;
+
+    const measure = () => {
+      frame = 0;
+      // A few pixels of slack: a section landed exactly under the bar by
+      // scroll-margin shouldn't lose to rounding.
+      const band = el.getBoundingClientRect().bottom + 4;
+      let current = items[0]?.id ?? "";
+      for (const section of items) {
+        const node = document.getElementById(section.id);
+        if (node && node.getBoundingClientRect().top <= band) current = section.id;
+      }
+      setActive(current);
+    };
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(measure);
+    };
+
+    measure();
+    target.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+      target.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+    // `items` is rebuilt each render; its identity is the company name.
+  }, [companyName, sections]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const jump = (id: string) => (e: React.MouseEvent) => {
     e.preventDefault();
     const el = document.getElementById(id);
     if (!el) return;
-    el.scrollIntoView({ block: "start", behavior: "smooth" });
+    el.scrollIntoView({ block: "start", behavior: "instant" });
     setActive(id);
     window.history.replaceState(null, "", `#${id}`);
   };
 
   return (
     <nav
+      ref={bar}
       aria-label="Sections"
       className="sticky top-0 z-10 -mx-4 border-b border-line-subtle bg-canvas px-4"
     >
-      <ul className="flex gap-1 overflow-x-auto py-1.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {sections.map((s) => (
+      <ul className="flex overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {items.map((s) => (
           <li key={s.id} className="shrink-0">
             <a
               href={`#${s.id}`}
               onClick={jump(s.id)}
               aria-current={active === s.id ? "location" : undefined}
               className={cn(
-                "inline-flex h-8 items-center rounded-sm px-2.5 text-meta font-medium transition-colors",
+                "inline-flex h-11 items-center border-b-2 px-3 text-label font-medium whitespace-nowrap transition-colors",
                 active === s.id
-                  ? "bg-brand text-brand-on"
-                  : "text-ink-muted hover:bg-surface-hover hover:text-ink"
+                  ? "border-brand text-brand-ink"
+                  : "border-transparent text-ink-muted hover:text-ink"
               )}
             >
               {s.label}
