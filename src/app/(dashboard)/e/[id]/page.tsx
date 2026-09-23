@@ -1,90 +1,108 @@
-"use client";
-
-import { use, useState, useEffect } from "react";
-import Link from "next/link";
+import type { Metadata } from "next";
+import { EventPermalink } from "@/components/feed/event-permalink";
+import { displayCompanyName } from "@/lib/company-name";
+import { hasEvidence } from "@/lib/evidence";
+import { getPublicEvent } from "@/lib/events/api";
+import { SITE_URL } from "@/lib/share";
 import type { FilingEvent } from "@/types/events";
-import { api, ApiError } from "@/lib/api-client";
-import { FilingCard } from "@/components/feed/filing-card";
-import { Button } from "@/components/ui/button";
-import { EmptyState } from "@/components/ui/empty-state";
-import { AlertIcon, DocumentIcon } from "@/components/ui/icons";
-import { Skeleton } from "@/components/ui/skeleton";
 
-/** Shareable permalink for a single filing event (public). */
-export default function EventPermalinkPage({
-  params,
-}: {
+interface EventPageProps {
   params: Promise<{ id: string }>;
-}) {
-  const { id } = use(params);
-  const [event, setEvent] = useState<FilingEvent | null>(null);
-  // "offline" is a separate state on purpose: a dropped connection is not a
-  // deleted event, and the two need different next steps.
-  const [state, setState] = useState<
-    "loading" | "ready" | "missing" | "offline"
-  >("loading");
+}
 
-  useEffect(() => {
-    let cancelled = false;
-    api<{ event: FilingEvent }>(`/events/all/${id}`)
-      .then((data) => {
-        if (cancelled) return;
-        setEvent(data.event);
-        setState("ready");
-      })
-      .catch((err: unknown) => {
-        if (cancelled) return;
-        const offline = err instanceof ApiError && err.isOffline;
-        setState(offline ? "offline" : "missing");
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [id]);
+const DESCRIPTION_MAX = 200;
 
+function describe(event: FilingEvent): string {
+  const summary = event.briefing?.summary?.trim();
+  if (summary) {
+    return summary.length > DESCRIPTION_MAX
+      ? `${summary.slice(0, DESCRIPTION_MAX - 1).trimEnd()}…`
+      : summary;
+  }
+  return `${displayCompanyName(event.company_name)} ${event.signal_type} filing, briefed by Sensybull.`;
+}
+
+function titleFor(event: FilingEvent): string {
+  const headline =
+    event.briefing?.headline?.trim() ||
+    `${displayCompanyName(event.company_name)} ${event.signal_type}`;
+  return event.ticker ? `${event.ticker}: ${headline}` : headline;
+}
+
+export async function generateMetadata({
+  params,
+}: EventPageProps): Promise<Metadata> {
+  const { id } = await params;
+  const result = await getPublicEvent(id);
+  if (result.kind !== "ready") {
+    return { title: "Update", robots: { index: false, follow: true } };
+  }
+  const { event } = result;
+  const title = titleFor(event);
+  const description = describe(event);
+  return {
+    title,
+    description,
+    alternates: { canonical: `/e/${event.id}` },
+    openGraph: {
+      type: "article",
+      url: `${SITE_URL}/e/${event.id}`,
+      siteName: "Sensybull",
+      title,
+      description,
+      publishedTime: event.filing_date ?? event.received_at ?? undefined,
+    },
+    twitter: { card: "summary", title, description },
+    // Only updates that show their work — verified quotes from the filing —
+    // are worth a search result. The rest is model prose over a public
+    // document, which is thin content; the sitemap leaves them out too.
+    // (Spread rather than `robots: undefined`, which would drop the root
+    // layout's index/follow directives instead of inheriting them.)
+    ...(hasEvidence(event) ? {} : { robots: { index: false, follow: true } }),
+  };
+}
+
+/** Schema.org description of the update, for search and answer engines. */
+function jsonLd(event: FilingEvent) {
+  const name = displayCompanyName(event.company_name);
+  return {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    headline: titleFor(event),
+    description: describe(event),
+    datePublished: event.received_at ?? event.filing_date ?? undefined,
+    url: `${SITE_URL}/e/${event.id}`,
+    isBasedOn: event.edgar_url ?? undefined,
+    about: {
+      "@type": "Corporation",
+      name,
+      ...(event.ticker ? { tickerSymbol: event.ticker } : {}),
+    },
+    publisher: { "@type": "Organization", name: "Sensybull", url: SITE_URL },
+  };
+}
+
+/**
+ * Shareable permalink for a single filing event (public), rendered on the
+ * server so the update is in the HTML: link unfurlers, crawlers and AI
+ * agents read it without running JavaScript.
+ */
+export default async function EventPermalinkPage({ params }: EventPageProps) {
+  const { id } = await params;
+  const result = await getPublicEvent(id);
+  const event = result.kind === "ready" ? result.event : null;
   return (
-    <div className="h-full overflow-y-auto">
-      <div className="mx-auto max-w-3xl px-4 py-8">
-        {state === "loading" ? (
-          <Skeleton className="h-40" />
-        ) : state === "offline" ? (
-          <EmptyState
-            icon={AlertIcon}
-            className="pt-12"
-            title="Couldn't load this update"
-            description="We couldn't reach Sensybull. Check your connection — the link itself is fine."
-            action={
-              <Button onClick={() => window.location.reload()}>
-                Try again
-              </Button>
-            }
-          />
-        ) : state === "missing" || !event ? (
-          <EmptyState
-            icon={DocumentIcon}
-            className="pt-12"
-            title="This update no longer exists"
-            description="It may have been removed, or the link may be incomplete."
-            action={
-              <Link href="/feed">
-                <Button variant="outline">Browse the live feed</Button>
-              </Link>
-            }
-          />
-        ) : (
-          <div className="rounded-md border border-line-subtle bg-surface">
-            <FilingCard event={event} expanded />
-          </div>
-        )}
-        <p className="mt-6 text-center">
-          <Link
-            href="/feed"
-            className="text-meta text-brand-ink underline-offset-2 hover:underline"
-          >
-            Open the live feed
-          </Link>
-        </p>
-      </div>
-    </div>
+    <>
+      {event && (
+        <script
+          type="application/ld+json"
+          // `<` is escaped so a headline can never close the script tag
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(jsonLd(event)).replace(/</g, "\\u003c"),
+          }}
+        />
+      )}
+      <EventPermalink event={event} state={result.kind} />
+    </>
   );
 }

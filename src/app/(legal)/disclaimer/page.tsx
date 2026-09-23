@@ -1,5 +1,12 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ChevronLeftIcon } from "@/components/ui/icons";
+
+export const metadata: Metadata = {
+  title: "Disclaimer",
+  description: "Sensybull provides financial information for educational purposes only. It is not investment advice.",
+  alternates: { canonical: "/disclaimer" },
+};
 
 export default function Disclaimer() {
   return (

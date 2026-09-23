@@ -2,9 +2,12 @@ import type { Metadata } from "next";
 import { AuthProvider } from "@/context/auth-context";
 import { ThemeProvider } from "@/components/theme-provider";
 import { AppToaster } from "@/components/ui/app-toaster";
+import { SITE_URL } from "@/lib/share";
 import "./globals.css";
 
-const siteUrl = "https://www.sensybull.com";
+// The canonical origin: next.config.ts 301s www to the bare domain, so
+// metadataBase (and every canonical and OG URL built from it) must not use www.
+const siteUrl = SITE_URL;
 
 export const metadata: Metadata = {
   title: {
@@ -28,7 +31,9 @@ export const metadata: Metadata = {
   authors: [{ name: "Sensybull, LLC" }],
   creator: "Sensybull",
   metadataBase: new URL(siteUrl),
-  alternates: { canonical: "/" },
+  // No site-wide canonical: a child inherits this metadata, and a canonical
+  // of "/" here declared every page a duplicate of the homepage. Each
+  // indexable page sets its own.
   openGraph: {
     type: "website",
     locale: "en_US",
