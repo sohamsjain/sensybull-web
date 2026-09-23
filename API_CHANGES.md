@@ -1,5 +1,26 @@
 # API Changes
 
+## 2026-09-23 (company universe: SEC list → FMP)
+
+The company table is now FMP's US-listed common stocks (NYSE/NASDAQ/AMEX;
+no ETFs, funds, warrants, units, rights, preferreds or notes) instead of the
+SEC's ticker list. **No shape changes.** What the client can notice:
+
+- `company.ticker` is FMP's symbol. Where the SEC spelled a company
+  differently (renames, class shares), the company now carries FMP's.
+- Every symbol route (`GET /fundamentals/:symbol`, `/fundamentals/:symbol/documents`,
+  `GET /share/:symbol`, `POST /watchlists/track`) also answers to a
+  company's former tickers, its other share classes (GOOG → Alphabet, filed
+  under GOOGL), BRK.B/BRK-B spellings, and any ticker a stored feed event
+  carries. The response names the company's own ticker — the company page
+  now redirects to it, so each company has one URL.
+- New feed events store the company's ticker, not the SEC's/wire's, so a
+  feed row's company link always resolves.
+- `GET /companies/search` leaves out companies that dropped out of the
+  listed universe (OTC filers, delisted names). They still load by id and
+  by symbol — existing watchlists and events are untouched.
+- `market_cap` is FMP's figure from the quote; `shares_outstanding` is FMP's.
+
 ## 2026-09-23 (market data: Alpaca → FMP)
 
 The bars and quote routes now proxy Financial Modeling Prep instead of
