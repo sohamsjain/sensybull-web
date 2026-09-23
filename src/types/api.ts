@@ -64,7 +64,7 @@ export interface Quote {
   change: number | null;
   change_pct: number | null;
   as_of: string | null;
-  /** True when Alpaca was unreachable and this is the last synced price. */
+  /** True when the price feed (FMP) was unreachable and this is the last synced price. */
   stale: boolean;
 }
 

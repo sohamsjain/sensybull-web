@@ -59,7 +59,7 @@ function filing(at: string, overrides: Partial<FilingEvent> = {}): FilingEvent {
 
 describe("sessionDate", () => {
   it("reads a bar's Eastern trading date", () => {
-    // Alpaca stamps a daily bar at 04:00Z — midnight in New York
+    // The API stamps a daily bar at 04:00Z — midnight in New York
     expect(sessionDate(bars(1, 100, { from: "2026-06-01" })[0])).toBe("2026-06-01");
   });
 });

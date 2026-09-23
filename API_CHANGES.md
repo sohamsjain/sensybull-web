@@ -1,5 +1,25 @@
 # API Changes
 
+## 2026-09-23 (market data: Alpaca → FMP)
+
+The bars and quote routes now proxy Financial Modeling Prep instead of
+Alpaca. **No shape changes** — `GET /companies/:id/bars`,
+`GET /companies/:id/quote` and `GET /companies/quotes` answer exactly as
+before, and `price_reaction` socket events are unchanged. What a reader
+can notice:
+
+- Bars keep `t` as an ISO UTC string ending in `Z`, and daily bars keep
+  their midnight-New-York stamp (04:00Z / 05:00Z), so `sessionDate()` and
+  `loadOlder()`'s string comparison work as before. Volumes are
+  consolidated now rather than IEX-only, so they're far larger and closer
+  to what other sites show.
+- Quotes: `as_of` is FMP's quote timestamp. FMP's quote should track the regular
+  session, so before the open `change` / `change_pct` read 0 against
+  yesterday's close rather than a pre-market move. `stale: true` still
+  means the daily-synced price.
+- Nothing needs to change client-side. Comments that named Alpaca were
+  updated.
+
 ## 2026-09-23 (discovery: sitemap data, API catalog)
 
 ### `GET /discovery/sitemap` — new, public
