@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { normalizeSymbol, SITE_URL } from "@/lib/share";
 import { displayCompanyName } from "@/lib/company-name";
 import { getDocuments, getFundamentals } from "@/lib/fundamentals/api";
@@ -28,6 +28,7 @@ import { CompanyAvatar } from "@/components/watchlist/company-avatar";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { AlertIcon, CompaniesIcon, ExternalLinkIcon } from "@/components/ui/icons";
+import { fundamentalsHref } from "@/lib/fundamentals/links";
 import { cn } from "@/lib/utils";
 
 interface CompanyPageProps {
@@ -89,6 +90,13 @@ export default async function CompanyPage({ params }: CompanyPageProps) {
 
   const { data } = result;
   const { company, ratios, growth, analysis } = data;
+  // The API also answers to a company's former tickers and its other share
+  // classes (GOOG → Alphabet's GOOGL row). One URL per company: send the
+  // reader to the ticker it's filed under. Temporary, not permanent — a
+  // retired ticker can be reused by another company later.
+  if (company.ticker && company.ticker.toUpperCase() !== symbol) {
+    redirect(fundamentalsHref(company.ticker));
+  }
   const name = displayCompanyName(company.name);
   const ready = result.kind === "ready";
 
