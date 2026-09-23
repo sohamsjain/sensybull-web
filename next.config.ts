@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { homepageLinkHeader } from "./src/lib/api-catalog";
 
 // Derive the API origin (and its websocket origin) from the public API URL so
 // CSP connect-src allows REST + Socket.IO traffic without hardcoding the host.
@@ -50,6 +51,9 @@ const nextConfig: NextConfig = {
       // global frame-ancestors 'none' / X-Frame-Options: DENY and sets its
       // own strict CSP in the route handler (src/app/embed/[symbol]/route.ts).
       { source: "/((?!embed/).*)", headers: securityHeaders },
+      // RFC 8288 discovery: point agents that land on the homepage at the
+      // API catalog, the OpenAPI spec and the docs (src/lib/api-catalog.ts).
+      { source: "/", headers: [{ key: "Link", value: homepageLinkHeader() }] },
     ];
   },
   async redirects() {

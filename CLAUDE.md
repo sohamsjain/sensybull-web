@@ -60,6 +60,15 @@
 - API changes log: see API_CHANGES.md in this repo
 - When unsure about an endpoint's shape, read the backend route file directly
 
+## Discovery (crawlers and agents)
+- `src/app/page.tsx` is a **server component** so the landing page is in the HTML — most AI crawlers never run JavaScript. Signed-in readers are forwarded by `SignedInRedirect`; an inline script marks `<html data-session>` before paint when localStorage holds a session (keys mirror `hasSession()`), and `globals.css` hides `[data-landing]` until auth decides, so the landing never flashes for them. Don't turn the page back into a client component
+- Canonicals are per page. The root layout deliberately has none (a canonical there is inherited and declared every page a duplicate of `/`). `metadataBase` uses `SITE_URL` — the bare domain; www 301s to it
+- `/e/[id]` is server-rendered (`src/lib/events/api.ts` → `EventPermalink`) with NewsArticle JSON-LD. Only events with evidence are indexable; the rest are `noindex, follow`, and the sitemap lists only evidence-bearing events
+- `/robots.txt` is a route handler over `src/lib/robots.ts` (policy: search engines and AI search/answer agents welcome, AI training crawlers refused, `Content-Signal: search=yes, ai-input=yes, ai-train=no`). New signed-in or auth routes go in its `PRIVATE_PATHS`
+- `/sitemap.xml` (`src/app/sitemap.ts`) = static pages + the API's `GET /discovery/sitemap`; ISR every 6h, static pages only if the API is down
+- `/.well-known/api-catalog` (RFC 9727) and the homepage's RFC 8288 `Link` header both come from `src/lib/api-catalog.ts`
+- Not published, on purpose: OAuth/OIDC discovery, auth.md, MCP/A2A cards, WebMCP, ARD, DNS-AID. Each describes something we don't run (auth is first-party JWT; there is no MCP server or agent). Publish one only alongside the real thing
+
 ## Conventions
 - Files: kebab-case. Exports: PascalCase for components, camelCase for hooks/utils
 - All dashboard/auth components are client components (`"use client"`)

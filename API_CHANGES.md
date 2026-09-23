@@ -1,5 +1,31 @@
 # API Changes
 
+## 2026-09-23 (discovery: sitemap data, API catalog)
+
+### `GET /discovery/sitemap` — new, public
+
+```
+{ "companies": [{ "symbol": "AAPL", "lastmod": "…" }],
+  "events":    [{ "id": "<uuid>", "lastmod": "…" }] }
+```
+
+Companies with a fundamentals page (by market cap, up to 20k) and the
+most recent events whose briefing carries evidence quotes (up to 25k).
+Redis-cached for 6 hours. Backs `src/app/sitemap.ts`; nothing else
+should need it.
+
+### API host discovery files
+
+- `GET /.well-known/api-catalog` on the API host: RFC 9727 linkset
+  (`application/linkset+json`) pointing at `/docs/openapi.json`, `/docs`
+  and `/health`. The web app serves the same catalog at its own
+  `/.well-known/api-catalog` (`src/lib/api-catalog.ts`).
+- `GET /robots.txt` on the API host: allows `/docs` and `/.well-known/`,
+  disallows everything else.
+- The OpenAPI spec now documents the public event permalink, company
+  search, bars, quotes, fundamentals, the bulk inbox actions and
+  `briefing.evidence`.
+
 ## 2026-09-22 (fundamentals: all four statements at both granularities)
 
 **Breaking:** `quarterly` in `GET /fundamentals/<symbol>` changed from a

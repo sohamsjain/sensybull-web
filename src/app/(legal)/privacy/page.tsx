@@ -1,5 +1,12 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ChevronLeftIcon } from "@/components/ui/icons";
+
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+  description: "How Sensybull collects, uses and protects your information.",
+  alternates: { canonical: "/privacy" },
+};
 
 export default function PrivacyPolicy() {
   return (

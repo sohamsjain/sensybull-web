@@ -259,6 +259,12 @@
     -webkit-tap-highlight-color: transparent;
   }
 
+  /* A browser holding a session is about to be sent to /watchlist; keep the
+     server-rendered landing out of sight until auth decides (src/app/page.tsx). */
+  html[data-session] [data-landing] {
+    visibility: hidden;
+  }
+
   body {
     @apply bg-canvas text-ink;
     font-size: var(--text-body);

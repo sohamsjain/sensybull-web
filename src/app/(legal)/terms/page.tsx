@@ -1,5 +1,12 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ChevronLeftIcon } from "@/components/ui/icons";
+
+export const metadata: Metadata = {
+  title: "Terms of Use",
+  description: "The terms that govern use of Sensybull.",
+  alternates: { canonical: "/terms" },
+};
 
 export default function TermsOfService() {
   return (

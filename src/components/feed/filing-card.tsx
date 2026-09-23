@@ -140,10 +140,14 @@ export function FilingCard({
 
           <div className="flex shrink-0 items-baseline gap-3">
             <StockQuote quote={quote} size="sm" />
-            {/* Fixed width so prices line up in a column down the feed */}
+            {/* Fixed width so prices line up in a column down the feed.
+                Relative time and the reader's timezone differ between a
+                server render (permalinks) and the browser; the client's
+                wins, so don't flag the mismatch. */}
             <span
               className="w-16 text-right text-micro whitespace-nowrap tabular-nums text-ink-faint"
               title={fullDateTime(eventTimestamp)}
+              suppressHydrationWarning
             >
               {timeAgo(eventTimestamp)}
             </span>
