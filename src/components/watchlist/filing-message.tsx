@@ -114,6 +114,7 @@ export function FilingMessage({ event }: { event: FilingEvent }) {
           {event.price_reactions && (
             <PriceReactionStrip
               reactions={event.price_reactions}
+              intervals={event.price_reaction_intervals}
               className="mt-2.5"
             />
           )}

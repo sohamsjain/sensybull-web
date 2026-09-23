@@ -1,11 +1,13 @@
 "use client";
 
 import type { PriceReactions } from "@/types/events";
-import { REACTION_INTERVALS } from "@/config/constants";
+import { reactionSlots } from "@/lib/price-reactions";
 import { fullDateTime } from "@/lib/utils";
 
 interface PriceReactionStripProps {
   reactions: PriceReactions;
+  /** The event's `price_reaction_intervals` — which slots it will get. */
+  intervals?: string[] | null;
   className?: string;
 }
 
@@ -17,17 +19,16 @@ function formatPct(pct: number): string {
 /**
  * Horizontal strip of price moves after the filing (5m → 1w).
  * Success/danger follows the price-data colour convention; ⚡ marks moves
- * ≥ 2× ATR(14). For after-hours filings early intervals resolve to the
- * next available print — the tooltip shows when it actually traded.
+ * ≥ 2× ATR(14). A filing made during the session gets 5m–1h; one made
+ * outside it gets a single "At open" chip (the next session's opening
+ * print) instead — slot choice lives in `reactionSlots()`.
  */
 export function PriceReactionStrip({
   reactions,
+  intervals,
   className = "",
 }: PriceReactionStripProps) {
-  const points = REACTION_INTERVALS.map((interval) => ({
-    interval,
-    point: reactions[interval],
-  }));
+  const points = reactionSlots(reactions, intervals);
   if (!points.some(({ point }) => point && point.pct != null)) return null;
 
   return (
@@ -35,21 +36,21 @@ export function PriceReactionStrip({
       className={`flex flex-wrap items-center gap-1 font-mono text-micro tabular-nums ${className}`}
       aria-label="Price reaction since filing"
     >
-      {points.map(({ interval, point }) => {
+      {points.map(({ interval, label, description, point }) => {
         if (!point || point.pct == null) {
           return (
             <span
               key={interval}
               className="rounded-xs px-1.5 py-0.5 text-ink-dim"
-              title={`${interval} after filing: not yet measured`}
+              title={`${description}: not yet measured`}
             >
-              {interval} —
+              {label} —
             </span>
           );
         }
         const positive = point.pct >= 0;
         const tooltip = [
-          `${interval} after filing: ${formatPct(point.pct)}`,
+          `${description}: ${formatPct(point.pct)}`,
           point.price != null ? `at $${point.price}` : null,
           point.measured_at ? `(${fullDateTime(point.measured_at)})` : null,
           point.explosive ? "— explosive: ≥ 2× ATR(14)" : null,
@@ -66,7 +67,7 @@ export function PriceReactionStrip({
             }`}
             title={tooltip}
           >
-            <span className="opacity-60">{interval}</span>{" "}
+            <span className="opacity-60">{label}</span>{" "}
             {formatPct(point.pct)}
             {point.explosive && <span aria-hidden> ⚡</span>}
           </span>

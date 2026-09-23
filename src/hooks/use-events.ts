@@ -44,6 +44,7 @@ interface PriceReactionUpdate {
   filing_event_id: string;
   ticker: string | null;
   price_reactions: PriceReactions;
+  price_reaction_intervals?: string[];
   explosive: boolean;
 }
 
@@ -206,6 +207,8 @@ export function useEvents({
             ? {
                 ...e,
                 price_reactions: update.price_reactions,
+                price_reaction_intervals:
+                  update.price_reaction_intervals ?? e.price_reaction_intervals,
                 explosive: update.explosive,
               }
             : e

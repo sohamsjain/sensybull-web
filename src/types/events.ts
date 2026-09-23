@@ -83,7 +83,9 @@ export interface PriceReactionPoint {
   explosive: boolean;
 }
 
-/** Interval keys: "5m" | "15m" | "30m" | "1h" | "1d" | "1w" */
+/** Interval keys: "5m" | "15m" | "30m" | "1h" | "open" | "1d" | "1w".
+ *  "open" is the next session's opening print, measured instead of 5m–1h
+ *  for a filing made outside market hours. */
 export type PriceReactions = Record<string, PriceReactionPoint>;
 
 export interface FilingEvent {
@@ -121,5 +123,9 @@ export interface FilingEvent {
   received_at: string;
   market_cap?: number | null;
   price_reactions?: PriceReactions;
+  /** Which reaction slots this event will get, in display order (e.g.
+   *  ["open", "1d", "1w"] for an after-hours filing). Absent on payloads from
+   *  before it shipped — read through reactionSlots() in lib/price-reactions. */
+  price_reaction_intervals?: string[];
   explosive?: boolean;
 }

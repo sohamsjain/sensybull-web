@@ -1,5 +1,27 @@
 # API Changes
 
+## 2026-09-23 (price reactions: "at open" for off-hours filings)
+
+FMP's minute bars cover 09:30–16:00 ET only, so reactions now follow when
+the filing landed:
+
+- **During the session:** `5m` / `15m` / `30m` / `1h` as before, minus any
+  that would land after that session's close. Those are skipped, not
+  read off the next morning.
+- **Outside it** (evening, pre-market, weekend, holiday): one `open`
+  reaction instead of the four intraday ones. It's the next session's
+  opening print against the last regular-session price. Previously all
+  four intraday slots showed that same overnight gap.
+- `1d` / `1w` unchanged, except they now use the Eastern date. A filing
+  after 20:00 ET used to count as the next day and land a session late.
+
+Payload: `price_reactions` can carry an `"open"` key, and every event (and
+every `price_reaction` socket update) gains `price_reaction_intervals`:
+the slots this event will actually get, in display order, e.g.
+`["open", "1d", "1w"]` or `["5m", "15m", "1d", "1w"]`. Render slots from
+that list, not a fixed six; `reactionSlots()` in
+`src/lib/price-reactions.ts` does so and handles payloads that lack it.
+
 ## 2026-09-23 (market data: Alpaca → FMP)
 
 The bars and quote routes now proxy Financial Modeling Prep instead of
