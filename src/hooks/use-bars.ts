@@ -10,7 +10,7 @@ export type BarsLookback = "1M" | "3M" | "6M" | "1Y";
 const PAGE_LOOKBACK = "1Y";
 
 /**
- * Daily OHLCV bars for a company's price chart (backend proxies Alpaca).
+ * Daily OHLCV bars for a company's price chart (backend proxies FMP).
  *
  * `lookback` is the opening window, not a ceiling: `loadOlder()` walks
  * backwards from the earliest bar held, so panning left keeps finding
@@ -55,7 +55,7 @@ export function useBars(companyId: string | null, lookback: BarsLookback) {
         setState(response.bars.length > 0 ? "ready" : "unavailable");
       })
       .catch(() => {
-        // 422 no_ticker / 503 Alpaca down / unknown symbol
+        // 422 no_ticker / 503 market data down / unknown symbol
         if (!cancelled) setState("unavailable");
       });
     return () => {
