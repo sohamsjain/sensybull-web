@@ -64,9 +64,9 @@ function childValues(
  * tint on the cell, which is also what makes their intersection darker
  * than either alone.
  *
- * The frozen column carries no edge or shadow: the row tint alone marks
- * where the labels end, and a rule there competed with the banding for
- * the same job.
+ * The frozen column carries no edge, and the part-column it cuts in half
+ * is left cropped. Covering it costs a whole column of width, and a
+ * reader scrolling a table already knows the row continues.
  */
 export function FinancialTable({
   table,
@@ -95,47 +95,11 @@ export function FinancialTable({
     [banded, periods]
   );
 
-  /**
-   * Hide the part-column that the frozen labels cut in half.
-   *
-   * Free horizontal scrolling leaves whatever fraction of a column happens
-   * to fall at the labels' right edge, and a clipped "90,877" reads as a
-   * real figure of 877. Snapping columns to that edge would fix it, but
-   * only by giving up the landing on the newest period — measured, it
-   * drags the newest column off-screen entirely.
-   *
-   * So the fraction is covered rather than prevented: each frozen cell
-   * paints a strip of its own background over exactly the overlap. It
-   * inherits the row's colour, so stripes and bands line up, and it is
-   * positioned rather than padded, so nothing reflows while scrolling.
-   */
-  const coverSliver = useCallback(() => {
-    const el = scroller.current;
-    if (!el) return;
-    const label = el.querySelector<HTMLElement>("thead th");
-    if (!label) return;
-    const edge = label.getBoundingClientRect().right;
-    let width = 0;
-    for (const cell of el.querySelectorAll<HTMLElement>("thead th[data-col]")) {
-      const box = cell.getBoundingClientRect();
-      if (box.left >= edge - 0.5) {
-        // Cover as far as the first column that is *whole*. Covering only
-        // the overlapped pixels is not enough: the figures are right
-        // aligned, so a column with its first 16px hidden still shows
-        // "3,715" of "43,715" — a plausible, wrong number.
-        width = Math.max(0, Math.ceil(box.left - edge));
-        break;
-      }
-    }
-    el.style.setProperty("--sliver", `${width}px`);
-  }, []);
-
   const pinRight = useCallback(() => {
     const el = scroller.current;
     if (!el || !pinnedRight.current) return;
     el.scrollLeft = el.scrollWidth; // clamps to the maximum
-    coverSliver();
-  }, [coverSliver]);
+  }, []);
 
   // The newest period is the one worth reading, and it is at the far
   // right — land there rather than making the reader drag.
@@ -161,8 +125,7 @@ export function FinancialTable({
     if (!el) return;
     // A fraction of a pixel of rounding shouldn't count as scrolling away.
     pinnedRight.current = Math.ceil(el.scrollLeft) >= el.scrollWidth - el.clientWidth - 1;
-    coverSliver();
-  }, [coverSliver]);
+  }, []);
 
   const flaggedNotes = useMemo(() => {
     const notes = new Map<string, string>();
@@ -226,12 +189,11 @@ export function FinancialTable({
           scope="row"
           className={cn(
             "sticky left-0 z-[2] max-w-44 bg-inherit py-0.5 pr-3 text-left sm:max-w-none",
-            "after:absolute after:top-0 after:bottom-0 after:left-full after:w-(--sliver) after:bg-inherit after:content-['']",
             depth === 0 ? "pl-4 text-ink" : "pl-7 font-normal text-ink-muted",
             // A total earns weight and a rule; everything else stays
             // regular, so the totals are the only thing that stands out.
             spec.emphasis ? "font-semibold" : "font-normal",
-            rule && "border-t border-line"
+            rule && "border-t-2 border-line-strong"
           )}
         >
           {expandable ? (
@@ -239,15 +201,16 @@ export function FinancialTable({
               type="button"
               onClick={() => toggle(spec.key)}
               aria-expanded={isOpen}
-              className="group/toggle -my-0.5 flex min-h-7 w-full items-center justify-between gap-2 py-0.5 pr-1 text-left transition-colors hover:text-brand-ink"
+              className="group/toggle -my-0.5 flex min-h-7 items-center gap-1.5 py-0.5 pr-1 text-left transition-colors hover:text-brand-ink"
             >
               {label}
-              {/* The control sits on the right so every label in the
-                  column starts at the same x, expandable or not. */}
+              {/* Beside the label, not aligned down the column: it belongs
+                  to the row it opens, and a control parked at a far edge
+                  reads as belonging to the table instead. */}
               {isOpen ? (
-                <MinusIcon className="size-3.5 shrink-0 text-ink-faint transition-colors group-hover/toggle:text-brand-ink" />
+                <MinusIcon className="size-3.5 shrink-0 text-brand-ink" />
               ) : (
-                <PlusIcon className="size-3.5 shrink-0 text-ink-faint transition-colors group-hover/toggle:text-brand-ink" />
+                <PlusIcon className="size-3.5 shrink-0 text-brand-ink" />
               )}
             </button>
           ) : (
@@ -263,7 +226,7 @@ export function FinancialTable({
               className={cn(
                 "whitespace-nowrap px-2 py-0.5 text-right tabular-nums last:pr-4",
                 depth === 0 ? "text-ink" : "text-ink-muted",
-                rule && "border-t border-line",
+                rule && "border-t-2 border-line-strong",
                 // Translucent, so it darkens the stripe underneath it
                 // rather than replacing it.
                 bands[i] && !isTtm && "bg-band",
@@ -294,7 +257,7 @@ export function FinancialTable({
             <tr className="bg-surface">
               <th
                 scope="col"
-                className="sticky left-0 z-[2] border-b border-line bg-inherit py-1 pr-3 pl-4 text-left after:absolute after:top-0 after:bottom-0 after:left-full after:w-(--sliver) after:bg-inherit after:content-['']"
+                className="sticky left-0 z-[2] border-b border-line bg-inherit py-1 pr-3 pl-4 text-left"
                 aria-label="Line item"
               />
               {periods.map((p, i) => {
@@ -303,7 +266,6 @@ export function FinancialTable({
                   <th
                     key={p.key}
                     scope="col"
-                    data-col={i}
                     className={cn(
                       "border-b border-line px-2 py-1 text-right font-medium whitespace-nowrap text-ink-muted last:pr-4",
                       bands[i] && !isTtm && "bg-band",
