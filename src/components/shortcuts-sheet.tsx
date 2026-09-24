@@ -24,7 +24,7 @@ interface Shortcut {
  * Every shortcut the app actually listens for, grouped by where it works.
  *
  * This list is the documentation — if a handler is added or removed in
- * `filing-list.tsx` or `watchlist/page.tsx`, it changes here in the same
+ * `filing-list.tsx`, `feed-toolbar.tsx` or `watchlist/page.tsx`, it changes here in the same
  * commit. A shortcut nobody can discover is a shortcut nobody has.
  */
 const GROUPS: { title: string; items: Shortcut[] }[] = [
@@ -45,6 +45,7 @@ const GROUPS: { title: string; items: Shortcut[] }[] = [
       { keys: ["C"], action: "Copy a link to this update" },
       { keys: ["W"], action: "Follow this company" },
       { keys: ["/"], action: "Jump to search" },
+      { keys: ["F"], action: "Open filters" },
     ],
   },
   {

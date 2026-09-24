@@ -14,6 +14,7 @@ import { StockQuote } from "@/components/company/stock-quote";
 import { ImportantMarker, MetaLabel } from "@/components/ui/badge";
 import { ChevronDownIcon, PlusIcon } from "@/components/ui/icons";
 import { cn } from "@/lib/utils";
+import { formatMarketCap } from "@/lib/feed-filters";
 
 import { DealTerms } from "./deal-terms";
 import { CatalystsTable } from "./catalysts-table";
@@ -35,6 +36,12 @@ interface FilingCardProps {
   onToggleExpanded?: () => void;
   /** Keyboard-navigation cursor highlight. */
   selected?: boolean;
+  /**
+   * Narrow the feed to this update's category or sector. When set, those
+   * labels become buttons — the reader pivots from one interesting update
+   * to everything like it. Absent on permalinks, where there's no feed.
+   */
+  onFilterBy?: (by: { eventType?: string; sector?: string }) => void;
 }
 
 /**
@@ -54,6 +61,7 @@ export function FilingCard({
   expanded: expandedProp,
   onToggleExpanded,
   selected = false,
+  onFilterBy,
 }: FilingCardProps) {
   const { ticker, company_id, briefing, filing_date, received_at } = event;
   const company_name = displayCompanyName(event.company_name);
@@ -84,6 +92,8 @@ export function FilingCard({
   const canTrack =
     isLoggedIn && !isWatchlisted && !!company_id && !!onAddToWatchlist;
   const eventTimestamp = received_at || filing_date;
+  const sector = event.sector || null;
+  const cap = formatMarketCap(event.market_cap);
 
   return (
     <article
@@ -120,21 +130,26 @@ export function FilingCard({
                 </span>
               </a>
             ) : (
-              <>
-                {ticker && (
-                  <span className="shrink-0 font-mono text-label font-semibold text-ink">
-                    {ticker}
-                  </span>
-                )}
-                <span
-                  className={cn(
-                    "truncate text-meta text-ink-faint",
-                    ticker && "hidden sm:inline"
-                  )}
-                >
-                  {company_name}
-                </span>
-              </>
+              <span className="truncate text-meta text-ink-faint">{company_name}</span>
+            )}
+            {/* What kind of company: the market cap always (the same news
+                means different things at $300M and $300B), the sector from
+                md up */}
+            {cap && (
+              <span
+                className="shrink-0 text-micro whitespace-nowrap text-ink-faint"
+                title="Market cap"
+              >
+                <span className="font-mono tabular-nums">{cap}</span> cap
+              </span>
+            )}
+            {sector && (
+              <FilterableLabel
+                label={sector}
+                title={`Show ${sector} updates`}
+                onClick={onFilterBy && (() => onFilterBy({ sector }))}
+                className="hidden truncate text-micro text-ink-faint md:inline"
+              />
             )}
           </div>
 
@@ -159,7 +174,22 @@ export function FilingCard({
           <div className="mt-1 flex items-center justify-between gap-3">
             <div className="flex min-w-0 flex-wrap items-center gap-2.5">
               {important && <ImportantMarker />}
-              {category && <MetaLabel>{category}</MetaLabel>}
+              {category &&
+                (onFilterBy ? (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onFilterBy({ eventType: category });
+                    }}
+                    title={`Show ${category} updates`}
+                    className="-mx-1 rounded-xs px-1 transition-colors hover:bg-surface-hover [&>span]:hover:text-brand-ink"
+                  >
+                    <MetaLabel>{category}</MetaLabel>
+                  </button>
+                ) : (
+                  <MetaLabel>{category}</MetaLabel>
+                ))}
             </div>
             {canTrack && (
               <button
@@ -233,5 +263,33 @@ export function FilingCard({
         )}
       </div>
     </article>
+  );
+}
+
+/** Muted metadata that becomes a filter button when the feed offers one. */
+function FilterableLabel({
+  label,
+  title,
+  onClick,
+  className,
+}: {
+  label: string;
+  title: string;
+  onClick?: () => void;
+  className?: string;
+}) {
+  if (!onClick) return <span className={className}>{label}</span>;
+  return (
+    <button
+      type="button"
+      title={title}
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick();
+      }}
+      className={cn(className, "transition-colors hover:text-brand-ink hover:underline")}
+    >
+      {label}
+    </button>
   );
 }

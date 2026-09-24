@@ -1,5 +1,46 @@
 # API Changes
 
+## 2026-09-24 (feed filters, facets, saved views)
+
+The feed's filters now run **in the API**. Until now the web filtered the
+50 rows it had loaded, so "Important · Bankruptcy" showed whatever happened
+to be in the last 50 events. `GET /events/`, `GET /events/all` and
+`GET /events/company/:id` all take the same filters (multi-value ones are
+comma-separated; an unknown value is a **400**, not a silently wider feed):
+
+| Param | Values |
+| --- | --- |
+| `important` | `1` — the payload's `important` flag |
+| `event_type` | one or more labels from `GET /events/types` (was single-value; still accepts one) |
+| `sector` | FMP sectors: Technology, Healthcare, Financial Services, Consumer Cyclical, Consumer Defensive, Communication Services, Industrials, Energy, Basic Materials, Real Estate, Utilities |
+| `cap` | `mega` ≥$200B, `large` $10–200B, `mid` $2–10B, `small` $300M–2B, `micro` <$300M (the company's current cap) |
+| `source` | `sec` \| `pr` |
+| `sentiment` | Positive, Negative, Mixed, Neutral (the briefing's) |
+| `moved` | `any` \| `up` \| `down` — an explosive (≥2× ATR) measured reaction |
+| `since` | `1d` \| `7d` \| `30d` \| `90d`, on the list's own order key |
+| `q` | ticker, company name or headline (≤100 chars) |
+
+Responses gain `has_more` and `filters` (the canonical filters applied).
+Every event payload gains `sector` and `industry` (the filer's, FMP
+taxonomy; null for unclassified filers).
+
+New routes:
+
+- `GET /events/facets?scope=all|mine&…filters` — per-option counts, each
+  counted with every *other* filter applied: `{total, event_type, sector,
+  cap, source, sentiment, important, moved: {any, up, down}}`. `scope=all`
+  is public (cached 60s); `scope=mine` needs a token.
+- `GET /events/filters` — every option each filter accepts, with labels.
+- `GET/POST /feed/views`, `PUT/DELETE /feed/views/:id` (auth) — saved
+  views `{id, name, filters, position}`. `filters` is the canonical dict
+  (`scope` plus the query keys above); POST/PUT re-validate it (400) and
+  reject a duplicate name or a 21st view (409). DELETE answers
+  `{deleted: id}`.
+
+Client: `src/lib/feed-filters.ts` owns the filter shape, URL keys
+(`f t sec cap src snt m d q`, plus `s` for scope), the API query, and the
+live-socket predicate — it mirrors the API's `app/services/feed_filters.py`.
+
 ## 2026-09-23 (company universe: SEC list → FMP)
 
 The company table is now FMP's US-listed common stocks (NYSE/NASDAQ/AMEX;

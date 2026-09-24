@@ -5,11 +5,13 @@ import Link from "next/link";
 
 import type { FilingEvent } from "@/types/events";
 import type { Quote } from "@/types/api";
+import type { ApiError } from "@/lib/api-client";
 import { orderKeyFor, type FeedScope } from "@/hooks/use-events";
-import { dayLabel } from "@/lib/utils";
+import { cn, dayLabel } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import {
+  AlertIcon,
   ArrowUpIcon,
   CompaniesIcon,
   SearchIcon,
@@ -20,12 +22,20 @@ import { FilingCard } from "./filing-card";
 
 interface FilingListProps {
   events: FilingEvent[];
-  allCount: number;
+  /** Any filter or search is narrowing the list. */
+  filtered: boolean;
   /** Whose updates this list is showing. */
   scope: FeedScope;
   /** How many companies the reader follows; null until that's known. */
   followedCount?: number | null;
+  /** Nothing to show yet: the first answer for this stream is loading. */
   loading: boolean;
+  /** A new filter's answer is loading; the last one stays on screen. */
+  refreshing?: boolean;
+  loadingMore?: boolean;
+  /** The first page failed — distinct from "nothing matched". */
+  error?: ApiError | null;
+  onRetry?: () => void;
   hasMore: boolean;
   onLoadMore: () => void;
   /** Last price per company id, for the price on each row. */
@@ -38,6 +48,8 @@ interface FilingListProps {
   onResetFilters?: () => void;
   /** Switches the feed to the public stream from an empty "my companies". */
   onShowEverything?: () => void;
+  /** Narrow the feed to a row's category or sector (the row's pivot). */
+  onFilterBy?: (by: { eventType?: string; sector?: string }) => void;
 }
 
 /**
@@ -61,10 +73,14 @@ function readLastSeen(scope: FeedScope): string | null {
 
 export function FilingList({
   events,
-  allCount,
+  filtered,
   scope,
   followedCount = null,
   loading,
+  refreshing = false,
+  loadingMore = false,
+  error = null,
+  onRetry,
   hasMore,
   onLoadMore,
   quotes,
@@ -74,6 +90,7 @@ export function FilingList({
   isLoggedIn,
   onResetFilters,
   onShowEverything,
+  onFilterBy,
 }: FilingListProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -206,7 +223,7 @@ export function FilingList({
   useEffect(() => {
     loadMoreRef.current = onLoadMore;
   }, [onLoadMore]);
-  const canLoadMore = hasMore && !loading;
+  const canLoadMore = hasMore && !loading && !loadingMore && !refreshing;
   useEffect(() => {
     const sentinel = sentinelRef.current;
     if (!sentinel || !canLoadMore) return;
@@ -286,8 +303,16 @@ export function FilingList({
               </p>
             )}
 
-          {/* Event rows, grouped by day, separated by hairlines */}
-          <div className="divide-y divide-line-subtle">
+          {/* Event rows, grouped by day, separated by hairlines. While a
+              new filter's answer loads, the old rows stay but fade, so the
+              list doesn't blank and jump on every chip. */}
+          <div
+            className={cn(
+              "divide-y divide-line-subtle transition-opacity",
+              refreshing && "opacity-50"
+            )}
+            aria-busy={refreshing || undefined}
+          >
             {displayed.map((event, i) => {
               // Grouped on the ordering key too, so a day header can't repeat
               // when the two scopes sort by different timestamps.
@@ -336,6 +361,7 @@ export function FilingList({
                     onAddToWatchlist={onAddToWatchlist}
                     addingToWatchlist={addingCompanyId === event.company_id}
                     isLoggedIn={isLoggedIn}
+                    onFilterBy={onFilterBy}
                   />
                 </div>
               );
@@ -345,7 +371,7 @@ export function FilingList({
           {/* Earlier events load themselves as the reader gets near them */}
           {hasMore && (
             <div ref={sentinelRef} className="flex justify-center py-6">
-              {loading ? (
+              {loadingMore ? (
                 <span className="text-meta text-ink-faint">
                   Loading earlier events…
                 </span>
@@ -359,23 +385,57 @@ export function FilingList({
             </div>
           )}
 
-          {/* Empty states */}
-          {displayed.length === 0 && allCount > 0 && (
+          {/* Empty and error states */}
+          {error && !loading && (
             <EmptyState
-              icon={SearchIcon}
+              icon={AlertIcon}
               className="pt-16"
-              title="No updates match these filters"
-              description={`${allCount} update${allCount === 1 ? " is" : "s are"} hidden by the filters above.`}
+              title={
+                error.isOffline
+                  ? "Couldn't reach Sensybull"
+                  : "Couldn't load updates"
+              }
+              description={
+                error.isOffline
+                  ? "Check your connection — the feed picks up where it left off once you're back."
+                  : "Something went wrong on our side. Trying again usually works."
+              }
               action={
-                onResetFilters && (
-                  <Button variant="outline" onClick={onResetFilters}>
-                    Clear filters
+                onRetry && (
+                  <Button variant="outline" onClick={onRetry}>
+                    Try again
                   </Button>
                 )
               }
             />
           )}
-          {allCount === 0 && !loading && scope === "mine" && (
+          {!error && !loading && !refreshing && displayed.length === 0 && filtered && (
+            <EmptyState
+              icon={SearchIcon}
+              className="pt-16"
+              title="No updates match these filters"
+              description={
+                scope === "mine"
+                  ? "Nothing from the companies you follow fits every filter above. Remove one, or look across Everything."
+                  : "Nothing fits every filter above. Remove one to widen the search — new updates that match will still appear here live."
+              }
+              action={
+                <div className="flex flex-wrap justify-center gap-2">
+                  {onResetFilters && (
+                    <Button variant="outline" onClick={onResetFilters}>
+                      Clear filters
+                    </Button>
+                  )}
+                  {scope === "mine" && onShowEverything && (
+                    <Button variant="ghost" onClick={onShowEverything}>
+                      Search everything
+                    </Button>
+                  )}
+                </div>
+              }
+            />
+          )}
+          {!error && !loading && !filtered && displayed.length === 0 && scope === "mine" && (
             <EmptyState
               className="pt-16"
               title={
@@ -404,7 +464,7 @@ export function FilingList({
               }
             />
           )}
-          {allCount === 0 && !loading && scope === "all" && (
+          {!error && !loading && !filtered && displayed.length === 0 && scope === "all" && (
             <EmptyState
               icon={UpdatesIcon}
               className="pt-16"
@@ -412,7 +472,7 @@ export function FilingList({
               description="New filings and press releases appear here in real time, seconds after they're published. You don't need to refresh."
             />
           )}
-          {loading && allCount === 0 && (
+          {loading && displayed.length === 0 && (
             <div className="space-y-px pt-2">
               {[...Array(6)].map((_, i) => (
                 <Skeleton key={i} className="mx-4 h-16" />
