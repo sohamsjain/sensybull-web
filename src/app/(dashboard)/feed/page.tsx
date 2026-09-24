@@ -10,11 +10,11 @@ import { addToDefaultWatchlist } from "@/lib/default-watchlist";
 import { FilingList } from "@/components/feed/filing-list";
 import { FeedToolbar } from "@/components/feed/feed-toolbar";
 import { toast } from "@/components/ui/app-toaster";
+import { EMPTY_FILTERS, hasAnyFilter } from "@/lib/feed-filters";
 
 export default function FeedPage() {
   const { user } = useAuth();
-  const { scope, setScope, filter, setFilter, eventType, setEventType, search, setSearch } =
-    useDashboard();
+  const { scope, setScope, filters, setFilters } = useDashboard();
 
   const { watchlists, loading: watchlistsLoading, refetch } = useWatchlists();
   const [addingCompanyId, setAddingCompanyId] = useState<string | null>(null);
@@ -33,10 +33,19 @@ export default function FeedPage() {
     return ids;
   }, [watchlists, watchlistsLoading, user]);
 
-  const { events, allEvents, loading, hasMore, loadMore, connected } = useEvents({
-    filter,
-    eventType,
-    search,
+  const {
+    events,
+    total,
+    loading,
+    refreshing,
+    loadingMore,
+    hasMore,
+    loadMore,
+    error,
+    retry,
+    connected,
+  } = useEvents({
+    filters,
     scope,
     followedCompanyIds: watchlistedCompanyIds,
   });
@@ -74,21 +83,43 @@ export default function FeedPage() {
 
   /** Undo every filter at once, from the zero-result state they produced. */
   const resetFilters = useCallback(() => {
-    setFilter("all");
-    setEventType(null);
-    setSearch("");
-  }, [setFilter, setEventType, setSearch]);
+    setFilters(EMPTY_FILTERS);
+  }, [setFilters]);
+
+  /**
+   * Pivot on a row: its category or sector becomes that filter. Every
+   * other filter stays, so "Healthcare" from a filtered list of movers is
+   * healthcare movers.
+   */
+  const filterBy = useCallback(
+    ({ eventType, sector }: { eventType?: string; sector?: string }) => {
+      setFilters((prev) => ({
+        ...prev,
+        eventTypes: eventType ? [eventType] : prev.eventTypes,
+        sectors: sector ? [sector] : prev.sectors,
+      }));
+    },
+    [setFilters]
+  );
 
   return (
     <div className="h-full flex flex-col min-w-0">
-      <FeedToolbar connected={connected} />
+      <FeedToolbar
+        connected={connected}
+        total={loading ? null : total}
+        refreshing={refreshing}
+      />
       <div className="flex-1 min-w-0 overflow-hidden">
         <FilingList
           events={events}
-          allCount={allEvents.length}
+          filtered={hasAnyFilter(filters)}
           scope={scope ?? "all"}
           followedCount={watchlistedCompanyIds?.size ?? null}
           loading={loading}
+          refreshing={refreshing}
+          loadingMore={loadingMore}
+          error={error}
+          onRetry={retry}
           hasMore={hasMore}
           onLoadMore={loadMore}
           quotes={quotes}
@@ -98,6 +129,7 @@ export default function FeedPage() {
           isLoggedIn={!!user}
           onResetFilters={resetFilters}
           onShowEverything={() => setScope("all")}
+          onFilterBy={filterBy}
         />
       </div>
     </div>

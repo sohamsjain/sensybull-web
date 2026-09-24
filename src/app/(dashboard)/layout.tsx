@@ -14,12 +14,14 @@ import { CommandPalette } from "@/components/command-palette";
 import { ShortcutsSheet } from "@/components/shortcuts-sheet";
 import { SocketProvider } from "@/context/socket-provider";
 import { useAuth } from "@/hooks/use-auth";
-import type { FeedScope } from "@/hooks/use-events";
+import {
+  filtersFromParams,
+  filtersToParams,
+  type FeedFilters,
+  type FeedScope,
+} from "@/lib/feed-filters";
 
-/** The one feed filter: everything, or only market-moving updates. */
-export type FeedFilter = "all" | "important";
-
-export type { FeedScope };
+export type { FeedScope, FeedFilters };
 
 /** Where the reader's last scope choice is remembered between visits. */
 const SCOPE_KEY = "feed-scope";
@@ -40,24 +42,21 @@ interface DashboardContextValue {
    */
   scope: FeedScope | null;
   setScope: (scope: FeedScope) => void;
-  filter: FeedFilter;
-  setFilter: (filter: FeedFilter) => void;
-  /** Event-type category filter (null = all types). */
-  eventType: string | null;
-  setEventType: (value: string | null) => void;
-  search: string;
-  setSearch: (value: string) => void;
+  /**
+   * Every feed filter (importance, event types, sectors, market cap,
+   * source, tone, price move, time window, search) — see
+   * `src/lib/feed-filters.ts`. Mirrored into the URL so a filtered view is
+   * a shareable link.
+   */
+  filters: FeedFilters;
+  setFilters: (next: FeedFilters | ((prev: FeedFilters) => FeedFilters)) => void;
 }
 
 const DashboardContext = createContext<DashboardContextValue>({
   scope: "all",
   setScope: () => {},
-  filter: "all",
-  setFilter: () => {},
-  eventType: null,
-  setEventType: () => {},
-  search: "",
-  setSearch: () => {},
+  filters: filtersFromParams(new URLSearchParams()),
+  setFilters: () => {},
 });
 
 export const useDashboard = () => useContext(DashboardContext);
@@ -76,13 +75,9 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
   });
 
   // Filters initialize from the URL so filtered views are shareable
-  const [filter, setFilter] = useState<FeedFilter>(() =>
-    searchParams.get("f") === "important" ? "important" : "all"
+  const [filters, setFilters] = useState<FeedFilters>(() =>
+    filtersFromParams(searchParams)
   );
-  const [eventType, setEventType] = useState<string | null>(
-    () => searchParams.get("t") || null
-  );
-  const [search, setSearch] = useState(() => searchParams.get("q") ?? "");
 
   // Settle the scope once we know who's reading: their last choice if they
   // made one, otherwise their own companies. Done during render rather than
@@ -105,24 +100,18 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
     if (!pathname?.startsWith("/feed")) return;
     const params = new URLSearchParams();
     if (scope === "mine") params.set("s", "mine");
-    if (filter === "important") params.set("f", "important");
-    if (eventType) params.set("t", eventType);
-    if (search) params.set("q", search);
+    filtersToParams(filters, params);
     const qs = params.toString();
     window.history.replaceState(null, "", qs ? `${pathname}?${qs}` : pathname);
-  }, [scope, filter, eventType, search, pathname]);
+  }, [scope, filters, pathname]);
 
   return (
     <DashboardContext.Provider
       value={{
         scope,
         setScope: chooseScope,
-        filter,
-        setFilter,
-        eventType,
-        setEventType,
-        search,
-        setSearch,
+        filters,
+        setFilters,
       }}
     >
       {/* One socket for the whole session, owned above the pages so it

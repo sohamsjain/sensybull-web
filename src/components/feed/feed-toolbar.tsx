@@ -3,26 +3,36 @@
 import { useEffect, useState } from "react";
 
 import { useAuth } from "@/hooks/use-auth";
-import {
-  useDashboard,
-  type FeedFilter,
-  type FeedScope,
-} from "@/app/(dashboard)/layout";
+import { useDashboard, type FeedScope } from "@/app/(dashboard)/layout";
+import { useFeedFacets } from "@/hooks/use-feed-facets";
+import { useFeedViews } from "@/hooks/use-feed-views";
 import { api } from "@/lib/api-client";
-import { StatusDot } from "@/components/ui/badge";
+import {
+  EMPTY_FILTERS,
+  PRESETS,
+  activeFilterCount,
+  applyPreset,
+  filterPills,
+  type FeedFilters,
+} from "@/lib/feed-filters";
+import { StatusDot, CountBadge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Chip, ChipRow, SegmentedControl } from "@/components/ui/chip";
+import { CloseIcon, FilterIcon } from "@/components/ui/icons";
 import { Kbd } from "@/components/ui/kbd";
 import { SearchInput } from "@/components/ui/search-input";
-
-const FILTERS: { value: FeedFilter; label: string }[] = [
-  { value: "all", label: "All" },
-  { value: "important", label: "Important" },
-];
+import { FeedViewsMenu } from "./feed-views-menu";
+import { FilterPanel } from "./filter-panel";
 
 /** Whose updates you're reading. */
 const SCOPES: { value: FeedScope; label: string }[] = [
   { value: "mine", label: "My companies" },
   { value: "all", label: "Everything" },
+];
+
+const PRIORITY: { value: "all" | "important"; label: string }[] = [
+  { value: "all", label: "All" },
+  { value: "important", label: "Important" },
 ];
 
 /** Fallback while GET /events/types loads (mirrors the API's canonical list). */
@@ -37,29 +47,31 @@ const DEFAULT_EVENT_TYPES = [
   "Delisting",
   "Restatement",
   "Cybersecurity Incident",
+  "Regulatory / Clinical",
 ];
 
+interface FeedToolbarProps {
+  connected: boolean;
+  /** Matching updates for the current filters; null until the first answer. */
+  total: number | null;
+  /** A new filter's answer is loading while the last one stays on screen. */
+  refreshing: boolean;
+}
+
 /**
- * Feed header, two rows that always sit in the same place: whose updates
- * you're reading plus search on top, then how to narrow them — All /
- * Important, and the event categories.
+ * Feed header. Row one is *whose* updates and search, plus the door to
+ * every filter; row two says what the list is narrowed to right now.
  *
- * The stream's state lives here rather than in the reading column: it is
- * chrome, and a "Live · 50 events" banner above the first update was a row
- * of furniture between the reader and the news.
+ * Row two is the honest part: each active filter is a pill you can remove
+ * on its own, so a filtered feed never looks like a quiet market. With
+ * nothing on, it offers a handful of presets — real filter sets, which
+ * read back as ordinary pills once chosen, so they teach the panel rather
+ * than hide it.
  */
-export function FeedToolbar({ connected }: { connected: boolean }) {
+export function FeedToolbar({ connected, total, refreshing }: FeedToolbarProps) {
   const { user } = useAuth();
-  const {
-    scope,
-    setScope,
-    filter,
-    setFilter,
-    eventType,
-    setEventType,
-    search,
-    setSearch,
-  } = useDashboard();
+  const { scope, setScope, filters, setFilters } = useDashboard();
+  const [panelOpen, setPanelOpen] = useState(false);
 
   const [eventTypes, setEventTypes] = useState<string[]>(DEFAULT_EVENT_TYPES);
   useEffect(() => {
@@ -67,7 +79,7 @@ export function FeedToolbar({ connected }: { connected: boolean }) {
     api<{ event_types: string[] }>("/events/types")
       .then((data) => {
         if (cancelled || !data.event_types?.length) return;
-        // "Other" isn't a useful filter — the All chip already covers it
+        // "Other" isn't a useful filter — clearing the filter already covers it
         setEventTypes(data.event_types.filter((t) => t !== "Other"));
       })
       .catch(() => {});
@@ -76,9 +88,36 @@ export function FeedToolbar({ connected }: { connected: boolean }) {
     };
   }, []);
 
+  const facets = useFeedFacets(scope, filters, panelOpen);
+  const views = useFeedViews(!!user);
+
+  // `f` opens the panel, like `/` focuses search
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== "f" || e.metaKey || e.ctrlKey || e.altKey) return;
+      const target = e.target as HTMLElement;
+      if (
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.isContentEditable
+      ) {
+        return;
+      }
+      e.preventDefault();
+      setPanelOpen(true);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
+
+  const active = activeFilterCount(filters);
+  const pills = filterPills(filters).filter((p) => p.key !== "important");
+  const set = (patch: Partial<FeedFilters>) =>
+    setFilters((prev) => ({ ...prev, ...patch }));
+
   return (
     <div className="shrink-0 border-b border-line-subtle bg-canvas">
-      <div className="mx-auto flex h-14 w-full max-w-3xl items-center gap-2.5 px-4">
+      <div className="mx-auto flex h-14 w-full max-w-3xl items-center gap-2 px-4">
         {/* Signed-in readers choose whose filings they're looking at */}
         {user && (
           <SegmentedControl
@@ -91,15 +130,29 @@ export function FeedToolbar({ connected }: { connected: boolean }) {
 
         <SearchInput
           id="feed-search"
-          value={search}
-          onValueChange={setSearch}
+          value={filters.q}
+          onValueChange={(q) => set({ q })}
           placeholder="Search company or headline…"
-          className="min-w-0 max-w-xs flex-1"
+          className="min-w-0 flex-1 sm:max-w-xs"
           hint={<Kbd className="hidden md:inline-flex">/</Kbd>}
         />
 
+        <Button
+          variant={active > 0 ? "secondary" : "outline"}
+          onClick={() => setPanelOpen(true)}
+          aria-label={
+            active > 0 ? `Filters, ${active} on` : "Filters"
+          }
+          title="Filters (F)"
+          className="px-2.5 sm:px-3"
+        >
+          <FilterIcon />
+          <span className="hidden sm:inline">Filters</span>
+          <CountBadge count={active} />
+        </Button>
+
         <span
-          className="ml-auto hidden items-center gap-1.5 text-meta text-ink-faint sm:flex"
+          className="ml-auto hidden items-center gap-1.5 text-meta text-ink-faint md:flex"
           aria-live="polite"
         >
           <StatusDot live={connected} />
@@ -107,42 +160,93 @@ export function FeedToolbar({ connected }: { connected: boolean }) {
         </span>
       </div>
 
-      {/* items-start so All/Important stays on the first line of chips when
-          the categories wrap onto a second and third row */}
-      <div className="mx-auto flex w-full max-w-3xl items-start gap-2.5 px-4 pb-2.5">
+      <div className="mx-auto flex w-full max-w-3xl items-start gap-2 px-4 pb-2.5">
         <SegmentedControl
-          options={FILTERS}
-          value={filter}
-          onChange={setFilter}
+          options={PRIORITY}
+          value={filters.important ? "important" : "all"}
+          onChange={(v) => set({ important: v === "important" })}
           label="Show all updates or only important ones"
         />
-        <span className="mt-1.5 h-5 w-px shrink-0 bg-line-subtle" />
+        <span className="mt-2 h-5 w-px shrink-0 bg-line-subtle" />
+
+        {/* Scrolls on touch, wraps from md up: a pointer can't swipe a
+            hidden overflow */}
         <ChipRow
           className="min-w-0 flex-1 md:flex-wrap md:overflow-visible md:[mask-image:none]"
-          role="tablist"
-          aria-label="Filter by event type"
+          aria-label={pills.length ? "Active filters" : "Suggested filters"}
         >
-          <Chip
-            role="tab"
-            aria-selected={eventType === null}
-            selected={eventType === null}
-            onClick={() => setEventType(null)}
-          >
-            All types
-          </Chip>
-          {eventTypes.map((type) => (
-            <Chip
-              key={type}
-              role="tab"
-              aria-selected={eventType === type}
-              selected={eventType === type}
-              onClick={() => setEventType(eventType === type ? null : type)}
-            >
-              {type}
-            </Chip>
-          ))}
+          {pills.length > 0 ? (
+            <>
+              {pills.map((pill) => (
+                <Chip
+                  key={pill.key}
+                  selected
+                  onClick={() => setFilters((prev) => pill.remove(prev))}
+                  className="inline-flex items-center gap-1 pr-2"
+                  title="Remove this filter"
+                >
+                  {pill.label}
+                  <CloseIcon className="size-3.5" aria-hidden />
+                  <span className="sr-only">(remove)</span>
+                </Chip>
+              ))}
+              <Chip
+                variant="quiet"
+                onClick={() => setFilters({ ...EMPTY_FILTERS, q: filters.q })}
+              >
+                Clear
+              </Chip>
+            </>
+          ) : (
+            <>
+              <span className="shrink-0 pl-1 text-micro text-ink-faint">Try</span>
+              {PRESETS.map((preset) => (
+                <Chip
+                  key={preset.key}
+                  variant="quiet"
+                  onClick={() => setFilters((prev) => applyPreset(prev, preset.filters))}
+                >
+                  {preset.label}
+                </Chip>
+              ))}
+            </>
+          )}
         </ChipRow>
+
+        {total != null && (
+          <span
+            className="mt-2 hidden shrink-0 text-micro tabular-nums text-ink-faint sm:inline"
+            aria-live="polite"
+          >
+            {refreshing ? "Updating…" : `${total.toLocaleString()} update${total === 1 ? "" : "s"}`}
+          </span>
+        )}
+
+        {user && scope && views.loaded && (
+          <FeedViewsMenu
+            views={views.views}
+            scope={scope}
+            filters={filters}
+            onApply={(nextScope, next) => {
+              setScope(nextScope);
+              setFilters(next);
+            }}
+            onCreate={(name) => views.create(name, scope, filters)}
+            onUpdate={(id) => views.update(id, scope, filters)}
+            onRemove={views.remove}
+          />
+        )}
       </div>
+
+      <FilterPanel
+        open={panelOpen}
+        onOpenChange={setPanelOpen}
+        filters={filters}
+        onChange={setFilters}
+        eventTypes={eventTypes}
+        facets={facets}
+        total={facets?.total ?? total}
+      />
     </div>
   );
 }

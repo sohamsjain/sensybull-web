@@ -120,6 +120,10 @@ export interface FilingEvent {
   catalysts: Catalyst[];
   received_at: string;
   market_cap?: number | null;
+  /** The filer's FMP sector (one of SECTORS in `src/lib/feed-filters.ts`);
+   *  null for unclassified filers and on payloads from before Sept 2026. */
+  sector?: string | null;
+  industry?: string | null;
   price_reactions?: PriceReactions;
   explosive?: boolean;
 }

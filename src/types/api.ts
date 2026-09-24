@@ -85,6 +85,32 @@ export interface PaginatedResponse<T> {
 
 export interface PaginatedEvents extends PaginatedResponse<FilingEvent> {
   events: FilingEvent[];
+  /** More matching events past this page (absent on older API builds). */
+  has_more?: boolean;
+}
+
+/**
+ * GET /events/facets — how many events each filter option would return,
+ * each counted with every *other* active filter applied.
+ */
+export interface FeedFacets {
+  total: number;
+  event_type: Record<string, number>;
+  sector: Record<string, number>;
+  cap: Record<string, number>;
+  source: Record<string, number>;
+  sentiment: Record<string, number>;
+  important: number;
+  moved: Record<string, number>;
+}
+
+/** A saved feed view (GET/POST /feed/views). `filters` is the API's
+ *  canonical dict — read it through `filtersFromView()`. */
+export interface FeedView {
+  id: string;
+  name: string;
+  filters: Record<string, unknown>;
+  position: number;
 }
 
 export interface PaginatedWatchlists extends PaginatedResponse<Watchlist> {

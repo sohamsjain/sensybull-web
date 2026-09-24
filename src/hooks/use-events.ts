@@ -1,25 +1,32 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import type { FilingEvent, PriceReactions } from "@/types/events";
 import type { PaginatedEvents } from "@/types/api";
-import { api } from "@/lib/api-client";
+import { api, ApiError } from "@/lib/api-client";
 import { useAuth } from "@/hooks/use-auth";
 import { useSocket } from "@/context/socket-provider";
-import { isImportant } from "@/lib/event-actions";
+import {
+  filtersToQuery,
+  matchesFeedFilters,
+  type FeedFilters,
+  type FeedScope,
+} from "@/lib/feed-filters";
 
-/**
- * Whose updates the feed is showing: only the companies you follow
- * (`GET /events/`, auth) or every company that files (`GET /events/all`).
- */
-export type FeedScope = "mine" | "all";
+export type { FeedScope };
+export { matchesSearch } from "@/lib/feed-filters";
+
+const PAGE_SIZE = 50;
+const EMPTY: FilingEvent[] = [];
+/** Typing in search waits this long before it becomes a request. */
+const SEARCH_DEBOUNCE_MS = 300;
 
 interface UseEventsOptions {
-  /** "important" keeps only market-moving updates; "all" keeps everything. */
-  filter: "all" | "important";
-  /** Event-type category (from GET /events/types); null keeps every type. */
-  eventType?: string | null;
-  search: string;
+  /**
+   * Every feed filter. Applied by the API (so a page is a page of matches)
+   * and, for live socket events, by `matchesFeedFilters`.
+   */
+  filters: FeedFilters;
   /**
    * Whose updates to load. `null` means the scope hasn't been decided yet
    * (it depends on whether the visitor is signed in) — nothing is fetched
@@ -92,88 +99,137 @@ export function isFollowed(
   return !!e.company_id && !!followed?.has(e.company_id);
 }
 
-/** Matches the search box against the ticker, the name, and the headline. */
-export function matchesSearch(e: FilingEvent, query: string): boolean {
-  const q = query.trim().toLowerCase();
-  if (!q) return true;
-  return (
-    !!e.ticker?.toLowerCase().includes(q) ||
-    !!e.company_name?.toLowerCase().includes(q) ||
-    !!e.briefing?.headline?.toLowerCase().includes(q)
-  );
+/** Debounce the search text only; every other filter applies at once. */
+function useAppliedFilters(filters: FeedFilters): FeedFilters {
+  const [q, setQ] = useState(filters.q);
+  useEffect(() => {
+    if (filters.q === q) return;
+    // Clearing the box is instant; typing waits for a pause
+    const delay = filters.q.trim() ? SEARCH_DEBOUNCE_MS : 0;
+    const t = setTimeout(() => setQ(filters.q), delay);
+    return () => clearTimeout(t);
+  }, [filters.q, q]);
+  return useMemo(() => ({ ...filters, q }), [filters, q]);
+}
+
+/** The API's answer for one list (stream + filters), grown by paging and
+ *  by live arrivals. */
+interface Answer {
+  key: string;
+  scope: FeedScope;
+  events: FilingEvent[];
+  total: number;
+  page: number;
+  hasMore: boolean;
+  error: ApiError | null;
 }
 
 export function useEvents({
-  filter,
-  eventType = null,
-  search,
+  filters,
   scope = "all",
   followedCompanyIds = null,
 }: UseEventsOptions) {
   const { user } = useAuth();
   const { socket, connected } = useSocket();
-  const [events, setEvents] = useState<FilingEvent[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [hasMore, setHasMore] = useState(false);
-  const pageRef = useRef(1);
+  const [answer, setAnswer] = useState<Answer | null>(null);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [attempt, setAttempt] = useState(0);
 
+  const applied = useAppliedFilters(filters);
   const path = scope === "mine" ? "/events/" : "/events/all";
+  const query = filtersToQuery(applied).toString();
+  // Identifies a list: a response for any other key (a filter changed
+  // while it was in flight) is dropped.
+  const listKey = `${path}?${query}`;
 
-  // The followed set changes as the watchlist loads and as companies are
-  // tracked; a ref keeps that out of the socket subscription's deps so a
-  // watchlist edit never tears down and rebuilds the listeners.
+  // The followed set and the filters change without the socket needing to
+  // resubscribe; refs keep them out of the listener effect's deps.
   const followedRef = useRef(followedCompanyIds);
+  const filtersRef = useRef(applied);
   useEffect(() => {
     followedRef.current = followedCompanyIds;
-  }, [followedCompanyIds]);
+    filtersRef.current = applied;
+  }, [followedCompanyIds, applied]);
 
-  // Fetch history from the REST API. Refetches when the scope changes — the
-  // two streams come from different endpoints in different orders.
+  const url = useCallback(
+    (page: number) =>
+      `${path}?${query ? `${query}&` : ""}page=${page}&per_page=${PAGE_SIZE}`,
+    [path, query]
+  );
+
+  // First page. Refetches whenever the scope or any applied filter changes
+  // (and on retry). State is only written when the answer lands.
   useEffect(() => {
     if (!scope) return;
-    setLoading(true);
-    setEvents([]);
-    pageRef.current = 1;
-
     let cancelled = false;
-    api<PaginatedEvents>(`${path}?page=1&per_page=50`)
+    const key = listKey;
+    api<PaginatedEvents>(url(1))
       .then((data) => {
         if (cancelled) return;
-        setEvents(data.events || []);
-        setHasMore((data.events?.length || 0) < data.total);
+        const rows = data.events || [];
+        setAnswer({
+          key,
+          scope,
+          events: rows,
+          total: data.total,
+          page: 1,
+          hasMore: data.has_more ?? rows.length < data.total,
+          error: null,
+        });
       })
-      .catch(() => {})
-      .finally(() => {
-        if (!cancelled) setLoading(false);
+      .catch((err) => {
+        if (cancelled) return;
+        setAnswer({
+          key,
+          scope,
+          events: [],
+          total: 0,
+          page: 1,
+          hasMore: false,
+          error: err instanceof ApiError ? err : new ApiError(String(err), 0),
+        });
       });
     return () => {
       cancelled = true;
     };
-  }, [user, scope, path]);
+  }, [user, scope, listKey, url, attempt]);
+
+  // Another stream's rows are simply wrong, so they never show under this
+  // one; the same stream's last answer stays up while a new filter loads.
+  const current = answer && answer.scope === scope ? answer : null;
+  // Until the scope settles there is nothing to show yet, not "nothing filed"
+  const loading = !current;
+  const refreshing = !!current && current.key !== listKey;
 
   const loadMore = useCallback(async () => {
-    if (loading) return;
-    setLoading(true);
-    pageRef.current += 1;
+    if (!current || refreshing || loadingMore || !current.hasMore) return;
+    const key = current.key;
+    const page = current.page + 1;
+    setLoadingMore(true);
     try {
-      const data = await api<PaginatedEvents>(
-        `${path}?page=${pageRef.current}&per_page=50`
-      );
-      setEvents((prev) => {
-        // A replayed watchlist filing may already sit in the list at its
-        // chronological spot; skip it so a later page doesn't duplicate it.
-        const seen = new Set(prev.map((e) => e.edgar_id));
-        const incoming = (data.events || []).filter(
-          (e) => !seen.has(e.edgar_id)
-        );
-        return [...prev, ...incoming];
+      const data = await api<PaginatedEvents>(url(page));
+      const rows = data.events || [];
+      setAnswer((prev) => {
+        if (!prev || prev.key !== key) return prev;
+        // A live arrival may already sit in the list; offsets shift under
+        // new events, so skip anything already shown.
+        const seen = new Set(prev.events.map((e) => e.edgar_id));
+        return {
+          ...prev,
+          events: [...prev.events, ...rows.filter((e) => !seen.has(e.edgar_id))],
+          total: data.total,
+          page,
+          hasMore: data.has_more ?? page * PAGE_SIZE < data.total,
+        };
       });
-      setHasMore(
-        events.length + (data.events?.length || 0) < data.total
-      );
-    } catch {}
-    setLoading(false);
-  }, [loading, events.length, path]);
+    } catch {
+      // The sentinel's visible "Load earlier events" button stays as the retry
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [current, refreshing, loadingMore, url]);
+
+  const retry = useCallback(() => setAttempt((n) => n + 1), []);
 
   // Live events from the shared session socket (owned by SocketProvider).
   useEffect(() => {
@@ -182,34 +238,52 @@ export function useEvents({
 
     const onFiling = (event: FilingEvent) => {
       // The socket carries the whole public stream; in "mine" scope only
-      // the companies the reader follows belong in the list.
+      // the companies the reader follows belong in the list, and in either
+      // scope only what the active filters would have returned.
       if (scope === "mine" && !isFollowed(event, followedRef.current)) return;
-      setEvents((prev) => insertByReceivedOrder(prev, event, key));
+      if (!matchesFeedFilters(event, filtersRef.current)) return;
+      setAnswer((prev) => {
+        if (!prev || prev.scope !== scope) return prev;
+        const events = insertByReceivedOrder(prev.events, event, key);
+        return events === prev.events
+          ? prev
+          : { ...prev, events, total: prev.total + 1 };
+      });
     };
 
     // An existing event gained data (e.g. a press release backfilled with
     // its SEC filing link) — replace in place, ignore if not loaded
     const onFilingUpdate = (event: FilingEvent) => {
-      setEvents((prev) =>
-        prev.some((e) => e.id === event.id)
-          ? prev.map((e) => (e.id === event.id ? event : e))
+      setAnswer((prev) =>
+        prev && prev.events.some((e) => e.id === event.id)
+          ? {
+              ...prev,
+              events: prev.events.map((e) => (e.id === event.id ? event : e)),
+            }
           : prev
       );
     };
 
     // Reactions are measured minutes-to-days after the filing arrives;
-    // merge them into already-rendered events as they complete
+    // merge them into already-rendered events as they complete. (An event
+    // that only now qualifies for a "moved" filter shows up on the next
+    // fetch, not live — it wasn't in the list to update.)
     const onReaction = (update: PriceReactionUpdate) => {
-      setEvents((prev) =>
-        prev.map((e) =>
-          e.id === update.filing_event_id
-            ? {
-                ...e,
-                price_reactions: update.price_reactions,
-                explosive: update.explosive,
-              }
-            : e
-        )
+      setAnswer((prev) =>
+        prev && prev.events.some((e) => e.id === update.filing_event_id)
+          ? {
+              ...prev,
+              events: prev.events.map((e) =>
+                e.id === update.filing_event_id
+                  ? {
+                      ...e,
+                      price_reactions: update.price_reactions,
+                      explosive: update.explosive,
+                    }
+                  : e
+              ),
+            }
+          : prev
       );
     };
 
@@ -223,13 +297,18 @@ export function useEvents({
     };
   }, [socket, scope]);
 
-  // Client-side filtering
-  const filtered = events.filter((e) => {
-    if (filter === "important" && !isImportant(e)) return false;
-    if (eventType && !matchesEventType(e, eventType)) return false;
-    if (!matchesSearch(e, search)) return false;
-    return true;
-  });
-
-  return { events: filtered, allEvents: events, loading, hasMore, loadMore, connected };
+  return {
+    events: current?.events ?? EMPTY,
+    total: current?.total ?? 0,
+    loading,
+    refreshing,
+    loadingMore,
+    hasMore: current?.hasMore ?? false,
+    loadMore,
+    error: current && !refreshing ? current.error : null,
+    retry,
+    connected,
+    /** The search text the list currently reflects (debounced). */
+    appliedQuery: applied.q,
+  };
 }
