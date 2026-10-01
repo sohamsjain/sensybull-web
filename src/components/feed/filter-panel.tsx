@@ -313,7 +313,7 @@ function OptionChip({
       {count !== undefined && (
         <span
           className={cn(
-            "text-micro tabular-nums",
+            "font-mono text-micro tabular-nums",
             selected ? "text-brand-on/80" : "text-ink-faint"
           )}
         >

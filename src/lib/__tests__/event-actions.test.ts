@@ -67,19 +67,19 @@ describe("buildAiPrompt for press releases", () => {
 describe("buildShareText", () => {
   it("prefers the briefing headline", () => {
     expect(buildShareText(ev())).toBe(
-      "Micron Technology (MU): Micron agrees to acquire ChipWorks for $2.1B"
+      "Micron Technology, Inc. (MU): Micron agrees to acquire ChipWorks for $2.1B"
     );
   });
 
   it("falls back to 'issued a press release' phrasing for PRs", () => {
     expect(buildShareText(ev({ briefing: null }))).toBe(
-      "Micron Technology (MU) issued a press release"
+      "Micron Technology, Inc. (MU) issued a press release"
     );
   });
 
   it("falls back to 'filed …' phrasing for filings", () => {
     expect(buildShareText(ev({ briefing: null, signal_type: "8-K" }))).toBe(
-      "Micron Technology (MU) filed an 8-K"
+      "Micron Technology, Inc. (MU) filed an 8-K"
     );
   });
 });

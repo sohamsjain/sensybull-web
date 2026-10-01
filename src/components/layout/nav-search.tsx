@@ -142,7 +142,7 @@ export function NavSearch({ className }: { className?: string }) {
                 <span className="min-w-0 flex-1 truncate text-label text-ink">
                   {displayCompanyName(r.name)}
                 </span>
-                <span className="shrink-0 tabular-nums text-micro text-ink-faint">
+                <span className="shrink-0 font-mono text-micro text-ink-faint">
                   {r.ticker}
                 </span>
               </a>

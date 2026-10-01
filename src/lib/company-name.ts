@@ -108,7 +108,7 @@ function caseToken(token: string, isEdge: boolean): string {
  * "Aes Corp" rather than "AES Corp": nothing in the string says which it is,
  * and the whole point of this pass is that nothing shouts.
  */
-export function caseCompanyName(name: string | null | undefined): string {
+export function displayCompanyName(name: string | null | undefined): string {
   if (!name) return "";
   if (!isShouted(name)) return name;
 
@@ -122,30 +122,27 @@ export function caseCompanyName(name: string | null | undefined): string {
     .join("");
 }
 
-// Trailing legal forms. Deliberately excludes words that are part of how a
-// company is known ("Holdings", "Group", "Company", "Trust", "Bancorp").
+// Trailing legal forms a chip can do without. Deliberately excludes words
+// that are part of how a company is known ("Holdings", "Group", "Company").
 const LEGAL_SUFFIX = new Set([
   "inc", "incorporated", "corp", "corporation", "co", "ltd", "limited",
   "plc", "llc", "lp", "nv", "sa", "ag", "se",
 ]);
 
 /**
- * The name every surface prints: the name a reader would say. Cased by
- * `caseCompanyName()`, then shorn of trailing legal forms and EDGAR's state
- * tags — "MICRON TECHNOLOGY INC" → "Micron Technology", "Tesla, Inc." →
- * "Tesla", "JPMorgan Chase & Co." → "JPMorgan Chase", "ACME CORP /DE/" →
- * "Acme". A name that is nothing but a legal form is returned cased, whole.
+ * The name a reader would say: cased by `displayCompanyName()`, then shorn of
+ * trailing legal forms and EDGAR's state tags — "MICRON TECHNOLOGY INC" →
+ * "Micron Technology", "Tesla, Inc." → "Tesla", "ACME CORP /DE/" → "Acme".
+ * For tight spaces (chips); anywhere the full name fits, use the full name.
  */
-export function displayCompanyName(name: string | null | undefined): string {
-  const full = caseCompanyName(name);
-  if (!full) return "";
+export function shortCompanyName(name: string): string {
+  const full = displayCompanyName(name);
   const words = full.replace(/\s*\/[A-Za-z]{2,3}\/?\s*$/, "").split(/\s+/);
   while (words.length > 1) {
     const last = words[words.length - 1].replace(/[.,]/g, "").toLowerCase();
     if (!LEGAL_SUFFIX.has(last)) break;
     words.pop();
   }
-  // "Chase & Co." loses "Co." — and then the dangling "&" and comma.
-  const short = words.join(" ").replace(/[\s,&]+$/, "");
+  const short = words.join(" ").replace(/[\s,]+$/, "");
   return short || full;
 }

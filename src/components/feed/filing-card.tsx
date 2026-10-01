@@ -122,7 +122,7 @@ export function FilingCard({
                 className="group/company flex min-w-0 items-baseline gap-2 text-left"
                 title={`${company_name} financials (opens in a new tab)`}
               >
-                <span className="shrink-0 tabular-nums text-label font-semibold text-ink transition-colors group-hover/company:text-brand-ink">
+                <span className="shrink-0 font-mono text-label font-semibold text-ink transition-colors group-hover/company:text-brand-ink">
                   {ticker}
                 </span>
                 <span className="hidden truncate text-meta text-ink-faint transition-colors group-hover/company:text-brand-ink sm:inline">
@@ -140,7 +140,7 @@ export function FilingCard({
                 className="shrink-0 text-micro whitespace-nowrap text-ink-faint"
                 title="Market cap"
               >
-                <span className="tabular-nums">{cap}</span> cap
+                <span className="font-mono tabular-nums">{cap}</span> cap
               </span>
             )}
             {sector && (

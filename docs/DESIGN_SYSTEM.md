@@ -86,11 +86,8 @@ not size; a 2px jump between two adjacent metadata rows reads as a mistake
 rather than as a level. The ramp opens up from `body-lg` on, where size is
 doing the work.
 
-There is no monospace anywhere in the product — not for numbers, not for
-tickers, not for key caps. Figures line up through `tabular-nums` on the sans
-face, which gives equal-width digits without a second typeface. `--font-mono`
-points at the sans stack so nothing the browser defaults to mono (`kbd`,
-`code`) slips through; never write `font-mono`.
+Numbers use `font-mono` with `tabular-nums` so figures compare vertically.
+Tickers are mono too — they read as identifiers, not prose.
 
 `.eyebrow` is the one way to title a group: 12px, semibold, uppercase,
 tracked, `ink-faint`.
@@ -134,7 +131,7 @@ breakpoint. iOS zooms the viewport when a focused field is smaller than
 | `IconButton` | Icon-only control; quiet until hovered, accent fill only when *on* |
 | `Badge`, `CountBadge`, `ImportantMarker`, `StatusDot`, `MetaLabel` | Every status and count in the product |
 | `Section`, `GroupLabel`, `Card` | Titled groups. A `Card` is for something that is genuinely one unit |
-| `Table` + `THead`/`TH`/`TR`/`TD` | Research tables: hairline rules, sticky header, `numeric` right-aligns and sets tabular figures |
+| `Table` + `THead`/`TH`/`TR`/`TD` | Research tables: hairline rules, sticky header, `numeric` right-aligns and sets tabular mono |
 | `EmptyState`, `Skeleton`, `SkeletonRows` | Zero, loading and error states. `EmptyState` takes an optional `icon` and an `action` — see "Nothing is a dead end" |
 | `Switch`, `Tip`, `Kbd`, `Dialog`, `Sheet`, `DropdownMenu`, `AppToaster` | — |
 | `icons.tsx` | **The** icon set. Import icons from here, never from `lucide-react` directly, and never hand-roll an `<svg>` |
