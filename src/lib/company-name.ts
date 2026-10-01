@@ -121,3 +121,28 @@ export function displayCompanyName(name: string | null | undefined): string {
     .map((t) => (/\s/.test(t) ? t : caseToken(t, t === first || t === last)))
     .join("");
 }
+
+// Trailing legal forms a chip can do without. Deliberately excludes words
+// that are part of how a company is known ("Holdings", "Group", "Company").
+const LEGAL_SUFFIX = new Set([
+  "inc", "incorporated", "corp", "corporation", "co", "ltd", "limited",
+  "plc", "llc", "lp", "nv", "sa", "ag", "se",
+]);
+
+/**
+ * The name a reader would say: cased by `displayCompanyName()`, then shorn of
+ * trailing legal forms and EDGAR's state tags — "MICRON TECHNOLOGY INC" →
+ * "Micron Technology", "Tesla, Inc." → "Tesla", "ACME CORP /DE/" → "Acme".
+ * For tight spaces (chips); anywhere the full name fits, use the full name.
+ */
+export function shortCompanyName(name: string): string {
+  const full = displayCompanyName(name);
+  const words = full.replace(/\s*\/[A-Za-z]{2,3}\/?\s*$/, "").split(/\s+/);
+  while (words.length > 1) {
+    const last = words[words.length - 1].replace(/[.,]/g, "").toLowerCase();
+    if (!LEGAL_SUFFIX.has(last)) break;
+    words.pop();
+  }
+  const short = words.join(" ").replace(/[\s,]+$/, "");
+  return short || full;
+}

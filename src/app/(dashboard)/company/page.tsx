@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { CompanySearch } from "@/components/fundamentals/company-search";
 import { fundamentalsHref, NEW_TAB } from "@/lib/fundamentals/links";
+import { POPULAR_COMPANIES } from "@/lib/fundamentals/popular";
 
 export const metadata: Metadata = {
   title: "Company financials",
@@ -29,7 +30,7 @@ export default function CompanyIndexPage() {
         <CompanySearch autoFocus />
         <p className="mt-6 eyebrow">Try</p>
         <ul className="mt-2 flex flex-wrap gap-1.5">
-          {STARTERS.map((t) => (
+          {POPULAR_COMPANIES.map(({ ticker: t }) => (
             <li key={t}>
               <Link
                 href={fundamentalsHref(t)}

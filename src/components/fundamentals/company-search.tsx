@@ -7,6 +7,7 @@ import { api, ApiError } from "@/lib/api-client";
 import { displayCompanyName } from "@/lib/company-name";
 import { formatCompactDollars } from "@/lib/fundamentals/format";
 import { companyLinkProps } from "@/lib/fundamentals/links";
+import { recordSearch } from "@/lib/search-history";
 import type { CompanySearchResponse, CompanySearchResult } from "@/types/api";
 import { SearchInput } from "@/components/ui/search-input";
 import { Kbd } from "@/components/ui/kbd";
@@ -16,7 +17,16 @@ import { cn } from "@/lib/utils";
  * The search box that is the fundamentals section's home: type a ticker or
  * a name, arrow to a result, Enter to open. Public — works signed out.
  */
-export function CompanySearch({ autoFocus = false }: { autoFocus?: boolean }) {
+export function CompanySearch({
+  autoFocus = false,
+  size = "md",
+  placeholder = "Search a company or ticker…",
+}: {
+  autoFocus?: boolean;
+  /** "lg" is the hero field on an otherwise empty pane. */
+  size?: "md" | "lg";
+  placeholder?: string;
+}) {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<CompanySearchResult[]>([]);
@@ -63,6 +73,7 @@ export function CompanySearch({ autoFocus = false }: { autoFocus?: boolean }) {
       setSelected((s) => Math.max(s - 1, 0));
     } else if (e.key === "Enter" && results[selected]) {
       e.preventDefault();
+      recordSearch(results[selected]);
       const { href, target } = companyLinkProps(results[selected]);
       // Financials always open in a new tab; only the watchlist fallback
       // navigates this one.
@@ -78,8 +89,9 @@ export function CompanySearch({ autoFocus = false }: { autoFocus?: boolean }) {
         value={query}
         onValueChange={setQuery}
         onKeyDown={onKeyDown}
-        placeholder="Search a company or ticker…"
+        placeholder={placeholder}
         aria-label="Search companies"
+        className={size === "lg" ? "h-12 px-4 [&_input]:text-body" : undefined}
         autoComplete="off"
       />
       {state === "offline" && (
@@ -103,6 +115,7 @@ export function CompanySearch({ autoFocus = false }: { autoFocus?: boolean }) {
               <Link
                 {...companyLinkProps(r)}
                 onMouseEnter={() => setSelected(i)}
+                onClick={() => recordSearch(r)}
                 className={cn(
                   "flex items-center gap-3 px-3 py-2.5 transition-colors",
                   i === selected ? "bg-brand-soft" : "hover:bg-surface-hover"

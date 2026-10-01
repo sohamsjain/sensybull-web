@@ -10,10 +10,10 @@ import { usePaneWidth } from "@/hooks/use-pane-width";
 import { WatchlistPanel } from "@/components/watchlist/watchlist-panel";
 import { Conversation } from "@/components/watchlist/conversation";
 import { FirstRun } from "@/components/watchlist/first-run";
+import { SearchHome } from "@/components/watchlist/search-home";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ExpandPaneIcon } from "@/components/ui/icons";
-import { Kbd } from "@/components/ui/kbd";
 
 export default function WatchlistPage() {
   const { user, loading: authLoading } = useAuth();
@@ -234,29 +234,8 @@ export default function WatchlistPage() {
              can't be followed, so this pane becomes the way to get one. */
           <FirstRun onAddCompany={addCompany} />
         ) : (
-          <div className="flex flex-1 items-center justify-center bg-canvas-sunken">
-            <div className="max-w-sm px-6 text-center">
-              <p className="text-title font-semibold text-ink">
-                Pick a company
-              </p>
-              <p className="mt-2 text-label leading-relaxed text-ink-muted">
-                Its filing history opens here in plain English. Every briefing
-                links back to the original document on SEC EDGAR, and the
-                chart view shows how the stock moved around each filing.
-              </p>
-              <p className="mt-6 flex flex-wrap items-center justify-center gap-x-2 gap-y-1.5 text-micro text-ink-faint">
-                <Kbd>↑</Kbd>
-                <Kbd>↓</Kbd>
-                <span>switch companies</span>
-                <span className="text-ink-dim">·</span>
-                <Kbd>/</Kbd>
-                <span>search</span>
-                <span className="text-ink-dim">·</span>
-                <Kbd>?</Kbd>
-                <span>all shortcuts</span>
-              </p>
-            </div>
-          </div>
+          /* No company open: a search front page, not an instruction. */
+          <SearchHome />
         )}
       </div>
     </div>

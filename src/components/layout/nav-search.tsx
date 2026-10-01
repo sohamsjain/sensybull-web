@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { api } from "@/lib/api-client";
 import { displayCompanyName } from "@/lib/company-name";
 import { companyLinkProps } from "@/lib/fundamentals/links";
+import { recordSearch } from "@/lib/search-history";
 import type { CompanySearchResponse, CompanySearchResult } from "@/types/api";
 import { Kbd } from "@/components/ui/kbd";
 import { SearchIcon } from "@/components/ui/icons";
@@ -59,6 +60,7 @@ export function NavSearch({ className }: { className?: string }) {
   };
 
   const open = (result: CompanySearchResult) => {
+    recordSearch(result);
     const { href, target } = companyLinkProps(result);
     if (target) {
       window.open(href, "_blank", "noopener,noreferrer");
