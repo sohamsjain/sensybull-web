@@ -9,6 +9,15 @@ import "./globals.css";
 // metadataBase (and every canonical and OG URL built from it) must not use www.
 const siteUrl = SITE_URL;
 
+/** The API's origin, for the preconnect hint. Null if the URL is unusable. */
+const apiOrigin = (() => {
+  try {
+    return new URL(process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1").origin;
+  } catch {
+    return null;
+  }
+})();
+
 export const metadata: Metadata = {
   title: {
     default: "Sensybull — Know when your investment thesis changes",
@@ -85,6 +94,13 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
+        {/* Open the TLS connection to the API before the first search
+            keystroke needs it. "anonymous" because company search is sent
+            without credentials, and browsers pool those connections apart
+            from credentialed ones. */}
+        {apiOrigin && (
+          <link rel="preconnect" href={apiOrigin} crossOrigin="anonymous" />
+        )}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

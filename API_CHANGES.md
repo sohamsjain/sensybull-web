@@ -1,5 +1,15 @@
 # API Changes
 
+## 2026-10-01 (company search caching)
+
+`GET /companies/search` answers are now cached: Redis for 5 minutes across
+readers, and `Cache-Control: public, max-age=300` so the browser reuses them
+too. The universe only changes in the daily `sync-companies`, so a search can
+lag a new listing by at most five minutes. The route also loads every row's
+fundamentals in one query instead of one per row. Response shape unchanged.
+The web calls it with `publicApi()` (no auth header, no credentials) so the
+request is CORS-simple and skips the preflight.
+
 ## 2026-09-24 (feed filters, facets, saved views)
 
 The feed's filters now run **in the API**. Until now the web filtered the

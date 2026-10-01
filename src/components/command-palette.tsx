@@ -5,11 +5,10 @@ import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 
 import { useAuth } from "@/hooks/use-auth";
-import { api } from "@/lib/api-client";
 import { displayCompanyName } from "@/lib/company-name";
 import { companyLinkProps } from "@/lib/fundamentals/links";
 import { recordSearch } from "@/lib/search-history";
-import type { CompanySearchResult, CompanySearchResponse } from "@/types/api";
+import { useCompanySearch } from "@/hooks/use-company-search";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { EnterIcon, SearchIcon } from "@/components/ui/icons";
 import { Kbd } from "@/components/ui/kbd";
@@ -40,8 +39,11 @@ export function CommandPalette() {
   const { resolvedTheme, setTheme } = useTheme();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<CompanySearchResult[]>([]);
   const [selected, setSelected] = useState(0);
+  // Company typeahead (public — the endpoint works signed out). Shares the
+  // app-wide search cache, so a company found in the navbar is instant here.
+  const { results: found } = useCompanySearch(open ? query : "");
+  const results = useMemo(() => found.slice(0, 6), [found]);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Global shortcut
@@ -70,7 +72,6 @@ export function CommandPalette() {
     setPrevOpen(open);
     if (open) {
       setQuery("");
-      setResults([]);
       setSelected(0);
     }
   }
@@ -81,25 +82,6 @@ export function CommandPalette() {
     const timer = setTimeout(() => inputRef.current?.focus(), 30);
     return () => clearTimeout(timer);
   }, [open]);
-
-  // Company typeahead (public — the endpoint works signed out)
-  useEffect(() => {
-    if (!open) return;
-    const q = query.trim();
-    const timer = setTimeout(async () => {
-      if (!q) {
-        setResults([]);
-        return;
-      }
-      try {
-        const data = await api<CompanySearchResponse>(
-          `/companies/search?q=${encodeURIComponent(q)}&limit=6`
-        );
-        setResults(data.results || []);
-      } catch {}
-    }, 200);
-    return () => clearTimeout(timer);
-  }, [query, open]);
 
   const close = useCallback(() => setOpen(false), []);
 

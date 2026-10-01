@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 const LOGO_DEV_TOKEN = process.env.NEXT_PUBLIC_LOGO_DEV_TOKEN;
 
 const SIZES = {
+  xs: "size-7 text-micro",
   sm: "size-9 text-micro",
   md: "size-10 text-micro",
 } as const;
