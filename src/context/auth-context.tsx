@@ -18,6 +18,7 @@ import {
   logout as apiLogout,
 } from "@/lib/api-client";
 import type { User, AuthResponse } from "@/types/api";
+import { clearSearchHistory } from "@/lib/search-history";
 
 interface AuthContextValue {
   user: User | null;
@@ -145,6 +146,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     // Revoke the refresh token server-side (best-effort) and clear local state.
     void apiLogout();
+    clearSearchHistory();
     setUser(null);
   };
 

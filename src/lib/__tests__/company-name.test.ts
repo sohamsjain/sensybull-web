@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { displayCompanyName } from "@/lib/company-name";
+import { displayCompanyName, shortCompanyName } from "@/lib/company-name";
 
 describe("displayCompanyName", () => {
   it("title-cases shouted EDGAR names", () => {
@@ -89,5 +89,19 @@ describe("displayCompanyName", () => {
     expect(displayCompanyName("MCKESSON CORP")).toBe("McKesson Corp");
     expect(displayCompanyName("COCA-COLA CO")).toBe("Coca-Cola Co");
     expect(displayCompanyName("SAM'S CLUB")).toBe("Sam's Club");
+  });
+});
+
+describe("shortCompanyName", () => {
+  it.each([
+    ["MICRON TECHNOLOGY INC", "Micron Technology"],
+    ["Tesla, Inc.", "Tesla"],
+    ["Braemar Hotels & Resorts Inc.", "Braemar Hotels & Resorts"],
+    ["ACME CORP /DE/", "Acme"],
+    ["Booking Holdings Inc.", "Booking Holdings"],
+    ["Linde plc", "Linde"],
+    ["Inc", "Inc"],
+  ])("%s → %s", (input, expected) => {
+    expect(shortCompanyName(input)).toBe(expected);
   });
 });
