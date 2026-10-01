@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { api } from "@/lib/api-client";
 import { displayCompanyName } from "@/lib/company-name";
 import { companyLinkProps } from "@/lib/fundamentals/links";
 import { recordSearch } from "@/lib/search-history";
-import type { CompanySearchResponse, CompanySearchResult } from "@/types/api";
+import { useCompanySearch } from "@/hooks/use-company-search";
+import type { CompanySearchResult } from "@/types/api";
 import { Kbd } from "@/components/ui/kbd";
 import { SearchIcon } from "@/components/ui/icons";
 import { cn } from "@/lib/utils";
@@ -20,43 +20,16 @@ import { cn } from "@/lib/utils";
 export function NavSearch({ className }: { className?: string }) {
   const router = useRouter();
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<CompanySearchResult[]>([]);
-  const [selected, setSelected] = useState(0);
+  const [cursor, setCursor] = useState({ key: "", index: 0 });
   const [focused, setFocused] = useState(false);
-  const [searching, setSearching] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const q = query.trim();
-    // Drop an answer that lands after the query moved on, so an older
-    // request can never overwrite a newer one.
-    let stale = false;
-    const timer = setTimeout(async () => {
-      if (!q) {
-        setResults([]);
-        setSearching(false);
-        return;
-      }
-      setSearching(true);
-      try {
-        const data = await api<CompanySearchResponse>(
-          `/companies/search?q=${encodeURIComponent(q)}&limit=8`
-        );
-        if (stale) return;
-        setResults(data.results || []);
-        setSelected(0);
-      } catch {
-        if (stale) return;
-        setResults([]);
-      }
-      setSearching(false);
-    }, q ? 150 : 0);
-    return () => {
-      stale = true;
-      clearTimeout(timer);
-    };
-  }, [query]);
+  const { results, status } = useCompanySearch(query);
+  const q = query.trim();
+  // The cursor belongs to the query it was moved under; typing on resets it.
+  const selected =
+    cursor.key === q ? Math.min(cursor.index, Math.max(results.length - 1, 0)) : 0;
+  const setSelected = (index: number) => setCursor({ key: q, index });
 
   // Focus leaving the whole control closes the list. Result rows swallow
   // mousedown so a click never blurs the input first (Safari doesn't focus
@@ -76,17 +49,16 @@ export function NavSearch({ className }: { className?: string }) {
       router.push(href);
     }
     setQuery("");
-    setResults([]);
     inputRef.current?.blur();
   };
 
   const onKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      setSelected((s) => Math.min(s + 1, results.length - 1));
+      setSelected(Math.min(selected + 1, results.length - 1));
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
-      setSelected((s) => Math.max(s - 1, 0));
+      setSelected(Math.max(selected - 1, 0));
     } else if (e.key === "Enter" && results[selected]) {
       e.preventDefault();
       open(results[selected]);
@@ -99,8 +71,10 @@ export function NavSearch({ className }: { className?: string }) {
     }
   };
 
-  const q = query.trim();
-  const showList = focused && q.length > 0;
+  // Nothing in flight is announced: the list opens once it has rows or a
+  // definite answer, so a fast typist never sees "Searching…" blink.
+  const showList =
+    focused && q.length > 0 && (results.length > 0 || status !== "loading");
 
   return (
     <div
@@ -144,7 +118,9 @@ export function NavSearch({ className }: { className?: string }) {
         >
           {results.length === 0 ? (
             <p className="px-3 py-2.5 text-meta text-ink-faint">
-              {searching ? "Searching…" : `No company matches “${q}”.`}
+              {status === "offline"
+                ? "Couldn’t reach Sensybull."
+                : `No company matches “${q}”.`}
             </p>
           ) : (
             results.map((r, i) => (

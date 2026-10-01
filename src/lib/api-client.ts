@@ -307,6 +307,10 @@ export async function api<T>(
     throw new ApiError("Couldn't reach the server", 0);
   }
 
+  return readJson<T>(res);
+}
+
+async function readJson<T>(res: Response): Promise<T> {
   // An error body isn't always JSON — a gateway timeout or a proxy error
   // page is HTML, and parsing it would mask the real status behind a
   // "Unexpected token '<'" that tells the reader nothing.
@@ -327,6 +331,23 @@ export async function api<T>(
     throw new ApiError(message, res.status);
   }
   return data as T;
+}
+
+/**
+ * GET a public route as a CORS "simple" request: no custom headers, no
+ * credentials. That spares the browser a preflight OPTIONS round trip —
+ * which it would otherwise make for every new URL, i.e. every new search
+ * query — so it halves the latency of a typeahead keystroke. Only for routes
+ * that answer the same to everyone.
+ */
+export async function publicApi<T>(path: string): Promise<T> {
+  let res: Response;
+  try {
+    res = await fetch(`${API_URL}${path}`, { credentials: "omit" });
+  } catch {
+    throw new ApiError("Couldn't reach the server", 0);
+  }
+  return readJson<T>(res);
 }
 
 /** Raw fetch with auto-refresh — returns the Response object */
