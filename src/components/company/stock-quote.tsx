@@ -45,7 +45,7 @@ export function StockQuote({
   return (
     <div
       className={cn(
-        "flex shrink-0 items-baseline gap-1.5 font-mono tabular-nums",
+        "flex shrink-0 items-baseline gap-1.5 tabular-nums",
         size === "sm" ? "text-micro" : "text-meta",
         className
       )}
