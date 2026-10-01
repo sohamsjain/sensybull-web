@@ -62,7 +62,7 @@ function CopyRow({ label, value }: { label: string; value: string }) {
           window.getSelection()?.removeAllRanges();
           window.getSelection()?.addRange(range);
         }}
-        className="block w-full cursor-text rounded-md border border-line-subtle bg-canvas-sunken px-2.5 py-2 font-mono text-meta leading-relaxed break-all text-ink-muted"
+        className="block w-full cursor-text rounded-md border border-line-subtle bg-canvas-sunken px-2.5 py-2 tabular-nums text-meta leading-relaxed break-all text-ink-muted"
       >
         {value}
       </code>

@@ -207,7 +207,7 @@ export function FirstRun({
                   className="flex w-full items-center justify-between gap-3 border-b border-line-subtle px-3 py-2.5 text-left transition-colors last:border-b-0 hover:bg-surface-hover disabled:opacity-50"
                 >
                   <span className="flex min-w-0 items-baseline gap-2">
-                    <span className="shrink-0 font-mono text-label font-semibold text-ink">
+                    <span className="shrink-0 tabular-nums text-label font-semibold text-ink">
                       {company.ticker}
                     </span>
                     <span className="truncate text-meta text-ink-faint">
@@ -238,7 +238,7 @@ export function FirstRun({
                   onClick={() => addByTicker(ticker)}
                   disabled={addingId != null}
                   className={cn(
-                    "font-mono",
+                    "tabular-nums",
                     addingId === ticker && "opacity-60"
                   )}
                 >

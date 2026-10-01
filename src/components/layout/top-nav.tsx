@@ -39,17 +39,9 @@ export function TopNav() {
         <Link
           href={user ? "/watchlist" : "/feed"}
           aria-label="Sensybull home"
-          className="mr-2 flex h-8 shrink-0 items-center gap-2 rounded-md px-1"
+          className="mr-2 flex h-8 shrink-0 items-center rounded-md px-1 text-label font-semibold tracking-tight text-ink"
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/logo.png"
-            alt=""
-            className="h-5 opacity-80 invert-0 dark:invert"
-          />
-          <span className="hidden text-label font-semibold tracking-tight text-ink sm:inline">
-            Sensybull
-          </span>
+          Sensybull
         </Link>
 
         <nav aria-label="Primary" className="flex items-center gap-0.5">
