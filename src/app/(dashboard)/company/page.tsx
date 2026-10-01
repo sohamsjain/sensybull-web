@@ -35,7 +35,7 @@ export default function CompanyIndexPage() {
               <Link
                 href={fundamentalsHref(t)}
                 {...NEW_TAB}
-                className="inline-flex h-8 items-center rounded-sm bg-surface-hover px-2.5 tabular-nums text-meta font-medium text-ink-muted transition-colors hover:bg-surface-active hover:text-ink"
+                className="inline-flex h-8 items-center rounded-sm bg-surface-hover px-2.5 font-mono text-meta font-medium text-ink-muted transition-colors hover:bg-surface-active hover:text-ink"
               >
                 {t}
               </Link>

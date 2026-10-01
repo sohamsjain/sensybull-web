@@ -61,7 +61,7 @@ export function DocumentsSection({
               <li key={u.id} className="py-2">
                 <Link href={`/e/${u.id}`} className="group/update block">
                   <p className="flex items-center gap-2 text-micro text-ink-faint">
-                    <span className="tabular-nums">
+                    <span className="font-mono tabular-nums">
                       {formatFilingDate(u.filing_date)}
                     </span>
                     <span>{u.signal_type === "PR" ? "Press release" : u.signal_type}</span>
@@ -109,7 +109,7 @@ function FilingList({
                 target="_blank"
                 rel="noopener noreferrer"
                 title={`${d.form} filed ${formatFilingDate(d.filed)}`}
-                className="inline-flex h-7 items-center gap-1 rounded-sm bg-surface-hover px-2 text-micro tabular-nums text-ink-muted transition-colors hover:bg-surface-active hover:text-ink"
+                className="inline-flex h-7 items-center gap-1 rounded-sm bg-surface-hover px-2 font-mono text-micro tabular-nums text-ink-muted transition-colors hover:bg-surface-active hover:text-ink"
               >
                 {periodLabel(d)}
                 <ExternalLinkIcon className="size-3 text-ink-faint" />

@@ -15,7 +15,7 @@ export function CatalystsTable({ catalysts }: { catalysts: Catalyst[] }) {
         <tbody>
           {catalysts.map((cat, i) => (
             <tr key={i} className="align-baseline">
-              <td className="w-24 py-0.5 pr-3 text-micro tabular-nums whitespace-nowrap text-ink">
+              <td className="w-24 py-0.5 pr-3 font-mono text-micro tabular-nums whitespace-nowrap text-ink">
                 {formatCatalystDate(cat.date)}
               </td>
               <td className="py-0.5 text-label leading-snug text-ink-muted">

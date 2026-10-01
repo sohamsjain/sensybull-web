@@ -315,7 +315,7 @@ function Portfolio() {
               <dd>
                 <span
                   className={cn(
-                    "block text-display font-semibold tabular-nums",
+                    "block font-mono text-display font-semibold tabular-nums",
                     tone
                   )}
                 >
