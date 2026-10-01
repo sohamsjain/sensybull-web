@@ -29,6 +29,9 @@ export function NavSearch({ className }: { className?: string }) {
 
   useEffect(() => {
     const q = query.trim();
+    // Drop an answer that lands after the query moved on, so an older
+    // request can never overwrite a newer one.
+    let stale = false;
     const timer = setTimeout(async () => {
       if (!q) {
         setResults([]);
@@ -40,14 +43,19 @@ export function NavSearch({ className }: { className?: string }) {
         const data = await api<CompanySearchResponse>(
           `/companies/search?q=${encodeURIComponent(q)}&limit=8`
         );
+        if (stale) return;
         setResults(data.results || []);
         setSelected(0);
       } catch {
+        if (stale) return;
         setResults([]);
       }
       setSearching(false);
     }, q ? 150 : 0);
-    return () => clearTimeout(timer);
+    return () => {
+      stale = true;
+      clearTimeout(timer);
+    };
   }, [query]);
 
   // Focus leaving the whole control closes the list. Result rows swallow

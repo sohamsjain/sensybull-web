@@ -25,24 +25,29 @@ export function SearchHome() {
   const recent = history.length > 0;
 
   return (
-    <div className="flex flex-1 justify-center overflow-y-auto bg-canvas-sunken">
-      <div className="w-full max-w-xl px-4 pt-[18vh] pb-16 sm:px-6">
-        <div className="flex items-center justify-center gap-3">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="" className="h-9 invert-0 dark:invert" />
-          <span className="text-heading font-semibold tracking-tight text-ink">
-            Sensybull
-          </span>
-        </div>
-        <p className="mt-3 mb-8 text-center text-body text-ink-muted">
-          Every SEC filing, in plain English — and the financials behind it.
+    // Three rows, the outer two equal: the search field sits at the exact
+    // centre of the pane, the brand stacks up from it and the chips hang
+    // down from it, however many chips there are.
+    <div className="grid flex-1 grid-rows-[1fr_auto_1fr] overflow-y-auto bg-canvas-sunken px-4 sm:px-6">
+      <div className="flex flex-col items-center justify-end pt-10 pb-8 text-center">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/logo.png" alt="" className="h-12 invert-0 dark:invert" />
+        <h1 className="mt-3 text-heading font-semibold tracking-tight text-ink">
+          Sensybull
+        </h1>
+        <p className="mt-2 text-body text-ink-muted">
+          Never miss a material update on your portfolio.
         </p>
+      </div>
 
+      <div className="mx-auto w-full max-w-xl">
         <CompanySearch size="lg" placeholder="Search for a company" />
+      </div>
 
+      <div className="mx-auto w-full max-w-xl pb-10">
         <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
           <span className="mr-1 text-meta text-ink-muted">
-            {recent ? "Recently searched:" : "Or analyse:"}
+            {recent ? "Recently searched:" : "Popular:"}
           </span>
           {recent
             ? history.map((h) => (
@@ -72,7 +77,7 @@ export function SearchHome() {
           )}
         </div>
 
-        <p className="mt-12 hidden flex-wrap items-center justify-center gap-x-2 gap-y-1.5 text-micro text-ink-faint md:flex">
+        <p className="mt-10 hidden flex-wrap items-center justify-center gap-x-2 gap-y-1.5 text-micro text-ink-faint md:flex">
           <Kbd>↑</Kbd>
           <Kbd>↓</Kbd>
           <span>switch companies</span>
