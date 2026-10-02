@@ -50,7 +50,7 @@ export function EventPermalink({
           />
         ) : (
           <div className="rounded-md border border-line-subtle bg-surface">
-            <FilingCard event={event} expanded />
+            <FilingCard event={event} expanded headingAs="h1" />
           </div>
         )}
         <p className="mt-6 text-center">

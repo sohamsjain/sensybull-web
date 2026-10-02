@@ -11,7 +11,9 @@ export default function AuthLayout({
         <Link href="/" className="mb-6 flex justify-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/logo.png"
+            src="/logo.webp"
+            width={256}
+            height={256}
             alt="Sensybull"
             className="size-14 opacity-80 dark:invert"
           />

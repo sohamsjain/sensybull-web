@@ -31,7 +31,7 @@ export function SearchHome() {
     <div className="grid flex-1 grid-rows-[1fr_auto_1fr] overflow-y-auto bg-canvas-sunken px-4 sm:px-6">
       <div className="flex flex-col items-center justify-end pt-10 pb-8 text-center">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/logo.png" alt="" className="h-24 invert-0 dark:invert" />
+        <img src="/logo.webp" width={256} height={256} alt="" className="h-24 invert-0 dark:invert" />
         {/* Display type outside marketing, deliberately: this pane is the
             product's front page, and the brand is the whole of its content. */}
         <h1 className="mt-4 text-display-lg font-semibold text-ink">

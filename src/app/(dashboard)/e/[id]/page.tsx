@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { EventPermalink } from "@/components/feed/event-permalink";
 import { displayCompanyName } from "@/lib/company-name";
 import { hasEvidence } from "@/lib/evidence";
@@ -78,7 +79,34 @@ function jsonLd(event: FilingEvent) {
       name,
       ...(event.ticker ? { tickerSymbol: event.ticker } : {}),
     },
+    // The briefing is written by Sensybull's pipeline, not a named person,
+    // so the author is the organization. Inventing a byline would misstate
+    // who wrote it.
+    author: { "@type": "Organization", name: "Sensybull", url: SITE_URL },
     publisher: { "@type": "Organization", name: "Sensybull", url: SITE_URL },
+  };
+}
+
+/**
+ * Home › Live feed › this update, for search result breadcrumbs. Not the
+ * company page as the middle step: an OTC filer has updates but no company
+ * page, and a breadcrumb must never point at a 404.
+ */
+function breadcrumbLd(event: FilingEvent) {
+  const trail = [
+    { name: "Sensybull", url: SITE_URL },
+    { name: "Live feed", url: `${SITE_URL}/feed` },
+    { name: titleFor(event), url: `${SITE_URL}/e/${event.id}` },
+  ];
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: trail.map((t, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: t.name,
+      item: t.url,
+    })),
   };
 }
 
@@ -90,6 +118,9 @@ function jsonLd(event: FilingEvent) {
 export default async function EventPermalinkPage({ params }: EventPageProps) {
   const { id } = await params;
   const result = await getPublicEvent(id);
+  // A real 404 for a deleted or mistyped id: a 200 "no longer exists" page
+  // is a soft 404 to a crawler, and link checkers can't see it at all.
+  if (result.kind === "missing") notFound();
   const event = result.kind === "ready" ? result.event : null;
   return (
     <>
@@ -98,7 +129,10 @@ export default async function EventPermalinkPage({ params }: EventPageProps) {
           type="application/ld+json"
           // `<` is escaped so a headline can never close the script tag
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(jsonLd(event)).replace(/</g, "\\u003c"),
+            __html: JSON.stringify([jsonLd(event), breadcrumbLd(event)]).replace(
+              /</g,
+              "\\u003c"
+            ),
           }}
         />
       )}

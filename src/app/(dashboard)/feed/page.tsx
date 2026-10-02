@@ -104,6 +104,9 @@ export default function FeedPage() {
 
   return (
     <div className="h-full flex flex-col min-w-0">
+      {/* The page's title for screen readers and crawlers; the toolbar is
+          the visible header and has no room for one. */}
+      <h1 className="sr-only">Live SEC filing feed</h1>
       <FeedToolbar
         connected={connected}
         total={loading ? null : total}

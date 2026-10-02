@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
@@ -15,7 +15,18 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ExpandPaneIcon } from "@/components/ui/icons";
 
+// useSearchParams needs a Suspense boundary on a statically rendered page.
+// The watchlist is signed-in only, so rendering nothing on the server costs
+// no crawler anything.
 export default function WatchlistPage() {
+  return (
+    <Suspense fallback={null}>
+      <WatchlistPageInner />
+    </Suspense>
+  );
+}
+
+function WatchlistPageInner() {
   const { user, loading: authLoading } = useAuth();
   const [activeCompanyId, setActiveCompanyId] = useState<string | null>(null);
   // Deep link: /watchlist?c=<companyId> opens that company once entries load.

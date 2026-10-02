@@ -110,11 +110,24 @@ export default async function CompanyPage({ params }: CompanyPageProps) {
     ...(company.industry ? { industry: company.industry } : {}),
   };
 
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { name: "Sensybull", item: SITE_URL },
+      { name: "Companies", item: `${SITE_URL}/company` },
+      { name, item: `${SITE_URL}/company/${symbol}` },
+    ].map((crumb, i) => ({ "@type": "ListItem", position: i + 1, ...crumb })),
+  };
+
   return (
     <div className="h-full overflow-y-auto">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        // `<` is escaped so a company name can never close the script tag
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([jsonLd, breadcrumbLd]).replace(/</g, "\\u003c"),
+        }}
       />
       <div className="mx-auto max-w-[88rem] px-4 pb-16">
         {ready && <SectionNav companyName={name} />}

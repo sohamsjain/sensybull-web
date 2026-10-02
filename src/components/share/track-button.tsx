@@ -101,7 +101,7 @@ export function TrackButton({
     >
       {showLogo ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src="/logo.png" alt="" className="size-4 dark:invert" aria-hidden />
+        <img src="/logo.webp" width={256} height={256} alt="" className="size-4 dark:invert" aria-hidden />
       ) : (
         <span aria-hidden>+</span>
       )}

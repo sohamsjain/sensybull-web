@@ -43,7 +43,9 @@ export function TopNav() {
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/logo.png"
+            src="/logo.webp"
+            width={256}
+            height={256}
             alt=""
             className="h-5 opacity-80 invert-0 dark:invert"
           />

@@ -69,6 +69,11 @@ export const metadata: Metadata = {
       "Sensybull watches the companies you own and tells you when something happens that could change why you own them. Free while in beta.",
     images: ["/logo-tile.png"],
   },
+  // Google Search Console's HTML-tag ownership check, when the site is
+  // verified that way rather than by DNS record. Read at build time.
+  ...(process.env.GOOGLE_SITE_VERIFICATION
+    ? { verification: { google: process.env.GOOGLE_SITE_VERIFICATION } }
+    : {}),
   robots: {
     index: true,
     follow: true,

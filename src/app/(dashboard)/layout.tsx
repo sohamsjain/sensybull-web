@@ -4,11 +4,11 @@ import {
   useState,
   useEffect,
   useCallback,
+  useLayoutEffect,
   createContext,
   useContext,
-  Suspense,
 } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { TopNav } from "@/components/layout/top-nav";
 import { CommandPalette } from "@/components/command-palette";
 import { ShortcutsSheet } from "@/components/shortcuts-sheet";
@@ -64,20 +64,30 @@ export const useDashboard = () => useContext(DashboardContext);
 function DashboardInner({ children }: { children: React.ReactNode }) {
   const { user, loading: authLoading } = useAuth();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
 
-  // Scope initializes from the URL when a shared link names one; otherwise it
-  // stays undecided until auth resolves, so a signed-in reader lands on their
-  // own companies without the public firehose flashing up first.
-  const [scope, setScope] = useState<FeedScope | null>(() => {
-    const s = searchParams.get("s");
-    return s === "mine" || s === "all" ? s : null;
-  });
-
-  // Filters initialize from the URL so filtered views are shareable
+  // Scope stays undecided until auth resolves, so a signed-in reader lands on
+  // their own companies without the public firehose flashing up first.
+  const [scope, setScope] = useState<FeedScope | null>(null);
   const [filters, setFilters] = useState<FeedFilters>(() =>
-    filtersFromParams(searchParams)
+    filtersFromParams(new URLSearchParams())
   );
+
+  // Scope and filters initialize from the URL so filtered views are
+  // shareable. Read from `location` once on mount rather than through
+  // useSearchParams: that hook opts every statically rendered page under
+  // this layout out of server rendering (the server sent /feed and /company
+  // with an empty <body>). A layout effect runs before the browser paints
+  // and before AuthProvider's effects (children's effects run first), so
+  // the URL's values are in place before auth settles and anything fetches.
+  /* eslint-disable react-hooks/set-state-in-effect -- syncing from the
+     URL, an external system the server render can't see */
+  useLayoutEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const s = params.get("s");
+    if (s === "mine" || s === "all") setScope(s);
+    setFilters(filtersFromParams(params));
+  }, []);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   // Settle the scope once we know who's reading: their last choice if they
   // made one, otherwise their own companies. Done during render rather than
@@ -136,10 +146,8 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // useSearchParams requires a Suspense boundary on statically rendered pages
-  return (
-    <Suspense fallback={null}>
-      <DashboardInner>{children}</DashboardInner>
-    </Suspense>
-  );
+  // No Suspense boundary with an empty fallback here: one around the whole
+  // shell is what a page's useSearchParams bails out to, and the server then
+  // renders nothing for it. A page that reads search params wraps itself.
+  return <DashboardInner>{children}</DashboardInner>;
 }

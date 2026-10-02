@@ -42,6 +42,11 @@ interface FilingCardProps {
    * to everything like it. Absent on permalinks, where there's no feed.
    */
   onFilterBy?: (by: { eventType?: string; sector?: string }) => void;
+  /**
+   * The headline's element. A feed row's is an h3 under the page's h1; on a
+   * permalink the update is the page, so its headline is the h1.
+   */
+  headingAs?: "h1" | "h3";
 }
 
 /**
@@ -62,6 +67,7 @@ export function FilingCard({
   onToggleExpanded,
   selected = false,
   onFilterBy,
+  headingAs: Heading = "h3",
 }: FilingCardProps) {
   const { ticker, company_id, briefing, filing_date, received_at } = event;
   const company_name = displayCompanyName(event.company_name);
@@ -209,11 +215,11 @@ export function FilingCard({
         )}
 
         {/* Headline */}
-        <h3 className="mt-1.5 text-body-lg font-medium text-ink">
+        <Heading className="mt-1.5 text-body-lg font-medium text-ink">
           {briefing
             ? briefing.headline
             : `${company_name} ${filedPhrase(event.signal_type)}.`}
-        </h3>
+        </Heading>
 
         {/* Details, only when opened */}
         {expanded && (
