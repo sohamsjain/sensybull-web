@@ -131,7 +131,7 @@ export default async function CompanyPage({ params }: CompanyPageProps) {
               <div className="min-w-0">
                 <h1 className="text-heading leading-tight font-semibold text-ink">{name}</h1>
                 <p className="mt-0.5 flex flex-wrap items-center gap-x-2 text-meta text-ink-faint">
-                  <span className="font-mono font-semibold text-ink-muted">{symbol}</span>
+                  <span className="tabular-nums font-semibold text-ink-muted">{symbol}</span>
                   {company.exchange && <span>{company.exchange}</span>}
                   {company.industry && <span>· {company.industry}</span>}
                   {company.is_adr && <span>· ADR</span>}

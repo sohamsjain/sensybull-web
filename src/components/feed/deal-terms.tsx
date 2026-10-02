@@ -18,7 +18,7 @@ export function DealTerms({ terms }: { terms: Record<string, string> }) {
             <dt className="truncate text-micro text-ink-faint">{label}</dt>
             <dd
               className={`text-label leading-snug tabular-nums text-ink ${
-                isFinancialValue(value) ? "font-mono font-semibold" : "font-medium"
+                isFinancialValue(value) ? "tabular-nums font-semibold" : "font-medium"
               }`}
             >
               {value}

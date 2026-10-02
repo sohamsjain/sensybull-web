@@ -11,8 +11,23 @@ import { useCompanySearch } from "@/hooks/use-company-search";
 import type { CompanySearchResult } from "@/types/api";
 import { SearchInput } from "@/components/ui/search-input";
 import { Kbd } from "@/components/ui/kbd";
-import { CompanyAvatar } from "@/components/watchlist/company-avatar";
 import { cn } from "@/lib/utils";
+
+/** Space kept between the list's bottom edge and the viewport's. */
+const VIEWPORT_GAP = 16;
+/** Never shrink the list below this, even at the very bottom of the screen. */
+const MIN_LIST_HEIGHT = 160;
+
+/**
+ * Cap the open list at the room left below it, so a long list scrolls inside
+ * itself instead of stretching (and scrolling) the page or pane around it.
+ * A ref callback: it measures once, as the list mounts.
+ */
+function fitToViewport(el: HTMLDivElement | null) {
+  if (!el) return;
+  const room = window.innerHeight - el.getBoundingClientRect().top - VIEWPORT_GAP;
+  el.style.maxHeight = `${Math.max(room, MIN_LIST_HEIGHT)}px`;
+}
 
 /**
  * The search box that is the fundamentals section's home: type a ticker or
@@ -54,6 +69,14 @@ export function CompanySearch({
     cursor.key === q ? Math.min(cursor.index, Math.max(results.length - 1, 0)) : 0;
   const select = (index: number) => setCursor({ key: q, index });
 
+  // Arrowing past the list's visible edge scrolls the list, not the page.
+  const moveTo = (index: number) => {
+    select(index);
+    document
+      .getElementById(`company-search-option-${index}`)
+      ?.scrollIntoView({ block: "nearest" });
+  };
+
   const openResult = (result: CompanySearchResult) => {
     recordSearch(result);
     const { href, target } = companyLinkProps(result);
@@ -66,10 +89,10 @@ export function CompanySearch({
   const onKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      select(Math.min(selected + 1, results.length - 1));
+      moveTo(Math.min(selected + 1, results.length - 1));
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
-      select(Math.max(selected - 1, 0));
+      moveTo(Math.max(selected - 1, 0));
     } else if (e.key === "Enter" && results[selected]) {
       e.preventDefault();
       openResult(results[selected]);
@@ -121,15 +144,21 @@ export function CompanySearch({
       />
       {open && (
         <div
+          ref={fitToViewport}
           onMouseDown={(e) => e.preventDefault()}
-          className="absolute top-full right-0 left-0 z-30 mt-1.5 overflow-hidden rounded-lg border border-line bg-popover py-1 shadow-popover"
+          className="absolute top-full right-0 left-0 z-30 mt-1.5 overflow-y-auto overscroll-contain rounded-lg border border-line bg-popover py-1 shadow-popover"
         >
           {message ? (
             <p className="px-4 py-2.5 text-meta text-ink-faint">{message}</p>
           ) : (
             <ul id="company-search-results" role="listbox" aria-label="Companies">
               {results.map((r, i) => (
-                <li key={r.id} role="option" aria-selected={i === selected}>
+                <li
+                  key={r.id}
+                  id={`company-search-option-${i}`}
+                  role="option"
+                  aria-selected={i === selected}
+                >
                   <Link
                     {...companyLinkProps(r)}
                     onMouseEnter={() => select(i)}
@@ -141,12 +170,6 @@ export function CompanySearch({
                         : "border-l-transparent"
                     )}
                   >
-                    <CompanyAvatar
-                      ticker={r.ticker}
-                      name={displayCompanyName(r.name)}
-                      size="xs"
-                      fallback={showTickers ? "ticker" : "initials"}
-                    />
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-label font-medium text-ink">
                         {displayCompanyName(r.name)}
@@ -160,7 +183,7 @@ export function CompanySearch({
                       )}
                     </span>
                     {r.market_cap != null && (
-                      <span className="shrink-0 font-mono text-micro tabular-nums text-ink-faint">
+                      <span className="shrink-0 text-micro tabular-nums text-ink-faint">
                         {formatCompactDollars(r.market_cap)}
                       </span>
                     )}

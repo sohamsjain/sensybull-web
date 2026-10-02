@@ -192,7 +192,7 @@ export function AddFlow({ symbol, company: companyProp }: AddFlowProps) {
             <h1 className="text-title font-medium text-ink">Adding {displayName}…</h1>
             <p className="mt-1.5 text-label text-ink-muted">
               Setting up material-update alerts for{" "}
-              <span className="font-mono">{symbol}</span>.
+              <span className="tabular-nums">{symbol}</span>.
             </p>
             <div className="mt-5 flex justify-center" role="status" aria-label="Adding company">
               <span className="size-5 animate-spin rounded-full border-2 border-brand/30 border-t-brand" />
@@ -226,7 +226,7 @@ export function AddFlow({ symbol, company: companyProp }: AddFlowProps) {
               {symbol ? (
                 <>
                   No listed company matches{" "}
-                  <span className="font-mono">{symbol}</span> — it may be
+                  <span className="tabular-nums">{symbol}</span> — it may be
                   delisted or the link may be mistyped.
                 </>
               ) : (
