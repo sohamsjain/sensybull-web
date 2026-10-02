@@ -80,7 +80,7 @@ export function ChartMarkerTooltip({
       <div className="mb-1.5 flex items-center gap-2">
         <span
           className={cn(
-            "inline-flex items-center gap-1 font-mono text-meta font-semibold tabular-nums",
+            "inline-flex items-center gap-1 text-meta font-semibold tabular-nums",
             up ? "text-success" : "text-danger"
           )}
         >

@@ -216,7 +216,7 @@ export function CommandPalette() {
                   >
                     <span className="truncate">{row.label}</span>
                     {row.hint && (
-                      <span className="shrink-0 font-mono text-micro text-ink-faint">
+                      <span className="shrink-0 text-micro text-ink-faint">
                         {row.hint}
                       </span>
                     )}

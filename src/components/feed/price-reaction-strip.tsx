@@ -32,7 +32,7 @@ export function PriceReactionStrip({
 
   return (
     <div
-      className={`flex flex-wrap items-center gap-1 font-mono text-micro tabular-nums ${className}`}
+      className={`flex flex-wrap items-center gap-1 text-micro tabular-nums ${className}`}
       aria-label="Price reaction since filing"
     >
       {points.map(({ interval, point }) => {

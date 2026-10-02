@@ -32,8 +32,6 @@
      jump between two metadata rows would read as a mistake. */
   --font-sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI",
     "Inter", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", "JetBrains Mono", Menlo,
-    Consolas, monospace;
 
   --text-micro: 0.75rem; /* 12px — timestamps, keycaps, counts, eyebrows */
   --text-micro--line-height: 1.45;
@@ -282,11 +280,9 @@
     text-rendering: optimizeLegibility;
   }
 
-  /* Numbers are read in columns: keep every figure the same width, and let
-     tickers and IDs use the same lining figures. */
+  /* Numbers are read in columns: keep every figure the same width. */
   .tabular,
-  [class*="tabular-nums"],
-  .font-mono {
+  [class*="tabular-nums"] {
     font-variant-numeric: tabular-nums;
   }
 

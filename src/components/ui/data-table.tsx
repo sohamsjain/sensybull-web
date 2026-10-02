@@ -69,7 +69,7 @@ export function TD({
     <td
       className={cn(
         "px-3 py-2 align-top text-ink-muted",
-        numeric && "text-right font-mono tabular-nums text-ink",
+        numeric && "text-right tabular-nums text-ink",
         className
       )}
       {...props}

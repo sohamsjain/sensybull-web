@@ -68,7 +68,7 @@ export function NotificationList() {
               <TR key={n.id}>
                 <TD className="text-ink">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-label font-semibold">
+                    <span className="text-label font-semibold">
                       {n.filing_event.ticker}
                     </span>
                     {important && <ImportantMarker />}
