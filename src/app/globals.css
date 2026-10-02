@@ -230,8 +230,11 @@
   --ink-faint: oklch(0.598 0.009 268);
   --ink-dim: oklch(0.462 0.009 268);
 
-  --brand: oklch(0.585 0.176 273);
-  --brand-hover: oklch(0.645 0.176 273);
+  /* White button text needs 4.5:1 (WCAG AA): 0.565 gives 4.6, the old
+     0.585 gave 4.3. Hover goes darker, not lighter — a lighter indigo
+     can't carry white text at this chroma. */
+  --brand: oklch(0.565 0.176 273);
+  --brand-hover: oklch(0.535 0.176 273);
   --brand-soft: oklch(0.645 0.176 273 / 16%);
   --brand-ink: oklch(0.755 0.13 273);
   --brand-on: oklch(0.99 0 0);

@@ -328,7 +328,7 @@ function Portfolio() {
             </div>
           ))}
         </dl>
-        <p className="mt-2 text-micro text-ink-dim">Illustrative.</p>
+        <p className="mt-2 text-micro text-ink-faint">Illustrative.</p>
 
         <p className="mt-10 text-body-lg leading-relaxed text-ink-muted">
           You don&apos;t need to read every filing. You need to know when
@@ -360,7 +360,7 @@ function Portfolio() {
             </li>
           ))}
         </ul>
-        <p className="mt-2 text-micro text-ink-dim">Illustrative.</p>
+        <p className="mt-2 text-micro text-ink-faint">Illustrative.</p>
       </div>
     </section>
   );
@@ -478,7 +478,7 @@ function Footer() {
             />
             <div>
               <span className="block text-meta text-ink-faint">Sensybull</span>
-              <span className="block text-micro text-ink-dim">
+              <span className="block text-micro text-ink-faint">
                 Thesis monitoring for serious investors.
               </span>
             </div>
@@ -501,10 +501,10 @@ function Footer() {
             </Link>
           </div>
         </div>
-        <p className="mt-6 border-t border-line-subtle pt-5 text-center text-micro text-ink-dim">
+        <p className="mt-6 border-t border-line-subtle pt-5 text-center text-micro text-ink-faint">
           Portfolio monitoring · SEC filings · Company updates · Thesis drift
         </p>
-        <p className="mt-3 text-center text-micro text-ink-dim">
+        <p className="mt-3 text-center text-micro text-ink-faint">
           Sensybull reports what companies disclose. It is not investment
           advice — see our{" "}
           <Link href="/disclaimer" className="underline hover:text-ink">
@@ -512,7 +512,7 @@ function Footer() {
           </Link>
           .
         </p>
-        <p className="mt-3 text-center text-micro text-ink-dim">
+        <p className="mt-3 text-center text-micro text-ink-faint">
           &copy; {new Date().getFullYear()} Sensybull, LLC. All rights
           reserved.
         </p>
