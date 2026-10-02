@@ -14,8 +14,8 @@ const SIZES = {
 } as const;
 
 /**
- * A company's mark: the logo where we have one, the ticker in mono where we
- * don't. Round, so a wordmark, a monogram and four letters of ticker all
+ * A company's mark: the logo where we have one, the ticker where we don't.
+ * Round, so a wordmark, a monogram and four letters of ticker all
  * occupy the same silhouette down the left edge of a list.
  */
 export function CompanyAvatar({
@@ -51,7 +51,7 @@ export function CompanyAvatar({
       className={cn(
         "flex shrink-0 select-none items-center justify-center overflow-hidden rounded-full border border-line-subtle",
         SIZES[size],
-        showImg ? "bg-surface" : "bg-surface-hover font-mono font-semibold text-ink-muted",
+        showImg ? "bg-surface" : "bg-surface-hover font-semibold text-ink-muted",
         className
       )}
       aria-hidden="true"

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { shortCompanyName } from "@/lib/company-name";
+import { displayCompanyName } from "@/lib/company-name";
 import { companyLinkProps, fundamentalsHref, NEW_TAB } from "@/lib/fundamentals/links";
 import { POPULAR_COMPANIES } from "@/lib/fundamentals/popular";
 import { clearSearchHistory, recordSearch, useSearchHistory } from "@/lib/search-history";
@@ -30,11 +30,20 @@ export function SearchHome() {
     // down from it, however many chips there are.
     <div className="grid flex-1 grid-rows-[1fr_auto_1fr] overflow-y-auto bg-canvas-sunken px-4 sm:px-6">
       <div className="flex flex-col items-center justify-end pt-10 pb-8 text-center">
+        {/* The tightly cropped mark (logo.png carries a square's worth of
+            padding), so its height is the bull's height and it can sit right
+            on top of the name. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/logo.png" alt="" className="h-24 invert-0 dark:invert" />
+        <img
+          src="/logo-mark.png"
+          alt=""
+          width={880}
+          height={471}
+          className="h-20 w-auto invert-0 sm:h-24 dark:invert"
+        />
         {/* Display type outside marketing, deliberately: this pane is the
             product's front page, and the brand is the whole of its content. */}
-        <h1 className="mt-4 text-display-lg font-semibold text-ink">
+        <h1 className="mt-2 text-display-lg font-semibold text-ink">
           Sensybull
         </h1>
         <p className="mt-3 text-body text-ink-muted">
@@ -60,7 +69,7 @@ export function SearchHome() {
                   title={h.name}
                   className={CHIP}
                 >
-                  {shortCompanyName(h.name)}
+                  {displayCompanyName(h.name)}
                 </Link>
               ))
             : POPULAR_COMPANIES.map((c) => (

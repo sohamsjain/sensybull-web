@@ -160,7 +160,7 @@ export function CompanySearch({
                       )}
                     </span>
                     {r.market_cap != null && (
-                      <span className="shrink-0 font-mono text-micro tabular-nums text-ink-faint">
+                      <span className="shrink-0 text-micro tabular-nums text-ink-faint">
                         {formatCompactDollars(r.market_cap)}
                       </span>
                     )}

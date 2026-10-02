@@ -148,7 +148,7 @@ export function ChannelSetupTelegram({ channelName, onConnected, onDisconnect }:
           </a>{" "}
           on Telegram:
         </p>
-        <code className="block rounded-md border border-line-subtle bg-canvas-sunken px-3 py-2 font-mono text-label tracking-widest text-ink">
+        <code className="block rounded-md border border-line-subtle bg-canvas-sunken px-3 py-2 text-label tracking-widest text-ink">
           {linkData.code}
         </code>
         <p className={helperClass}>
