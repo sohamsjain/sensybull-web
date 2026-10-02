@@ -4,6 +4,19 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Tailwind gates `hover:` on `(hover: hover)`, which asks only about the
+   *primary* input. A touchscreen laptop or a tablet with a trackpad reports
+   touch as primary, so every hover style went dead under a real mouse.
+   `any-hover` asks whether any input can hover: hybrids get hover back,
+   while phones (no hovering input at all) still never get a sticky one. */
+@custom-variant hover {
+  @media (any-hover: hover) {
+    &:hover {
+      @slot;
+    }
+  }
+}
+
 /* ==========================================================================
    Sensybull design tokens
    --------------------------------------------------------------------------
