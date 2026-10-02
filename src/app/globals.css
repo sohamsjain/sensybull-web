@@ -4,18 +4,15 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Tailwind gates `hover:` on `(hover: hover)`, which asks only about the
-   *primary* input. A touchscreen laptop or a tablet with a trackpad reports
-   touch as primary, so every hover style went dead under a real mouse.
-   `any-hover` asks whether any input can hover: hybrids get hover back,
-   while phones (no hovering input at all) still never get a sticky one. */
-@custom-variant hover {
-  @media (any-hover: hover) {
-    &:hover {
-      @slot;
-    }
-  }
-}
+/* Tailwind gates `hover:` on `@media (hover: hover)`, which asks the OS
+   whether the device's input can hover. Windows can get that wrong: after a
+   driver or OS update a laptop with a touchpad reported no hover-capable
+   input at all (`hover` and `any-hover` both false), and every hover style
+   in the app went dead under a working mouse. `:hover` itself only matches
+   when a pointer is actually over the element, so apply it unconditionally.
+   The cost: on a phone, a tapped control can keep its hover look until the
+   next tap elsewhere. */
+@custom-variant hover (&:hover);
 
 /* ==========================================================================
    Sensybull design tokens
