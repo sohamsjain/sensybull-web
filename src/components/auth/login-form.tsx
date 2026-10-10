@@ -23,7 +23,7 @@ export function LoginForm() {
     try {
       await login(email, password);
       // ?next= / a stored pending action (e.g. a shared /add/MU link) wins
-      router.push(resolvePostAuthPath("/watchlist"));
+      router.push(resolvePostAuthPath("/"));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
     }

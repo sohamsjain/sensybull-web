@@ -10,7 +10,6 @@ import { usePaneWidth } from "@/hooks/use-pane-width";
 import { WatchlistPanel } from "@/components/watchlist/watchlist-panel";
 import { Conversation } from "@/components/watchlist/conversation";
 import { FirstRun } from "@/components/watchlist/first-run";
-import { SearchHome } from "@/components/watchlist/search-home";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ExpandPaneIcon } from "@/components/ui/icons";
@@ -53,6 +52,9 @@ export default function WatchlistPage() {
   const { events, loading: eventsLoading, hasMore, loadEarlier } =
     useCompanyEvents(activeCompanyId, socket);
   const pane = usePaneWidth();
+  // The list can be collapsed only while a company is open: with nothing
+  // open, hiding it would leave the page with nothing to show.
+  const listHidden = pane.collapsed && !!activeEntry;
 
   // Unread count in the tab title
   useEffect(() => {
@@ -165,7 +167,7 @@ export default function WatchlistPage() {
       <div
         className={`${
           activeCompanyId || firstRun ? "hidden md:flex" : "flex"
-        } ${pane.collapsed ? "md:!hidden" : ""} w-full shrink-0 flex-col border-r border-line-subtle md:w-[var(--pane-w)]`}
+        } ${listHidden ? "md:!hidden" : ""} w-full shrink-0 flex-col border-r border-line-subtle md:w-[var(--pane-w)]`}
         style={{ "--pane-w": `${pane.width}px` } as React.CSSProperties}
       >
         <WatchlistPanel
@@ -175,7 +177,7 @@ export default function WatchlistPage() {
           activeCompanyId={activeCompanyId}
           onSelect={handleSelect}
           onAddCompany={addCompany}
-          onCollapse={pane.collapse}
+          onCollapse={activeEntry ? pane.collapse : undefined}
           onBulkSetMuted={bulkSetMuted}
           onBulkMarkRead={bulkMarkRead}
           onBulkRemove={handleBulkRemove}
@@ -184,7 +186,7 @@ export default function WatchlistPage() {
       </div>
 
       {/* Drag handle: resize, double-click to reset, drag closed to collapse */}
-      {!pane.collapsed && (
+      {!listHidden && (
         <div
           role="separator"
           aria-orientation="vertical"
@@ -197,7 +199,7 @@ export default function WatchlistPage() {
       )}
 
       {/* Reopen chevron when the pane is hidden */}
-      {pane.collapsed && (
+      {listHidden && (
         <button
           onClick={pane.expand}
           className="hidden w-7 shrink-0 items-center justify-center border-r border-line-subtle text-ink-faint transition-colors hover:bg-surface-hover hover:text-ink md:flex"
@@ -234,8 +236,14 @@ export default function WatchlistPage() {
              can't be followed, so this pane becomes the way to get one. */
           <FirstRun onAddCompany={addCompany} />
         ) : (
-          /* No company open: a search front page, not an instruction. */
-          <SearchHome />
+          /* No company open (desktop only — on phones the list fills the
+             screen). Search lives on the home page and in the bar. */
+          <div className="flex flex-1 items-center justify-center px-6">
+            <EmptyState
+              title="Pick a company"
+              description="Its filings and press releases open here."
+            />
+          </div>
         )}
       </div>
     </div>
