@@ -929,3 +929,19 @@ once — wire copies of one release are de-duplicated across wires, a PR
 arriving after its 8-K already published is dropped, and an 8-K that
 merely wraps an already-published PR is suppressed (server env
 `PR_SUPPRESS_8K=0` disables suppression while tuning).
+
+## Press releases from FMP (Oct 2026)
+
+Press-release ingestion now reads FMP's aggregated press-release endpoint
+(PR Newswire, GlobeNewswire, Business Wire, ACCESS Newswire) instead of
+per-wire RSS, polled every second. Payload shape is unchanged — PR events
+still carry `signal_type="PR"`, `source` = wire name (`prnewswire`,
+`globenewswire`, `businesswire`, `accesswire`), `edgar_url` = article URL.
+
+- `briefing.headline` on a PR event is now the release's own title, not an
+  LLM rewrite, so it can run past 100 characters. Headline rows must wrap
+  or clamp rather than assume a short line.
+- Every first-party release from a US-listed company publishes — there is
+  no materiality gate. Routine ones (significance Low) arrive at
+  `max_tier` 3 and are not Important, and `primary_event_type` can be
+  `"Other"`. Law-firm shareholder alerts are filtered out at ingest.
