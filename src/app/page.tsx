@@ -1,29 +1,33 @@
 import type { Metadata } from "next";
-import LandingPage from "@/components/landing/landing-page";
-import { SignedInRedirect } from "@/components/landing/signed-in-redirect";
+import { TopNav } from "@/components/layout/top-nav";
+import { CommandPalette } from "@/components/command-palette";
+import { ShortcutsSheet } from "@/components/shortcuts-sheet";
+import { SearchHome } from "@/components/home/search-home";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
-// Runs before the landing is parsed: a browser that believes it holds a
-// session hides the landing until SignedInRedirect decides. Keys mirror
-// hasSession() in src/lib/api-client.ts.
-const MARK_SESSION = `try{var s=localStorage;if(s.getItem("sensybull:session")==="1"||s.getItem("access_token")!==null)document.documentElement.setAttribute("data-session","")}catch(e){}`;
-
 /**
- * The landing page, server-rendered: its HTML is what search engines and AI
- * crawlers read, and most of those never run JavaScript. Signed-in readers
- * are forwarded to /watchlist on the client.
+ * The home page, for guests and signed-in readers alike: the app's bar
+ * (Watchlist, Feed, search) over the mark, one company search and
+ * one-click companies. No company list — that belongs to /watchlist.
+ *
+ * It sits outside the (dashboard) group on purpose and repeats that
+ * layout's shell. The dashboard layout reads useSearchParams under a
+ * Suspense boundary, which bails a prerendered page out to client
+ * rendering: inside it, this page's HTML would be empty, and most crawlers
+ * never run JavaScript. Nothing here needs the feed context or the socket.
  */
 export default function Home() {
   return (
-    <>
-      <script dangerouslySetInnerHTML={{ __html: MARK_SESSION }} />
-      <SignedInRedirect />
-      <div data-landing className="contents">
-        <LandingPage />
-      </div>
-    </>
+    <div className="flex h-dvh flex-col overflow-hidden bg-canvas text-ink">
+      <TopNav />
+      <main className="min-h-0 flex-1 overflow-hidden">
+        <SearchHome />
+      </main>
+      <CommandPalette />
+      <ShortcutsSheet />
+    </div>
   );
 }

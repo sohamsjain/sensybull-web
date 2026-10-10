@@ -31,13 +31,11 @@ export function TopNav() {
   const pathname = usePathname();
   const unread = useUnreadCount();
 
-  const items = NAV_ITEMS.filter((item) => !item.authed || user);
-
   return (
     <header className="shrink-0 border-b border-line-subtle bg-canvas">
       <div className="flex h-12 items-center gap-1 px-3 sm:px-4">
         <Link
-          href={user ? "/watchlist" : "/feed"}
+          href="/"
           aria-label="Sensybull home"
           className="mr-2 flex h-8 shrink-0 items-center rounded-md px-1 text-label font-semibold tracking-tight text-ink"
         >
@@ -45,7 +43,7 @@ export function TopNav() {
         </Link>
 
         <nav aria-label="Primary" className="flex items-center gap-0.5">
-          {items.map(({ href, label, hint, unread: showUnread }) => {
+          {NAV_ITEMS.map(({ href, label, hint, unread: showUnread }) => {
             const active = pathname?.startsWith(href) ?? false;
             return (
               <Link

@@ -29,7 +29,7 @@ function MagicLinkVerifyContent() {
         setMessage("Signed in successfully! Redirecting...");
         // A stored pending action (e.g. a shared /add/MU link) resumes here —
         // the email round-trip loses ?next=, localStorage doesn't.
-        setTimeout(() => router.push(resolvePostAuthPath("/watchlist")), 1000);
+        setTimeout(() => router.push(resolvePostAuthPath("/")), 1000);
       })
       .catch((err) => {
         setStatus("error");

@@ -9,8 +9,6 @@ export interface NavItem {
   Icon: React.ComponentType<IconProps>;
   /** Shows the unread-company count. */
   unread?: boolean;
-  /** Needs a session — hidden from guests. */
-  authed?: boolean;
 }
 
 /**
@@ -26,7 +24,6 @@ export const NAV_ITEMS: NavItem[] = [
     hint: "The companies you follow, and everything they have filed",
     Icon: CompaniesIcon,
     unread: true,
-    authed: true,
   },
   {
     href: "/feed",
