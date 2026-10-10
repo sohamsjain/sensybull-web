@@ -941,5 +941,7 @@ still carry `signal_type="PR"`, `source` = wire name (`prnewswire`,
 - `briefing.headline` on a PR event is now the release's own title, not an
   LLM rewrite, so it can run past 100 characters. Headline rows must wrap
   or clamp rather than assume a short line.
-- With the server's `PR_REQUIRE_MATERIAL=0`, non-material first-party
-  releases publish too, at `max_tier` 3 (not Important).
+- Every first-party release from a US-listed company publishes — there is
+  no materiality gate. Routine ones (significance Low) arrive at
+  `max_tier` 3 and are not Important, and `primary_event_type` can be
+  `"Other"`. Law-firm shareholder alerts are filtered out at ingest.
