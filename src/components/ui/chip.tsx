@@ -65,7 +65,7 @@ export function SegmentedControl<T extends string>({
   label,
   className,
 }: {
-  options: { value: T; label: string }[];
+  options: { value: T; label: React.ReactNode }[];
   value: T;
   onChange: (value: T) => void;
   label: string;

@@ -1,5 +1,47 @@
 # API Changes
 
+## 2026-10-13 (industry filter, alerts on saved views)
+
+**Industry filter.** Every feed route and `GET /events/facets` take
+`industry` — comma-separated industry *keys*, the slug of FMP's industry
+name (`"Banks - Regional"` → `banks-regional`; names carry commas, slugs
+don't). `industry_slug()` in `app/services/feed_filters.py` and
+`industrySlug()` in `src/lib/feed-filters.ts` must agree. Sector and
+industry are **one** filter: an event matches when its company is in any
+chosen sector **or** any chosen industry, the way a sector → industry tree
+reads. An unknown key is a 400 (the known list re-reads the `company`
+table before refusing, so a just-synced industry isn't rejected).
+
+- `GET /events/filters` gains `industry`: `[{sector, industries: [{key,
+  label, companies}]}]`, sectors in `SECTORS` order, industries
+  alphabetical, `companies` = listed companies in it.
+- `GET /events/facets` gains `industry: {key: count}`. It skips the same
+  filter as `sector` (they're one), so neighbours count what they'd add.
+- Saved views store it as `industry: [keys]`.
+
+**Alerts on saved views.** A `FeedView` can be an alert rule:
+
+- `POST /feed/views` and `PUT /feed/views/:id` take `alerts: boolean`;
+  every view now serializes `alerts`. With alerts on, the answer also
+  carries `alert_rate` — the view's matches per day over the last 7 days —
+  so the web can say what the reader signed up for.
+- A view that narrows nothing (`{"scope": "all"}` and no filter) can't
+  carry alerts: **400**. Clearing every filter from an alerting view is
+  refused the same way. `scope: "mine"` alone is narrow enough.
+- Delivery uses the reader's existing alert channels
+  (`/alerts/preferences`); the master `enabled` switch and per-company
+  mutes still win. One alert per event per channel however many reasons
+  (following + a view = one alert). Emails say which view matched
+  (`[View name]` subject prefix + footer); push notifications open the
+  event permalink. `GET /alerts/notifications` rows gain `feed_view_id`.
+- Matching runs the feed's own SQL filter against the new event, minus the
+  time window. A view filtered on `moved` alerts when the price-reaction
+  worker measures the explosive move (not at publish — nothing has moved
+  yet), and only within 2 days of the event.
+
+Migration `d4e5f6a7b8c9` adds `feed_view.alerts_enabled` and
+`notification.feed_view_id`.
+
 ## 2026-10-01 (company search caching)
 
 `GET /companies/search` answers are now cached: Redis for 5 minutes across

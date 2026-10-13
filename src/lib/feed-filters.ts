@@ -23,6 +23,14 @@ export interface FeedFilters {
   important: boolean;
   eventTypes: string[];
   sectors: string[];
+  /**
+   * Industry keys (`industrySlug()` of FMP's industry name). Sector and
+   * industry are one filter, read as a tree: a company matches when it is
+   * in any chosen sector OR any chosen industry. A fully-ticked sector is
+   * stored as the sector, never as its industries — `toggleSector()` and
+   * `toggleIndustry()` keep that canonical.
+   */
+  industries: string[];
   caps: CapBucket[];
   source: FeedSource | null;
   sentiments: Sentiment[];
@@ -35,6 +43,7 @@ export const EMPTY_FILTERS: FeedFilters = {
   important: false,
   eventTypes: [],
   sectors: [],
+  industries: [],
   caps: [],
   source: null,
   sentiments: [],
@@ -92,6 +101,27 @@ export const WINDOWS: { key: TimeWindow; label: string; days: number }[] = [
   { key: "30d", label: "30 days", days: 30 },
   { key: "90d", label: "90 days", days: 90 },
 ];
+
+/** One sector's industries, as GET /events/filters lists them. */
+export interface SectorIndustries {
+  sector: string;
+  industries: { key: string; label: string; companies: number }[];
+}
+
+/**
+ * FMP's industry name → its filter key: "Banks - Regional" →
+ * "banks-regional". Names carry commas ("Furnishings, Fixtures &
+ * Appliances"), so they can't ride a comma-separated URL value; the slug
+ * can. Mirrors the API's `industry_slug()`.
+ */
+export function industrySlug(name: string | null | undefined): string {
+  return (name ?? "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 const CAP_KEYS = new Set<string>(CAP_BUCKETS.map((b) => b.key));
 const SECTOR_SET = new Set<string>(SECTORS);
@@ -165,7 +195,11 @@ export function matchesFeedFilters(
 ): boolean {
   if (f.important && !isImportant(e)) return false;
   if (f.eventTypes.length && !hasEventType(e, f.eventTypes)) return false;
-  if (f.sectors.length && !(e.sector && f.sectors.includes(e.sector))) return false;
+  if (f.sectors.length || f.industries.length) {
+    const inSector = !!e.sector && f.sectors.includes(e.sector);
+    const inIndustry = !!e.industry && f.industries.includes(industrySlug(e.industry));
+    if (!inSector && !inIndustry) return false;
+  }
   if (f.caps.length) {
     const bucket = capBucket(e.market_cap);
     if (!bucket || !f.caps.includes(bucket)) return false;
@@ -209,6 +243,9 @@ export function filtersFromParams(
       ? types.filter((t) => knownEventTypes.includes(t))
       : types,
     sectors: list(params.get("sec")).filter((s) => SECTOR_SET.has(s)),
+    // Only the shape is checkable here; `dropUnknownIndustries()` removes
+    // well-formed keys no company carries once the option list loads
+    industries: list(params.get("ind")).filter((i) => SLUG_RE.test(i)),
     caps: list(params.get("cap")).filter((c) => CAP_KEYS.has(c)) as CapBucket[],
     source: source === "sec" || source === "pr" ? source : null,
     sentiments: list(params.get("snt")).filter((s) =>
@@ -225,6 +262,7 @@ export function filtersToParams(f: FeedFilters, params: URLSearchParams): void {
   if (f.important) params.set("f", "important");
   if (f.eventTypes.length) params.set("t", f.eventTypes.join(","));
   if (f.sectors.length) params.set("sec", f.sectors.join(","));
+  if (f.industries.length) params.set("ind", f.industries.join(","));
   if (f.caps.length) params.set("cap", f.caps.join(","));
   if (f.source) params.set("src", f.source);
   if (f.sentiments.length) params.set("snt", f.sentiments.join(","));
@@ -239,6 +277,7 @@ export function filtersToQuery(f: FeedFilters): URLSearchParams {
   if (f.important) p.set("important", "1");
   if (f.eventTypes.length) p.set("event_type", f.eventTypes.join(","));
   if (f.sectors.length) p.set("sector", f.sectors.join(","));
+  if (f.industries.length) p.set("industry", f.industries.join(","));
   if (f.caps.length) p.set("cap", f.caps.join(","));
   if (f.source) p.set("source", f.source);
   if (f.sentiments.length) p.set("sentiment", f.sentiments.join(","));
@@ -262,6 +301,7 @@ export function filtersFromView(stored: Record<string, unknown>): {
       important: stored.important === true,
       eventTypes: arr(stored.event_type),
       sectors: arr(stored.sector),
+      industries: arr(stored.industry),
       caps: arr(stored.cap) as CapBucket[],
       source: str(stored.source) as FeedSource | null,
       sentiments: arr(stored.sentiment) as Sentiment[],
@@ -286,6 +326,7 @@ export function filtersToView(
   if (f.important) out.important = true;
   if (f.eventTypes.length) out.event_type = f.eventTypes;
   if (f.sectors.length) out.sector = f.sectors;
+  if (f.industries.length) out.industry = f.industries;
   if (f.caps.length) out.cap = f.caps;
   if (f.source) out.source = f.source;
   if (f.sentiments.length) out.sentiment = f.sentiments;
@@ -302,6 +343,7 @@ export function sameFilters(a: FeedFilters, b: FeedFilters): boolean {
       ...f,
       eventTypes: [...f.eventTypes].sort(),
       sectors: [...f.sectors].sort(),
+      industries: [...f.industries].sort(),
       caps: [...f.caps].sort(),
       sentiments: [...f.sentiments].sort(),
     });
@@ -316,7 +358,7 @@ export function activeFilterCount(f: FeedFilters): number {
   return (
     (f.important ? 1 : 0) +
     (f.eventTypes.length ? 1 : 0) +
-    (f.sectors.length ? 1 : 0) +
+    (f.sectors.length || f.industries.length ? 1 : 0) +
     (f.caps.length ? 1 : 0) +
     (f.source ? 1 : 0) +
     (f.sentiments.length ? 1 : 0) +
@@ -342,7 +384,14 @@ function joined(values: string[], max = 2): string {
     : `${values.slice(0, max).join(", ")} +${values.length - max}`;
 }
 
-export function filterPills(f: FeedFilters): FilterPill[] {
+/**
+ * One removable pill per active filter. `industryLabel` names an industry
+ * key (from the loaded option list); without it the key is title-cased.
+ */
+export function filterPills(
+  f: FeedFilters,
+  industryLabel: (key: string) => string | undefined = () => undefined
+): FilterPill[] {
   const pills: FilterPill[] = [];
   if (f.important)
     pills.push({ key: "important", label: "Important", remove: (x) => ({ ...x, important: false }) });
@@ -360,8 +409,17 @@ export function filterPills(f: FeedFilters): FilterPill[] {
     });
   if (f.eventTypes.length)
     pills.push({ key: "type", label: joined(f.eventTypes), remove: (x) => ({ ...x, eventTypes: [] }) });
-  if (f.sectors.length)
-    pills.push({ key: "sector", label: joined(f.sectors), remove: (x) => ({ ...x, sectors: [] }) });
+  if (f.sectors.length || f.industries.length) {
+    const labels = [
+      ...f.sectors,
+      ...f.industries.map((k) => industryLabel(k) ?? titleFromSlug(k)),
+    ];
+    pills.push({
+      key: "sector",
+      label: joined(labels),
+      remove: (x) => ({ ...x, sectors: [], industries: [] }),
+    });
+  }
   if (f.caps.length) {
     const labels = CAP_BUCKETS.filter((b) => f.caps.includes(b.key)).map((b) => b.label);
     pills.push({
@@ -383,6 +441,72 @@ export function filterPills(f: FeedFilters): FilterPill[] {
       remove: (x) => ({ ...x, sentiments: [] }),
     });
   return pills;
+}
+
+function titleFromSlug(key: string): string {
+  const words = key.split("-");
+  return words.map((w, i) => (i === 0 ? w[0].toUpperCase() + w.slice(1) : w)).join(" ");
+}
+
+// ── sector → industry tree ────────────────────────────────────────────
+
+export type TreeState = "all" | "some" | "none";
+
+/** Is the whole sector on, some of its industries, or nothing? */
+export function sectorState(f: FeedFilters, node: SectorIndustries): TreeState {
+  if (f.sectors.includes(node.sector)) return "all";
+  return node.industries.some((i) => f.industries.includes(i.key)) ? "some" : "none";
+}
+
+/** A sector's chip: on → off (with any of its industries); off or
+ *  partial → the whole sector. */
+export function toggleSector(f: FeedFilters, node: SectorIndustries): FeedFilters {
+  const own = new Set(node.industries.map((i) => i.key));
+  const industries = f.industries.filter((k) => !own.has(k));
+  if (f.sectors.includes(node.sector)) {
+    return { ...f, sectors: f.sectors.filter((s) => s !== node.sector), industries };
+  }
+  return { ...f, sectors: [...f.sectors, node.sector], industries };
+}
+
+/**
+ * An industry's chip inside its sector. Unticking one industry of a
+ * fully-ticked sector leaves the sector's other industries ticked; ticking
+ * the last missing one collapses the set back to the sector — so a stored
+ * filter never lists every industry of a sector (and a new industry FMP
+ * adds to a ticked sector is in it).
+ */
+export function toggleIndustry(
+  f: FeedFilters,
+  node: SectorIndustries,
+  key: string
+): FeedFilters {
+  const own = node.industries.map((i) => i.key);
+  let chosen: string[];
+  if (f.sectors.includes(node.sector)) {
+    chosen = own.filter((k) => k !== key);
+  } else {
+    const current = own.filter((k) => f.industries.includes(k));
+    chosen = current.includes(key) ? current.filter((k) => k !== key) : [...current, key];
+  }
+  const others = f.industries.filter((k) => !own.includes(k));
+  const sectors = f.sectors.filter((s) => s !== node.sector);
+  if (own.length > 1 && chosen.length === own.length) {
+    return { ...f, sectors: [...sectors, node.sector], industries: others };
+  }
+  return { ...f, sectors, industries: [...others, ...chosen] };
+}
+
+/** Drop industry keys the option list doesn't know (a stale shared link)
+ *  — the API would 400 the whole feed on them. Same object when clean. */
+export function dropUnknownIndustries(
+  f: FeedFilters,
+  tree: SectorIndustries[]
+): FeedFilters {
+  if (!f.industries.length || !tree.length) return f;
+  const known = new Set(tree.flatMap((n) => n.industries.map((i) => i.key)));
+  const kept = f.industries.filter((k) => known.has(k));
+  return kept.length === f.industries.length ? f : { ...f, industries: kept };
 }
 
 /** Toggle a value in a multi-select list. */

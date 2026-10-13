@@ -45,7 +45,7 @@ const GROUPS: { title: string; items: Shortcut[] }[] = [
       { keys: ["C"], action: "Copy a link to this update" },
       { keys: ["W"], action: "Follow this company" },
       { keys: ["/"], action: "Jump to search" },
-      { keys: ["F"], action: "Open filters" },
+      { keys: ["F"], action: "Jump to filters" },
     ],
   },
   {

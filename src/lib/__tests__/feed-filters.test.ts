@@ -14,6 +14,12 @@ import {
   filtersToQuery,
   filtersToView,
   formatMarketCap,
+  dropUnknownIndustries,
+  industrySlug,
+  sectorState,
+  toggleIndustry,
+  toggleSector,
+  type SectorIndustries,
   matchesFeedFilters,
   sameFilters,
   type FeedFilters,
@@ -151,6 +157,7 @@ describe("serialization", () => {
     important: true,
     eventTypes: ["Acquisition", "Debt / Financing"],
     sectors: ["Healthcare", "Technology"],
+    industries: ["banks-regional", "semiconductors"],
     caps: ["small", "micro"],
     source: "pr",
     sentiments: ["Negative"],
@@ -173,7 +180,9 @@ describe("serialization", () => {
   });
 
   it("drops unknown values from a URL instead of trusting them", () => {
-    const params = new URLSearchParams("sec=Crypto,Energy&cap=huge&m=sideways&d=2y");
+    const params = new URLSearchParams(
+      "sec=Crypto,Energy&cap=huge&m=sideways&d=2y&ind=Banks - Regional"
+    );
     expect(filtersFromParams(params)).toEqual(f({ sectors: ["Energy"] }));
   });
 
@@ -182,6 +191,7 @@ describe("serialization", () => {
       important: "1",
       event_type: "Acquisition,Debt / Financing",
       sector: "Healthcare,Technology",
+      industry: "banks-regional,semiconductors",
       cap: "small,micro",
       source: "pr",
       sentiment: "Negative",
@@ -224,5 +234,79 @@ describe("pills and presets", () => {
       for (const s of applied.sectors) expect(SECTORS).toContain(s);
       expect(activeFilterCount(applied)).toBeGreaterThan(0);
     }
+  });
+});
+
+describe("industries", () => {
+  const health: SectorIndustries = {
+    sector: "Healthcare",
+    industries: [
+      { key: "biotechnology", label: "Biotechnology", companies: 500 },
+      { key: "medical-devices", label: "Medical - Devices", companies: 120 },
+      { key: "drug-manufacturers-general", label: "Drug Manufacturers - General", companies: 20 },
+    ],
+  };
+
+  it("slugs FMP's names the way the API does", () => {
+    expect(industrySlug("Banks - Regional")).toBe("banks-regional");
+    expect(industrySlug("Furnishings, Fixtures & Appliances")).toBe(
+      "furnishings-fixtures-appliances"
+    );
+    expect(industrySlug("  REIT—Office ")).toBe("reit-office");
+    expect(industrySlug(null)).toBe("");
+  });
+
+  it("a company matches a chosen sector OR a chosen industry", () => {
+    const filters = f({ sectors: ["Energy"], industries: ["biotechnology"] });
+    expect(matchesFeedFilters(ev({ sector: "Energy", industry: "Oil & Gas" }), filters, NOW)).toBe(true);
+    expect(
+      matchesFeedFilters(ev({ sector: "Healthcare", industry: "Biotechnology" }), filters, NOW)
+    ).toBe(true);
+    expect(
+      matchesFeedFilters(ev({ sector: "Healthcare", industry: "Medical - Devices" }), filters, NOW)
+    ).toBe(false);
+    expect(matchesFeedFilters(ev({ sector: null, industry: null }), filters, NOW)).toBe(false);
+  });
+
+  it("ticking a sector covers its industries", () => {
+    const on = toggleSector(f({ industries: ["biotechnology", "semiconductors"] }), health);
+    expect(on.sectors).toEqual(["Healthcare"]);
+    expect(on.industries).toEqual(["semiconductors"]);
+    expect(sectorState(on, health)).toBe("all");
+    expect(toggleSector(on, health).sectors).toEqual([]);
+  });
+
+  it("unticking one industry of a ticked sector keeps the rest", () => {
+    const narrowed = toggleIndustry(f({ sectors: ["Healthcare"] }), health, "biotechnology");
+    expect(narrowed.sectors).toEqual([]);
+    expect([...narrowed.industries].sort()).toEqual([
+      "drug-manufacturers-general",
+      "medical-devices",
+    ]);
+    expect(sectorState(narrowed, health)).toBe("some");
+  });
+
+  it("ticking the last missing industry collapses back to the sector", () => {
+    let filters = f({ industries: ["semiconductors"] });
+    for (const i of health.industries) filters = toggleIndustry(filters, health, i.key);
+    expect(filters.sectors).toEqual(["Healthcare"]);
+    expect(filters.industries).toEqual(["semiconductors"]);
+  });
+
+  it("counts as one filter with sectors, and one pill that clears both", () => {
+    const filters = f({ sectors: ["Energy"], industries: ["biotechnology"] });
+    expect(activeFilterCount(filters)).toBe(1);
+    const pills = filterPills(filters, (k) => (k === "biotechnology" ? "Biotechnology" : undefined));
+    expect(pills.map((p) => p.label)).toEqual(["Energy, Biotechnology"]);
+    expect(pills[0].remove(filters)).toEqual(f({}));
+  });
+
+  it("drops keys the option list doesn't know, and nothing else", () => {
+    const filters = f({ industries: ["biotechnology", "gone-industry"] });
+    expect(dropUnknownIndustries(filters, [health]).industries).toEqual(["biotechnology"]);
+    const clean = f({ industries: ["biotechnology"] });
+    expect(dropUnknownIndustries(clean, [health])).toBe(clean);
+    // Before the list loads there's nothing to judge by
+    expect(dropUnknownIndustries(filters, [])).toBe(filters);
   });
 });
