@@ -35,17 +35,31 @@ export function useFeedViews(enabled: boolean) {
     };
   }, [enabled]);
 
+  // The view the reader last opened or saved, so edits made after opening
+  // it can be saved back into it. Shared by the rail and the menu.
+  const [lastOpenedId, setLastOpenedId] = useState<string | null>(null);
+
   const create = useCallback(
-    async (name: string, scope: FeedScope, filters: FeedFilters) => {
+    async (name: string, scope: FeedScope, filters: FeedFilters, alerts = false) => {
       const data = await api<{ view: FeedView }>("/feed/views", {
         method: "POST",
-        body: JSON.stringify({ name, filters: filtersToView(scope, filters) }),
+        body: JSON.stringify({ name, filters: filtersToView(scope, filters), alerts }),
       });
       setViews((prev) => [...prev, data.view]);
+      setLastOpenedId(data.view.id);
       return data.view;
     },
     []
   );
+
+  const setAlerts = useCallback(async (id: string, alerts: boolean) => {
+    const data = await api<{ view: FeedView }>(`/feed/views/${id}`, {
+      method: "PUT",
+      body: JSON.stringify({ alerts }),
+    });
+    setViews((prev) => prev.map((v) => (v.id === id ? data.view : v)));
+    return data.view;
+  }, []);
 
   const update = useCallback(
     async (id: string, scope: FeedScope, filters: FeedFilters) => {
@@ -62,6 +76,7 @@ export function useFeedViews(enabled: boolean) {
   const remove = useCallback(async (id: string) => {
     await api(`/feed/views/${id}`, { method: "DELETE" });
     setViews((prev) => prev.filter((v) => v.id !== id));
+    setLastOpenedId((cur) => (cur === id ? null : cur));
   }, []);
 
   // A guest (or a reader who just signed out) has no views, whatever the
@@ -69,11 +84,16 @@ export function useFeedViews(enabled: boolean) {
   return {
     views: enabled ? views : NO_VIEWS,
     loaded: enabled && loaded,
+    lastOpenedId: enabled ? lastOpenedId : null,
+    setLastOpenedId,
     create,
     update,
+    setAlerts,
     remove,
   };
 }
+
+export type FeedViews = ReturnType<typeof useFeedViews>;
 
 /** The API's own words for a rejected view (duplicate name, limit), else a
  *  generic line — never a raw status code. */

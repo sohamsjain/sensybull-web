@@ -1,4 +1,5 @@
 import type { FilingEvent } from "./events";
+import type { SectorIndustries } from "@/lib/feed-filters";
 
 export interface User {
   id: string;
@@ -97,6 +98,8 @@ export interface FeedFacets {
   total: number;
   event_type: Record<string, number>;
   sector: Record<string, number>;
+  /** Keyed by industry slug (`industrySlug()`). */
+  industry: Record<string, number>;
   cap: Record<string, number>;
   source: Record<string, number>;
   sentiment: Record<string, number>;
@@ -111,6 +114,19 @@ export interface FeedView {
   name: string;
   filters: Record<string, unknown>;
   position: number;
+  /** New updates matching the view go out through the reader's alert
+   *  channels. */
+  alerts: boolean;
+  /** On create/update with alerts on: matching updates per day over the
+   *  last week. */
+  alert_rate?: number;
+}
+
+/** GET /events/filters — every option each feed filter accepts. */
+export interface FeedFilterOptions {
+  event_type: string[];
+  sector: string[];
+  industry: SectorIndustries[];
 }
 
 export interface PaginatedWatchlists extends PaginatedResponse<Watchlist> {
